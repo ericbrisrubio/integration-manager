@@ -140,12 +140,12 @@ func (c companyRepository) GetApplicationsByCompanyIdAndRepositoryType(id string
 	return applications
 }
 
-func (c companyRepository) Store(company v1.Company) (error, int64) {
+func (c companyRepository) Store(company v1.Company) error {
 	if len(IndexedCompanies) == 0 {
 		IndexedCompanies = make(map[string]v1.Company)
 	}
 	IndexedCompanies[company.Id] = company
-	return nil, int64(len(IndexedCompanies))
+	return nil
 }
 func (c companyRepository) Update(company v1.Company, companyUpdateOption ...v1.CompanyUpdateOption) {
 	panic("implement me")

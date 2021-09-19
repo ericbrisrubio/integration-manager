@@ -40,7 +40,7 @@ func (c companyRepository) GetApplicationsByCompanyIdAndRepositoryType(id string
 	panic("implement me")
 }
 
-func (c companyRepository) Store(company v1.Company) (error, int64) {
+func (c companyRepository) Store(company v1.Company) error {
 	panic("implement me")
 }
 

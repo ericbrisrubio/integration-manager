@@ -46,8 +46,8 @@ func TestCompanyRepository_Store(t *testing.T) {
 
 	repo := NewCompanyRepository(10)
 	for _, each := range testdata {
-		_, size := repo.Store(each.data)
-		com, _ := repo.GetCompanies(v1.CompanyQueryOption{
+		repo.Store(each.data)
+		com, size := repo.GetCompanies(v1.CompanyQueryOption{
 			Pagination: v1.Pagination{
 				Page:  0,
 				Limit: 10,
