@@ -44,7 +44,7 @@ func (c companyRepository) Store(company v1.Company) error {
 	panic("implement me")
 }
 
-func (c companyRepository) Update(company v1.Company, companyUpdateOption ...v1.CompanyUpdateOption) {
+func (c companyRepository) Update(company v1.Company, companyUpdateOption v1.CompanyUpdateOption) {
 	panic("implement me")
 }
 

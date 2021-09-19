@@ -14,7 +14,21 @@ type companyRepository struct {
 }
 
 func (c companyRepository) GetCompanyByApplicationUrl(url string) v1.Company {
-	panic("implement me")
+	var companies []v1.Company
+	var result v1.Company
+	for _, each := range IndexedCompanies {
+		companies = append(companies, each)
+	}
+	for _, each := range companies {
+		for _, eachRepo := range each.Repositories {
+			for _, app := range eachRepo.Applications {
+				if app.Url == url {
+					result = each
+				}
+			}
+		}
+	}
+	return result
 }
 
 func (c companyRepository) GetCompanies(option v1.CompanyQueryOption) ([]v1.Company, int64) {
@@ -147,12 +161,43 @@ func (c companyRepository) Store(company v1.Company) error {
 	IndexedCompanies[company.Id] = company
 	return nil
 }
-func (c companyRepository) Update(company v1.Company, companyUpdateOption ...v1.CompanyUpdateOption) {
-	panic("implement me")
+func (c companyRepository) Update(company v1.Company, companyUpdateOption v1.CompanyUpdateOption) {
+	var companies []v1.Company
+	var repo []v1.Repository
+	var app []v1.Application
+	for _, each := range IndexedCompanies {
+		companies = append(companies, each)
+	}
+	if companyUpdateOption.Option == enums.APPEND_REPOSITORY {
+		for _, each := range company.Repositories {
+			repo = append(repo, each)
+		}
+		for _, eachCom := range IndexedCompanies {
+			if eachCom.Id == company.Id {
+				eachCom.Repositories = repo
+			}
+		}
+	}
+	if companyUpdateOption.Option == enums.APPEND_APPLICATION {
+		for _, each := range company.Repositories {
+			for _, eachApp := range each.Applications {
+				app = append(app, eachApp)
+			}
+		}
+		for _, eachCom := range IndexedCompanies {
+			if eachCom.Id == company.Id {
+				for _, re := range eachCom.Repositories {
+					re.Applications = app
+				}
+			}
+		}
+	}
+
 }
 
 func (c companyRepository) Delete(companyId string) error {
-	panic("implement me")
+	delete(IndexedCompanies, companyId)
+	return nil
 }
 func paginate(logs []v1.Company, page int64, limit int64) []v1.Company {
 	if page < 0 || limit <= 0 {
