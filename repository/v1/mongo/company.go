@@ -8,15 +8,19 @@ import (
 )
 
 var (
-	CompanyCollection="CompanyCollection"
+	CompanyCollection = "CompanyCollection"
 )
 
 type companyRepository struct {
-	manager  *dmManager
-	timeout  time.Duration
+	manager *dmManager
+	timeout time.Duration
 }
 
-func (c companyRepository) GetCompanies(option v1.CompanyQueryOption) []v1.Company {
+func (c companyRepository) GetCompanyByApplicationUrl(url string) v1.Company {
+	panic("implement me")
+}
+
+func (c companyRepository) GetCompanies(option v1.CompanyQueryOption) ([]v1.Company, int64) {
 	panic("implement me")
 }
 
@@ -36,7 +40,7 @@ func (c companyRepository) GetApplicationsByCompanyIdAndRepositoryType(id string
 	panic("implement me")
 }
 
-func (c companyRepository) Store(company v1.Company) error {
+func (c companyRepository) Store(company v1.Company) (error, int64) {
 	panic("implement me")
 }
 

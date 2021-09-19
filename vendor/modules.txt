@@ -1,3 +1,5 @@
+# github.com/davecgh/go-spew v1.1.1
+github.com/davecgh/go-spew/spew
 # github.com/go-stack/stack v1.8.0
 github.com/go-stack/stack
 # github.com/golang-jwt/jwt v3.2.2+incompatible
@@ -5,7 +7,6 @@ github.com/golang-jwt/jwt
 # github.com/golang/snappy v0.0.1
 github.com/golang/snappy
 # github.com/joho/godotenv v1.3.0
-## explicit
 github.com/joho/godotenv
 # github.com/klauspost/compress v1.9.5
 github.com/klauspost/compress/fse
@@ -14,7 +15,6 @@ github.com/klauspost/compress/snappy
 github.com/klauspost/compress/zstd
 github.com/klauspost/compress/zstd/internal/xxhash
 # github.com/labstack/echo/v4 v4.5.0
-## explicit
 github.com/labstack/echo/v4
 github.com/labstack/echo/v4/middleware
 # github.com/labstack/gommon v0.3.0
@@ -26,8 +26,14 @@ github.com/labstack/gommon/random
 github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.12
 github.com/mattn/go-isatty
+# github.com/mitchellh/mapstructure v1.4.2
+github.com/mitchellh/mapstructure
 # github.com/pkg/errors v0.9.1
 github.com/pkg/errors
+# github.com/pmezard/go-difflib v1.0.0
+github.com/pmezard/go-difflib/difflib
+# github.com/stretchr/testify v1.6.1
+github.com/stretchr/testify/assert
 # github.com/valyala/bytebufferpool v1.0.0
 github.com/valyala/bytebufferpool
 # github.com/valyala/fasttemplate v1.2.1
@@ -41,7 +47,6 @@ github.com/xdg-go/stringprep
 # github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d
 github.com/youmark/pkcs8
 # go.mongodb.org/mongo-driver v1.7.2
-## explicit
 go.mongodb.org/mongo-driver/bson
 go.mongodb.org/mongo-driver/bson/bsoncodec
 go.mongodb.org/mongo-driver/bson/bsonoptions
@@ -99,3 +104,5 @@ golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 # golang.org/x/time v0.0.0-20201208040808-7e3f01d25324
 golang.org/x/time/rate
+# gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
+gopkg.in/yaml.v3

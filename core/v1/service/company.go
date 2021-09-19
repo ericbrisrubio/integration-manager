@@ -7,11 +7,12 @@ import (
 
 type Company interface {
 	Store(company v1.Company) error
-	Update(company v1.Company,companyUpdateOption ... v1.CompanyUpdateOption)
+	Update(company v1.Company, companyUpdateOption ...v1.CompanyUpdateOption)
 	Delete(companyId string) error
 	GetCompanies(option v1.CompanyQueryOption) []v1.Company
-	GetByCompanyId(id string,option v1.CompanyQueryOption) v1.Company
-	GetRepositoriesByCompanyId(id string,option v1.CompanyQueryOption) []v1.Repository
-	GetApplicationsByCompanyId(id string,option v1.CompanyQueryOption) []v1.Application
-	GetApplicationsByCompanyIdAndRepositoryType(id string,_type enums.REPOSITORY_TYPE,option v1.CompanyQueryOption) []v1.Application
+	GetByCompanyId(id string, option v1.CompanyQueryOption) v1.Company
+	GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) []v1.Repository
+	GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) []v1.Application
+	GetCompanyByApplicationUrl(url string) v1.Company
+	GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption) []v1.Application
 }
