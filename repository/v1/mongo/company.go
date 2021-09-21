@@ -21,6 +21,8 @@ func (c companyRepository) GetCompanyByApplicationUrl(url string) v1.Company {
 }
 
 func (c companyRepository) GetCompanies(option v1.CompanyQueryOption) ([]v1.Company, int64) {
+
+
 	panic("implement me")
 }
 

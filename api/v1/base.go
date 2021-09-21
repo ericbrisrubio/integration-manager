@@ -1,9 +1,9 @@
 package v1
 
 import (
-
+	"github.com/klovercloud-ci/core/v1/logic"
+	"github.com/klovercloud-ci/repository/v1/mongo"
 	"github.com/labstack/echo/v4"
-	"log"
 )
 
 func Router(g *echo.Group) {
@@ -11,13 +11,10 @@ func Router(g *echo.Group) {
 
 }
 
+
 func GithubEventRouter(g *echo.Group) {
-	g.POST("", GetEvents)
+	githubService:=NewGithubApi(logic.NewGithubService(logic.NewCompanyService(mongo.NewCompanyRepository(3000)),nil,logic.NewHttpClientService()))
+	g.POST("", githubService.ListenEvent)
 }
 
 
-func  GetEvents(context echo.Context) error {
-
-	log.Println(context.Request())
-	return nil
-}

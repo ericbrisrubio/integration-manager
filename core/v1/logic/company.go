@@ -11,6 +11,10 @@ type companyService struct {
 	repo repository.CompanyRepository
 }
 
+func (c companyService) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {
+	panic("implement me")
+}
+
 func (c companyService) GetCompanyByApplicationUrl(url string) v1.Company {
 	panic("implement me")
 }
