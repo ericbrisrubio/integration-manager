@@ -12,7 +12,9 @@ type companyService struct {
 }
 
 func (c companyService) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {
-	panic("implement me")
+	return v1.Repository{
+		Token: "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",
+	}
 }
 
 func (c companyService) GetCompanyByApplicationUrl(url string) v1.Company {

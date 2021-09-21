@@ -13,7 +13,7 @@ func Router(g *echo.Group) {
 
 
 func GithubEventRouter(g *echo.Group) {
-	githubService:=NewGithubApi(logic.NewGithubService(logic.NewCompanyService(mongo.NewCompanyRepository(3000)),nil,logic.NewHttpClientService()))
+	githubService:=NewGithubApi(logic.NewGithubService(logic.NewCompanyService(mongo.NewCompanyRepository(3000)),nil,logic.NewHttpClientService()),logic.NewCompanyService(mongo.NewCompanyRepository(3000)))
 	g.POST("", githubService.ListenEvent)
 }
 

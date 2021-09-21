@@ -11,32 +11,51 @@ import (
 )
 
 type githubApi struct {
-	gitService service.Git
+	gitService     service.Git
 	companyService service.Company
+	observerList []service.Observer
 }
 
 func (g githubApi) ListenEvent(context echo.Context) error {
-
 	resource := new(v1.GithubWebHook)
 	if err := context.Bind(resource); err != nil {
-	log.Println(err.Error())
+		log.Println(err.Error())
 	}
-	repoName:=resource.Repository.Name
-	owner:=resource.Repository.Owner.Login
-	revision:=resource.After
-
-	repository:=g.companyService.GetRepositoryByCompanyIdAndApplicationUrl(resource.Repository.Owner.Email,enums.GITHUB_BASE_URL+owner+"/"+repoName)
-
-	data:=g.gitService.GetPipeline(repoName,owner,revision,repository.Token)
-
-	if data!=nil {
-
+	repoName := resource.Repository.Name
+	owner := resource.Repository.Owner.Login
+	revision := resource.After
+	companyId := ""
+	if resource.Repository.Owner.Type == "Organization" {
+		companyId = resource.Repository.Name
+	} else {
+		companyId = resource.Repository.Owner.Email
 	}
-	return common.GenerateErrorResponse(context,nil,"Failed to trigger pipeline process!")
+	repository := g.companyService.GetRepositoryByCompanyIdAndApplicationUrl(companyId, enums.GITHUB_BASE_URL+owner+"/"+repoName)
+
+	data := g.gitService.GetPipeline(repoName, owner, revision, repository.Token)
+
+	if data != nil {
+		for i,_:=range data.Steps{
+			for j,_:=range data.Steps[i].Outputs{
+				if (data.Steps[i].Outputs[j].DeploymentResource!=nil){
+					if(data.Steps[i].Outputs[j].DeploymentResource.MountPath!=nil){
+						//read files from mount path and set to descriptors
+					}
+				}
+			}
+		}
+	}
+	return common.GenerateErrorResponse(context, nil, "Failed to trigger pipeline process!")
 }
-
-func NewGithubApi(gitService service.Git) api.Github {
+func (g githubApi)notifyAll(listener v1.Subject){
+	for _, observer := range g.observerList {
+		go observer.Listen(listener)
+	}
+}
+func NewGithubApi(gitService service.Git, companyService service.Company,observerList []service.Observer) api.Github {
 	return &githubApi{
-		gitService: gitService,
+		gitService:     gitService,
+		companyService: companyService,
+		observerList: observerList,
 	}
 }
