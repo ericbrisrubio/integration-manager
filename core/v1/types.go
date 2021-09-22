@@ -37,12 +37,12 @@ type Variable struct {
 }
 
 type Subject struct {
-	Step,Log string
+	Step, Log             string
 	CoreRequestQueryParam map[string]string
-	StepType enums.STEP_TYPE
-	EventData map[string]interface{}
-	ProcessLabel map[string]string
-	Pipeline     Pipeline
+	StepType              enums.STEP_TYPE
+	EventData             map[string]interface{}
+	ProcessLabel          map[string]string
+	Pipeline              Pipeline
 }
 type Repository struct {
 	Id           string                `bson:"_Id" json:"_Id"`
@@ -68,6 +68,8 @@ func (application Application) Validate() error {
 
 type ApplicationMetadata struct {
 	Labels map[string]string `bson:"labels" json:"labels"`
+	Id     string            `bson:"_id" json:"_id"`
+	Name   string            `bson:"name" json:"name"`
 }
 
 func (metadata ApplicationMetadata) Validate() error {

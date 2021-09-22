@@ -13,6 +13,92 @@ var (
 type companyRepository struct {
 }
 
+func (c companyRepository) AppendRepositories(companyId string, repos []v1.Repository) error {
+	var companies []v1.Company
+	for _, each := range IndexedCompanies {
+		companies = append(companies, each)
+	}
+	for _, each := range companies {
+		if companyId == each.Id {
+			for _, eachRepo := range repos {
+				each.Repositories = append(each.Repositories, eachRepo)
+			}
+		}
+	}
+	return nil
+}
+
+func (c companyRepository) DeleteRepositories(companyId string, repos []v1.Repository, isSoftDelete bool) error {
+	var companies []v1.Company
+	var repositories []v1.Repository
+	for _, each := range IndexedCompanies {
+		companies = append(companies, each)
+	}
+	for _, each := range companies {
+		if companyId == each.Id {
+			if isSoftDelete {
+				each.Status = enums.INACTIVE
+			} else {
+				for i, eachRepo := range each.Repositories {
+					for _, DeleteRepo := range repos {
+						if eachRepo.Id == DeleteRepo.Id {
+							repositories = RemoveRepository(each.Repositories, i)
+						}
+					}
+				}
+				each.Repositories = repositories
+			}
+		}
+	}
+	return nil
+}
+
+func (c companyRepository) AppendApplications(companyId, repositoryId string, apps []v1.Application) error {
+	var companies []v1.Company
+	for _, each := range IndexedCompanies {
+		companies = append(companies, each)
+	}
+	for _, each := range companies {
+		for _, eachRepo := range each.Repositories {
+			if eachRepo.Id == repositoryId {
+				for _, eachApp := range apps {
+					eachRepo.Applications = append(eachRepo.Applications, eachApp)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (c companyRepository) DeleteApplications(companyId, repositoryId string, apps []v1.Application, isSoftDelete bool) error {
+	var companies []v1.Company
+	var applications []v1.Application
+	for _, each := range IndexedCompanies {
+		companies = append(companies, each)
+	}
+	for _, each := range companies {
+		if companyId == each.Id {
+			if isSoftDelete {
+				each.Status = enums.INACTIVE
+			} else {
+				for _, eachRepo := range each.Repositories {
+					if eachRepo.Id == repositoryId {
+						for i, eachApp := range eachRepo.Applications {
+							for _, deleteApp := range apps {
+								if eachApp.MetaData.Id == deleteApp.MetaData.Id {
+									applications = RemoveApplication(eachRepo.Applications, i)
+								}
+							}
+						}
+					}
+					eachRepo.Applications = applications
+				}
+			}
+		}
+	}
+	return nil
+}
+
 func (c companyRepository) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {
 	var company v1.Company
 	var result v1.Repository
@@ -180,37 +266,7 @@ func (c companyRepository) Store(company v1.Company) error {
 	return nil
 }
 func (c companyRepository) Update(company v1.Company, companyUpdateOption v1.CompanyUpdateOption) {
-	var companies []v1.Company
-	var repo []v1.Repository
-	var app []v1.Application
-	for _, each := range IndexedCompanies {
-		companies = append(companies, each)
-	}
-	if companyUpdateOption.Option == enums.APPEND_REPOSITORY {
-		for _, each := range company.Repositories {
-			repo = append(repo, each)
-		}
-		for _, eachCom := range IndexedCompanies {
-			if eachCom.Id == company.Id {
-				eachCom.Repositories = repo
-			}
-		}
-	}
-	if companyUpdateOption.Option == enums.APPEND_APPLICATION {
-		for _, each := range company.Repositories {
-			for _, eachApp := range each.Applications {
-				app = append(app, eachApp)
-			}
-		}
-		for _, eachCom := range IndexedCompanies {
-			if eachCom.Id == company.Id {
-				for _, re := range eachCom.Repositories {
-					re.Applications = app
-				}
-			}
-		}
-	}
-
+	panic("implement me")
 }
 
 func (c companyRepository) Delete(companyId string) error {
@@ -235,6 +291,14 @@ func paginate(logs []v1.Company, page int64, limit int64) []v1.Company {
 		return logs[startIndex:]
 	}
 	return logs[startIndex:endIndex]
+}
+func RemoveRepository(s []v1.Repository, i int) []v1.Repository {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
+}
+func RemoveApplication(s []v1.Application, i int) []v1.Application {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
 }
 
 func NewCompanyRepository(timeout int) repository.CompanyRepository {

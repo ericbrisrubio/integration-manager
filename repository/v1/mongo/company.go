@@ -20,6 +20,156 @@ type companyRepository struct {
 	timeout time.Duration
 }
 
+func (c companyRepository) AppendRepositories(companyId string, repos []v1.Repository) error {
+	query := bson.M{
+		"$and": []bson.M{},
+	}
+	and := []bson.M{{"id": companyId}}
+	query["$and"] = and
+	coll := c.manager.Db.Collection(CompanyCollection)
+	result, err := coll.Find(c.manager.Ctx, query)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	for result.Next(context.TODO()) {
+		elemValues := new(v1.Company)
+		err := result.Decode(elemValues)
+		if err != nil {
+			log.Println("[ERROR]", err)
+			break
+		}
+		for _, eachRepo := range repos {
+			elemValues.Repositories = append(elemValues.Repositories, eachRepo)
+		}
+		error := c.Store(*elemValues)
+		if err != nil {
+			return error
+		}
+	}
+	return nil
+}
+
+func (c companyRepository) DeleteRepositories(companyId string, repos []v1.Repository, isSoftDelete bool) error {
+	var repositories []v1.Repository
+	query := bson.M{
+		"$and": []bson.M{},
+	}
+	and := []bson.M{{"id": companyId}}
+	query["$and"] = and
+	coll := c.manager.Db.Collection(CompanyCollection)
+	result, err := coll.Find(c.manager.Ctx, query)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	for result.Next(context.TODO()) {
+		elemValues := new(v1.Company)
+		err := result.Decode(elemValues)
+		if err != nil {
+			log.Println("[ERROR]", err)
+			break
+		}
+		if isSoftDelete {
+			elemValues.Status = enums.INACTIVE
+			error := c.Store(*elemValues)
+			if error == nil {
+				return nil
+			}
+		} else {
+			for i, eachRepo := range elemValues.Repositories {
+				for _, deleteRepo := range repos {
+					if eachRepo.Id == deleteRepo.Id {
+						repositories = RemoveRepository(elemValues.Repositories, i)
+					}
+				}
+			}
+			elemValues.Repositories = repositories
+			error := c.Store(*elemValues)
+			if error != nil {
+				return error
+			}
+		}
+	}
+	return nil
+}
+
+func (c companyRepository) AppendApplications(companyId, repositoryId string, apps []v1.Application) error {
+	query := bson.M{
+		"$and": []bson.M{},
+	}
+	and := []bson.M{{"id": companyId}}
+	query["$and"] = and
+	coll := c.manager.Db.Collection(CompanyCollection)
+	result, err := coll.Find(c.manager.Ctx, query)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	for result.Next(context.TODO()) {
+		elemValues := new(v1.Company)
+		err := result.Decode(elemValues)
+		if err != nil {
+			log.Println("[ERROR]", err)
+			break
+		}
+		for _, eachRepo := range elemValues.Repositories {
+			for _, eachApp := range apps {
+				eachRepo.Applications = append(eachRepo.Applications, eachApp)
+			}
+		}
+		error := c.Store(*elemValues)
+		if err != nil {
+			return error
+		}
+	}
+	return nil
+}
+
+func (c companyRepository) DeleteApplications(companyId, repositoryId string, apps []v1.Application, isSoftDelete bool) error {
+	var applications []v1.Application
+	query := bson.M{
+		"$and": []bson.M{},
+	}
+	and := []bson.M{{"id": companyId}}
+	query["$and"] = and
+	coll := c.manager.Db.Collection(CompanyCollection)
+	result, err := coll.Find(c.manager.Ctx, query)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	for result.Next(context.TODO()) {
+		elemValues := new(v1.Company)
+		err := result.Decode(elemValues)
+		if err != nil {
+			log.Println("[ERROR]", err)
+			break
+		}
+		if isSoftDelete {
+			elemValues.Status = enums.INACTIVE
+			error := c.Store(*elemValues)
+			if error == nil {
+				return nil
+			}
+		} else {
+			for _, eachRepo := range elemValues.Repositories {
+				if repositoryId == eachRepo.Id {
+					for i, eachApp := range eachRepo.Applications {
+						for _, deleteApp := range apps {
+							if eachApp.MetaData.Id == deleteApp.MetaData.Id {
+								applications = RemoveApplication(eachRepo.Applications, i)
+							}
+						}
+					}
+				}
+				eachRepo.Applications = applications
+			}
+			error := c.Store(*elemValues)
+			if error != nil {
+				return error
+			}
+		}
+	}
+	return nil
+}
+
 func (c companyRepository) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {
 	var results v1.Repository
 	query := bson.M{
@@ -301,6 +451,15 @@ func (c companyRepository) Delete(companyId string) error {
 	)
 
 	return err
+}
+
+func RemoveRepository(s []v1.Repository, i int) []v1.Repository {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
+}
+func RemoveApplication(s []v1.Application, i int) []v1.Application {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
 }
 
 func NewCompanyRepository(timeout int) repository.CompanyRepository {
