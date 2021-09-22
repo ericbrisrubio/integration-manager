@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"bytes"
 	"errors"
 	"github.com/klovercloud-ci/core/v1/service"
 	"io/ioutil"
@@ -40,6 +41,29 @@ func (h httpClientService) Get(url string, header map[string]string) (error, []b
 		return errors.New("Status: "+res.Status+", code: "+strconv.Itoa(res.StatusCode)),nil
 	}
 
+}
+
+func (h httpClientService) Post(url string, header map[string]string, body []byte) error{
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
+	for k,v:=range header{
+		req.Header.Set(k, v)
+	}
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	defer resp.Body.Close()
+	if err != nil {
+		log.Println("[ERROR] Failed communicate agent:", err.Error())
+		return err
+	}else if resp.StatusCode != 200 {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+			log.Println("[ERROR] Failed communicate agent:", err.Error())
+		} else {
+			log.Println("[ERROR] Failed communicate agent::", string(body))
+		}
+	}
+	return nil
 }
 
 func NewHttpClientService() service.HttpClient {

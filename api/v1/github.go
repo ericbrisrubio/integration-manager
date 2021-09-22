@@ -5,7 +5,6 @@ import (
 	v1 "github.com/klovercloud-ci/core/v1"
 	"github.com/klovercloud-ci/core/v1/api"
 	"github.com/klovercloud-ci/core/v1/service"
-	"github.com/klovercloud-ci/enums"
 	"github.com/labstack/echo/v4"
 	"github.com/twinj/uuid"
 	"log"
@@ -31,7 +30,7 @@ func (g githubApi) ListenEvent(context echo.Context) error {
 	} else {
 		companyId = resource.Repository.Owner.Email
 	}
-	repository := g.companyService.GetRepositoryByCompanyIdAndApplicationUrl(companyId, enums.GITHUB_BASE_URL+owner+"/"+repoName)
+	repository := g.companyService.GetRepositoryByCompanyIdAndApplicationUrl(companyId, resource.Repository.URL)
 
 	data,err := g.gitService.GetPipeline(repoName, owner, revision, repository.Token)
 	if err!=nil{
@@ -56,9 +55,10 @@ func (g githubApi) ListenEvent(context echo.Context) error {
 	}
 	data.ProcessId=uuid.NewV4().String()
 	subject:=v1.Subject{
-		Log:       "Pipeline triggered",
-		EventData: map[string]interface{}{},
-		Pipeline:  *data,
+		Log:                   "Pipeline triggered",
+		CoreRequestQueryParam: map[string]string{"url": resource.Repository.URL,"revision":revision,"purging":"ENABLE"},
+		EventData:             map[string]interface{}{},
+		Pipeline:              *data,
 	}
 	go g.notifyAll(subject)
 	return common.GenerateSuccessResponse(context, data.ProcessId, nil,"Pipeline triggered!")

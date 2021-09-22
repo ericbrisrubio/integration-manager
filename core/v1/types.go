@@ -39,6 +39,7 @@ type Variable struct {
 
 type Subject struct {
 	Step,Log string
+	CoreRequestQueryParam map[string]string
 	StepType enums.STEP_TYPE
 	EventData map[string]interface{}
 	ProcessLabel map[string]string
