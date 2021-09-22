@@ -13,6 +13,24 @@ var (
 type companyRepository struct {
 }
 
+func (c companyRepository) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {
+	var company v1.Company
+	var result v1.Repository
+	for _, each := range IndexedCompanies {
+		if id == each.Id {
+			company = each
+		}
+	}
+	for _, eachRepo := range company.Repositories {
+		for _, app := range eachRepo.Applications {
+			if app.Url == url {
+				result = eachRepo
+			}
+		}
+	}
+	return result
+}
+
 func (c companyRepository) GetCompanyByApplicationUrl(url string) v1.Company {
 	var companies []v1.Company
 	var result v1.Company
