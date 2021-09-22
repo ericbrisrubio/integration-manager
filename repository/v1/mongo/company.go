@@ -85,35 +85,35 @@ func (c companyRepository) GetCompanies(option v1.CompanyQueryOption) ([]v1.Comp
 		log.Println(err.Error())
 	}
 	for result.Next(context.TODO()) {
-		elemValue := new([]v1.Company)
-		err := result.Decode(elemValue)
-		if err != nil {
-			log.Println("[ERROR]", err)
-			break
-		}
 		if option.LoadRepositories {
 			if option.LoadApplications {
+				elemValue := new([]v1.Company)
+				err := result.Decode(elemValue)
+				if err != nil {
+					log.Println("[ERROR]", err)
+					break
+				}
 				results = *elemValue
 			} else {
-				for i, each := range *elemValue {
-					results[i].Id = each.Id
-					results[i].MetaData = each.MetaData
-					results[i].Name = each.Name
-					results[i].Status = each.Status
-					for j, eachRepo := range each.Repositories {
-						results[i].Repositories[j].Type = eachRepo.Type
-						results[i].Repositories[j].Token = eachRepo.Token
-						results[i].Repositories[j].Applications = nil
-					}
+				elemValue := new([]v1.CompanyWiseRepositoriesDto)
+				err := result.Decode(elemValue)
+				if err != nil {
+					log.Println("[ERROR]", err)
+					break
+				}
+				for _, each := range *elemValue {
+					results = append(results, each.GetCompanyWithRepository())
 				}
 			}
 		} else {
-			for i, each := range *elemValue {
-				results[i].Id = each.Id
-				results[i].MetaData = each.MetaData
-				results[i].Name = each.Name
-				results[i].Status = each.Status
-				results[i].Repositories = nil
+			elemValue := new([]v1.OnlyCompanyDto)
+			err := result.Decode(elemValue)
+			if err != nil {
+				log.Println("[ERROR]", err)
+				break
+			}
+			for _, each := range *elemValue {
+				results = append(results, each.GetCompanyWithoutRepository())
 			}
 
 		}
@@ -156,15 +156,7 @@ func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOptio
 					break
 				}
 
-				results.Id = elemValue.Id
-				results.MetaData = elemValue.MetaData
-				results.Name = elemValue.Name
-				results.Status = elemValue.Status
-				for i, each := range elemValue.Repositories {
-					results.Repositories[i].Type = each.Type
-					results.Repositories[i].Token = each.Token
-					results.Repositories[i].Applications = nil
-				}
+				results = elemValue.GetCompanyWithRepository()
 			}
 		} else {
 			elemValue := new(v1.OnlyCompanyDto)
@@ -174,11 +166,7 @@ func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOptio
 				break
 			}
 
-			results.Id = elemValue.Id
-			results.MetaData = elemValue.MetaData
-			results.Name = elemValue.Name
-			results.Status = elemValue.Status
-			results.Repositories = nil
+			results = elemValue.GetCompanyWithoutRepository()
 		}
 
 	}
@@ -218,10 +206,8 @@ func (c companyRepository) GetRepositoriesByCompanyId(id string, option v1.Compa
 					log.Println("[ERROR]", err)
 					break
 				}
-				for i, each := range *elemValue {
-					results[i].Type = each.Type
-					results[i].Token = each.Token
-					results[i].Applications = nil
+				for _, each := range *elemValue {
+					results = append(results, each.GetRepositoryWithoutApplication())
 				}
 			}
 		}
@@ -301,7 +287,6 @@ func (c companyRepository) Store(company v1.Company) error {
 func (c companyRepository) Update(company v1.Company, companyUpdateOption v1.CompanyUpdateOption) {
 	panic("implement me")
 }
-
 
 func (c companyRepository) Delete(companyId string) error {
 	coll := c.manager.Db.Collection(CompanyCollection)
