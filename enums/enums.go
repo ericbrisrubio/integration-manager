@@ -58,6 +58,7 @@ type GITHUB_URL string
 const  (
 	GITHUB_RAW_CONTENT_BASE_URL="https://raw.githubusercontent.com/"
 	GITHUB_BASE_URL="https://github.com/"
+	GITHUB_API_BASE_URL="https://api.github.com/"
 )
 
 type GIT_FILE_NAME string

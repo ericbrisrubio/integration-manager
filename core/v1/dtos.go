@@ -22,6 +22,7 @@ type CompanyWiseRepositoriesDto struct {
 		Token string                `bson:"token" json:"token"`
 	} `bson:"repositories" json:"repositories"`
 }
+
 type RepositoryWithOutApplication struct {
 	Type  enums.REPOSITORY_TYPE `bson:"type" json:"type"`
 	Token string                `bson:"token" json:"token"`

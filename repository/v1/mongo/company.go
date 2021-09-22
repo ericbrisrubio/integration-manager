@@ -302,6 +302,7 @@ func (c companyRepository) Update(company v1.Company, companyUpdateOption v1.Com
 	panic("implement me")
 }
 
+
 func (c companyRepository) Delete(companyId string) error {
 	coll := c.manager.Db.Collection(CompanyCollection)
 	filter := bson.M{"id": companyId, "status": bson.M{"$in": enums.ACTIVE}}
