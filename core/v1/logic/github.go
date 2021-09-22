@@ -45,8 +45,6 @@ func (githubService githubService) GetDescriptors(repogitory_name,username, revi
 	var files []interface{}
 
 	for _,each:=range contents{
-		log.Println(strings.HasSuffix(each.Name,".yaml") , strings.HasSuffix(each.Name,".yml"))
-
 		if each.Type!="file" {
 			continue
 		}
