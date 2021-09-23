@@ -1,25 +1,32 @@
 package v1
 
 import (
-	"github.com/klovercloud-ci/core/v1/logic"
-	"github.com/klovercloud-ci/core/v1/service"
-	"github.com/klovercloud-ci/repository/v1/mongo"
+	"github.com/klovercloud-ci/dependency"
 	"github.com/labstack/echo/v4"
 )
 
 func Router(g *echo.Group) {
 	GithubEventRouter(g.Group("/githubs"))
-
+	CompanyRouter(g.Group("/companies"))
+	RepositoryRouter(g.Group("/repositories"))
 }
 
 
 func GithubEventRouter(g *echo.Group) {
-	var observers [] service.Observer
-	observers= append(observers, logic.NewCiCoreEventService(logic.NewHttpClientService()))
-	observers= append(observers, logic.NewProcessInventoryEventService(logic.NewHttpClientService()))
-	githubService:=logic.NewGithubService(logic.NewCompanyService(mongo.NewCompanyRepository(3000)),nil,logic.NewHttpClientService())
-	githubApi:=NewGithubApi(githubService,logic.NewCompanyService(mongo.NewCompanyRepository(3000)),observers)
+	githubApi:=NewGithubApi(dependency.GetGithubService(),dependency.GetCompanyService(),dependency.GetObservers())
 	g.POST("", githubApi.ListenEvent)
 }
 
+func CompanyRouter(g *echo.Group){
+	companyApi:=NewCompanyApi(dependency.GetCompanyService(),nil)
+	g.POST("",companyApi.Save)
+	g.GET("/:id",companyApi.GetById)
+	g.GET("/:id/repositories",companyApi.GetRepositoriesById)
+}
 
+func RepositoryRouter(g *echo.Group){
+	repositoryApi:=NewRepositoryApi(dependency.GetCompanyService(),nil)
+	g.POST("",repositoryApi.Save)
+	g.GET("/:id",repositoryApi.GetById)
+	g.GET("/:id/applications",repositoryApi.GetApplicationsById)
+}
