@@ -37,7 +37,7 @@ type Variable struct {
 }
 
 type Subject struct {
-	Step,Log string
+	Step, Log             string
 	CoreRequestQueryParam map[string]string
 	StepType enums.STEP_TYPE
 	EventData map[string]interface{}
@@ -73,8 +73,8 @@ func (application Application) Validate() error {
 
 type ApplicationMetadata struct {
 	Labels map[string]string `bson:"labels" json:"labels"`
-	Name string `bson:"name" json:"name"`
 	Id string `bson:"id" json:"id"`
+	Name   string            `bson:"name" json:"name"`
 }
 
 func (metadata ApplicationMetadata) Validate() error {

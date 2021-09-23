@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"fmt"
 	v1 "github.com/klovercloud-ci/core/v1"
 	"github.com/klovercloud-ci/core/v1/repository"
 	"github.com/klovercloud-ci/core/v1/service"
@@ -12,47 +13,98 @@ type companyService struct {
 }
 
 func (c companyService) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
-	return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId,repositoryId,applicationUrl)
+	return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl)
+}
+func (c companyService) UpdateRepositories(company v1.Company, companyUpdateOption v1.CompanyUpdateOption) {
+	if companyUpdateOption.Option == enums.APPEND_REPOSITORY {
+		err := c.repo.AppendRepositories(company.Id, company.Repositories)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+	if companyUpdateOption.Option == enums.SOFT_DELETE_REPOSITORY {
+		err := c.repo.DeleteRepositories(company.Id, company.Repositories, true)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+	if companyUpdateOption.Option == enums.DELETE_REPOSITORY {
+		err := c.repo.DeleteRepositories(company.Id, company.Repositories, false)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+}
+
+func (c companyService) UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.CompanyUpdateOption) {
+	if companyUpdateOption.Option == enums.APPEND_APPLICATION {
+		err := c.repo.AppendApplications(companyId, repositoryId, apps)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+	if companyUpdateOption.Option == enums.SOFT_DELETE_APPLICATION {
+		err := c.repo.DeleteApplications(companyId, repositoryId, apps, true)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+	if companyUpdateOption.Option == enums.DELETE_APPLICATION {
+		err := c.repo.DeleteApplications(companyId, repositoryId, apps, false)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
 }
 
 func (c companyService) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {
-	return c.repo.GetRepositoryByCompanyIdAndApplicationUrl(id,url)
+	return c.repo.GetRepositoryByCompanyIdAndApplicationUrl(id, url)
 }
 
 func (c companyService) GetCompanyByApplicationUrl(url string) v1.Company {
-	panic("implement me")
+	return c.repo.GetCompanyByApplicationUrl(url)
 }
 
 func (c companyService) Store(company v1.Company) error {
-	panic("implement me")
-}
-
-func (c companyService) Update(company v1.Company, companyUpdateOption ...v1.CompanyUpdateOption) {
-	panic("implement me")
+	return c.repo.Store(company)
 }
 
 func (c companyService) Delete(companyId string) error {
-	panic("implement me")
+	err := c.repo.Delete(companyId)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c companyService) GetCompanies(option v1.CompanyQueryOption) []v1.Company {
-	panic("implement me")
+	companies, _ := c.repo.GetCompanies(option)
+
+	return companies
 }
 
 func (c companyService) GetByCompanyId(id string, option v1.CompanyQueryOption) v1.Company {
-	panic("implement me")
+	company := c.repo.GetByCompanyId(id, option)
+
+	return company
 }
 
 func (c companyService) GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) []v1.Repository {
-	panic("implement me")
+	repositories := c.repo.GetRepositoriesByCompanyId(id, option)
+
+	return repositories
 }
 
 func (c companyService) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) []v1.Application {
-	panic("implement me")
+	applications := c.repo.GetApplicationsByCompanyId(id, option)
+
+	return applications
 }
 
 func (c companyService) GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption) []v1.Application {
-	panic("implement me")
+	applications := c.repo.GetApplicationsByCompanyIdAndRepositoryType(id, _type, option)
+
+	return applications
 }
 
 func NewCompanyService(repo repository.CompanyRepository) service.Company {
