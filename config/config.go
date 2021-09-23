@@ -17,6 +17,8 @@ var DatabaseName string
 var Database string
 var KlovercloudCiCoreUrl string
 var KlovercloudCiCoreToken string
+var EventStoreUrl string
+var EventStoreToken string
 func InitEnvironmentVariables() {
 	err := godotenv.Load()
 	if err != nil {
@@ -29,6 +31,8 @@ func InitEnvironmentVariables() {
 	DbUsername = os.Getenv("MONGO_USERNAME")
 	DbPassword = os.Getenv("MONGO_PASSWORD")
 	DatabaseName = os.Getenv("DATABASE_NAME")
+	EventStoreUrl=os.Getenv("EVENT_STORE_URL")
+	EventStoreToken=os.Getenv("EVENT_STORE_TOKEN")
 	Database = os.Getenv("DATABASE")
 	if Database == enums.Mongo {
 		DatabaseConnectionString = "mongodb://" + DbUsername + ":" + DbPassword + "@" + DbServer + ":" + DbPort

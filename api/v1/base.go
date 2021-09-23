@@ -16,6 +16,7 @@ func Router(g *echo.Group) {
 func GithubEventRouter(g *echo.Group) {
 	var observers [] service.Observer
 	observers= append(observers, logic.NewCiCoreEventService(logic.NewHttpClientService()))
+	observers= append(observers, logic.NewProcessInventoryEventService(logic.NewHttpClientService()))
 	githubService:=logic.NewGithubService(logic.NewCompanyService(mongo.NewCompanyRepository(3000)),nil,logic.NewHttpClientService())
 	githubApi:=NewGithubApi(githubService,logic.NewCompanyService(mongo.NewCompanyRepository(3000)),observers)
 	g.POST("", githubApi.ListenEvent)

@@ -20,6 +20,7 @@ func (g githubApi) ListenEvent(context echo.Context) error {
 	resource := new(v1.GithubWebHook)
 	if err := context.Bind(resource); err != nil {
 		log.Println(err.Error())
+		return common.GenerateErrorResponse(context,err.Error(),"Operation Failed!")
 	}
 	repoName := resource.Repository.Name
 	owner := resource.Repository.Owner.Login
@@ -54,11 +55,21 @@ func (g githubApi) ListenEvent(context echo.Context) error {
 		}
 	}
 	data.ProcessId=uuid.NewV4().String()
+	application:=g.companyService.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId,repository.Id,resource.Repository.URL)
 	subject:=v1.Subject{
 		Log:                   "Pipeline triggered",
-		CoreRequestQueryParam: map[string]string{"url": resource.Repository.URL,"revision":revision,"purging":"ENABLE"},
+		CoreRequestQueryParam: map[string]string{"url": resource.Repository.URL, "revision": revision, "purging": "ENABLE"},
 		EventData:             map[string]interface{}{},
 		Pipeline:              *data,
+		App: struct {
+			CompanyId string
+			AppId   string
+			RepositoryId string
+		}{
+			CompanyId: companyId,
+			AppId:  application.MetaData.Id ,
+			RepositoryId: repository.Id,
+		},
 	}
 	go g.notifyAll(subject)
 	return common.GenerateSuccessResponse(context, data.ProcessId, nil,"Pipeline triggered!")

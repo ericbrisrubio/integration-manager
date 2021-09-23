@@ -43,6 +43,11 @@ type Subject struct {
 	EventData map[string]interface{}
 	ProcessLabel map[string]string
 	Pipeline     Pipeline
+	App struct{
+		CompanyId string
+		AppId string
+		RepositoryId string
+	}
 }
 type Repository struct {
 	Id           string                `bson:"_Id" json:"_Id"`
@@ -68,6 +73,8 @@ func (application Application) Validate() error {
 
 type ApplicationMetadata struct {
 	Labels map[string]string `bson:"labels" json:"labels"`
+	Name string `bson:"name" json:"name"`
+	Id string `bson:"id" json:"id"`
 }
 
 func (metadata ApplicationMetadata) Validate() error {
@@ -97,4 +104,12 @@ type CompanyQueryOption struct {
 type Pagination struct {
 	Page  int64
 	Limit int64
+}
+
+type ProcessInventoryEvent struct {
+	ProcessId string  `bson:"process_id" json:"process_id"`
+	CompanyId string  `bson:"company_id" json:"company_id"`
+	AppId string `bson:"app_id" json:"app_id"`
+	RepositoryId string `bson:"repository_id" json:"repository_id"`
+	Data map[string]interface{}  `bson:"data" json:"data"`
 }

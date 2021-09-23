@@ -20,6 +20,10 @@ type companyRepository struct {
 	timeout time.Duration
 }
 
+func (c companyRepository) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
+	panic("implement me")
+}
+
 func (c companyRepository) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {
 	var results v1.Repository
 	query := bson.M{
