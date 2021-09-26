@@ -12,6 +12,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"log"
 	"strconv"
+	"strings"
 )
 
 type companyApi struct {
@@ -33,8 +34,8 @@ func (c companyApi) Save(context echo.Context) error {
 		Repositories: formData.Repositories,
 		Status:       enums.ACTIVE,
 	}
-	contextData, error := validate(payload)
-	if error != nil {
+	contextData, er := validate(payload)
+	if er != nil {
 		return common.GenerateErrorResponse(context, nil, "invalid repository id!")
 	}
 	err := c.companyService.Store(contextData)
@@ -73,8 +74,7 @@ func (c companyApi) GetById(context echo.Context) error {
 	}
 	option := getQueryOption(context)
 
-	data := c.companyService.GetByCompanyId(id, option)
-
+	data, _ := c.companyService.GetByCompanyId(id, option)
 	return common.GenerateSuccessResponse(context, data, nil, "Success!")
 }
 func getQueryOption(context echo.Context) v1.CompanyQueryOption {
@@ -101,14 +101,18 @@ func (c companyApi) GetRepositoriesById(context echo.Context) error {
 		return errors.New("Id required!")
 	}
 	option := getQueryOption(context)
-	data := c.companyService.GetRepositoriesByCompanyId(id, option)
-	if data == nil {
-		err := common.GenerateSuccessResponse(context, nil, nil, "Database Error!")
-		if err != nil {
-			return err
-		}
+	data, total := c.companyService.GetRepositoriesByCompanyId(id, option)
+	metadata := common.GetPaginationMetadata(option.Pagination.Page, option.Pagination.Limit, total, int64(len(data)))
+	uri := strings.Split(context.Request().RequestURI, "?")[0]
+	if option.Pagination.Page > 0 {
+		metadata.Links = append(metadata.Links, map[string]string{"prev": uri + "?order=" + context.QueryParam("order") + "&page=" + strconv.FormatInt(option.Pagination.Page-1, 10) + "&limit=" + strconv.FormatInt(option.Pagination.Limit, 10)})
 	}
-	return common.GenerateSuccessResponse(context, data, nil, "Database Error!")
+	metadata.Links = append(metadata.Links, map[string]string{"self": uri + "?order=" + context.QueryParam("order") + "&page=" + strconv.FormatInt(option.Pagination.Page, 10) + "&limit=" + strconv.FormatInt(option.Pagination.Limit, 10)})
+
+	if (option.Pagination.Page+1)*option.Pagination.Limit < metadata.TotalCount {
+		metadata.Links = append(metadata.Links, map[string]string{"next": uri + "?order=" + context.QueryParam("order") + "&page=" + strconv.FormatInt(option.Pagination.Page+1, 10) + "&limit=" + strconv.FormatInt(option.Pagination.Limit, 10)})
+	}
+	return common.GenerateSuccessResponse(context, data, &metadata, "")
 }
 
 func NewCompanyApi(companyService service.Company, observerList []service.Observer) api.Company {

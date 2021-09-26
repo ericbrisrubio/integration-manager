@@ -15,25 +15,29 @@ type companyService struct {
 func (c companyService) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
 	return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl)
 }
-func (c companyService) UpdateRepositories(company v1.Company, companyUpdateOption v1.CompanyUpdateOption) {
+func (c companyService) UpdateRepositories(company v1.Company, companyUpdateOption v1.CompanyUpdateOption) error {
 	if companyUpdateOption.Option == enums.APPEND_REPOSITORY {
 		err := c.repo.AppendRepositories(company.Id, company.Repositories)
 		if err != nil {
 			fmt.Println(err)
+			return err
 		}
 	}
 	if companyUpdateOption.Option == enums.SOFT_DELETE_REPOSITORY {
 		err := c.repo.DeleteRepositories(company.Id, company.Repositories, true)
 		if err != nil {
 			fmt.Println(err)
+			return err
 		}
 	}
 	if companyUpdateOption.Option == enums.DELETE_REPOSITORY {
 		err := c.repo.DeleteRepositories(company.Id, company.Repositories, false)
 		if err != nil {
 			fmt.Println(err)
+			return err
 		}
 	}
+	return nil
 }
 
 func (c companyService) UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.CompanyUpdateOption) {
@@ -83,22 +87,22 @@ func (c companyService) GetCompanies(option v1.CompanyQueryOption) []v1.Company 
 	return companies
 }
 
-func (c companyService) GetByCompanyId(id string, option v1.CompanyQueryOption) v1.Company {
-	company := c.repo.GetByCompanyId(id, option)
+func (c companyService) GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64) {
+	company, total := c.repo.GetByCompanyId(id, option)
 
-	return company
+	return company, total
 }
 
-func (c companyService) GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) []v1.Repository {
-	repositories := c.repo.GetRepositoriesByCompanyId(id, option)
+func (c companyService) GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64) {
+	repositories, total := c.repo.GetRepositoriesByCompanyId(id, option)
 
-	return repositories
+	return repositories, total
 }
 
-func (c companyService) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) []v1.Application {
-	applications := c.repo.GetApplicationsByCompanyId(id, option)
+func (c companyService) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Application, int64) {
+	applications, total := c.repo.GetApplicationsByCompanyId(id, option)
 
-	return applications
+	return applications, total
 }
 
 func (c companyService) GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption) []v1.Application {

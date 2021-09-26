@@ -154,7 +154,7 @@ func TestCompanyRepository_GetByCompanyId(t *testing.T) {
 
 	repo := NewCompanyRepository(10)
 	for _, each := range testdata {
-		each.actual = repo.GetByCompanyId("01", v1.CompanyQueryOption{
+		each.actual, _ = repo.GetByCompanyId("01", v1.CompanyQueryOption{
 			Pagination: v1.Pagination{
 				Page:  0,
 				Limit: 10,
@@ -212,7 +212,7 @@ func TestCompanyRepository_GetRepositoriesByCompanyId(t *testing.T) {
 	repo := NewCompanyRepository(10)
 	for _, each := range testdata {
 		repo.Store(each.data)
-		each.actual = repo.GetRepositoriesByCompanyId("02", v1.CompanyQueryOption{
+		each.actual, _ = repo.GetRepositoriesByCompanyId("02", v1.CompanyQueryOption{
 			Pagination: v1.Pagination{
 				Page:  0,
 				Limit: 10,
@@ -270,7 +270,7 @@ func TestCompanyRepository_GetApplicationsByCompanyId(t *testing.T) {
 	repo := NewCompanyRepository(10)
 	for _, each := range testdata {
 		repo.Store(each.data)
-		each.actual = repo.GetApplicationsByCompanyId(each.data.Id, v1.CompanyQueryOption{
+		each.actual, _ = repo.GetApplicationsByCompanyId(each.data.Id, v1.CompanyQueryOption{
 			Pagination: v1.Pagination{
 				Page:  0,
 				Limit: 10,
