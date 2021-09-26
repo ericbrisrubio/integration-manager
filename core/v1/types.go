@@ -53,7 +53,7 @@ type Subject struct {
 	}
 }
 type Repository struct {
-	Id           string                `bson:"_Id" json:"_Id"`
+	Id           string                `bson:"id" json:"id"`
 	Type         enums.REPOSITORY_TYPE `bson:"type" json:"type"`
 	Token        string                `bson:"token" json:"token"`
 	Applications []Application         `bson:"applications" json:"applications"`
