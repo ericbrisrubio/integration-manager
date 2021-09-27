@@ -34,6 +34,14 @@ type CompanyWiseRepositoriesDto struct {
 		Token string                `bson:"token" json:"token"`
 	} `bson:"repositories" json:"repositories"`
 }
+type CompanyWithUpdateOption struct {
+	MetaData     CompanyMetadata             `bson:"_metadata" json:"_metadata"`
+	Id           string                      `bson:"id" json:"id"`
+	Name         string                      `bson:"name" json:"name"`
+	Repositories []Repository                `bson:"repositories" json:"repositories"`
+	Status       enums.COMPANY_STATUS        `bson:"status" json:"status"`
+	Option       enums.COMPANY_UPDATE_OPTION `json:"option"`
+}
 
 func (dto CompanyWiseRepositoriesDto) GetCompanyWithRepository() Company {
 	company := Company{

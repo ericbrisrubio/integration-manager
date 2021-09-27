@@ -20,8 +20,52 @@ type companyRepository struct {
 	timeout time.Duration
 }
 
+func (c companyRepository) GetRepositoryByRepositoryId(id string) v1.Repository {
+	var repo v1.Repository
+	query := bson.M{
+		"$and": []bson.M{},
+	}
+	and := []bson.M{{"repositories.id": id}}
+	query["$and"] = and
+	coll := c.manager.Db.Collection(CompanyCollection)
+	result, err := coll.Find(c.manager.Ctx, query)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	for result.Next(context.TODO()) {
+		elemValues := new(v1.Repository)
+		err := result.Decode(elemValues)
+		if err != nil {
+			log.Println("[ERROR]", err)
+			break
+		}
+		repo = *elemValues
+	}
+	return repo
+}
+
 func (c companyRepository) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
-	panic("implement me")
+	var app v1.Application
+	query := bson.M{
+		"$and": []bson.M{},
+	}
+	and := []bson.M{{"id": companyId, "repositories.id": repositoryId, "repositories.applications.url": applicationUrl}}
+	query["$and"] = and
+	coll := c.manager.Db.Collection(CompanyCollection)
+	result, err := coll.Find(c.manager.Ctx, query)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	for result.Next(context.TODO()) {
+		elemValues := new(v1.Application)
+		err := result.Decode(elemValues)
+		if err != nil {
+			log.Println("[ERROR]", err)
+			break
+		}
+		app = *elemValues
+	}
+	return app
 }
 
 func (c companyRepository) AppendRepositories(companyId string, repos []v1.Repository) error {
@@ -206,27 +250,24 @@ func (c companyRepository) GetRepositoryByCompanyIdAndApplicationUrl(id, url str
 
 func (c companyRepository) GetCompanyByApplicationUrl(url string) v1.Company {
 	var results v1.Company
+	query := bson.M{
+		"$and": []bson.M{},
+	}
+	and := []bson.M{{"repositories.applications.url": url}}
+	query["$and"] = and
 	coll := c.manager.Db.Collection(CompanyCollection)
-	result, err := coll.Find(c.manager.Ctx, nil, nil)
+	result, err := coll.Find(c.manager.Ctx, query)
 	if err != nil {
 		log.Println(err.Error())
 	}
 	for result.Next(context.TODO()) {
-		elemValue := new([]v1.Company)
+		elemValue := new(v1.Company)
 		err := result.Decode(elemValue)
 		if err != nil {
 			log.Println("[ERROR]", err)
 			break
 		}
-		for _, each := range *elemValue {
-			for _, eachRepo := range each.Repositories {
-				for _, eachApp := range eachRepo.Applications {
-					if url == eachApp.Url {
-						results = each
-					}
-				}
-			}
-		}
+		results = *elemValue
 	}
 	return results
 }
@@ -446,10 +487,6 @@ func (c companyRepository) Store(company v1.Company) error {
 		log.Println("[ERROR] Insert document:", err.Error())
 	}
 	return nil
-}
-
-func (c companyRepository) Update(company v1.Company, companyUpdateOption v1.CompanyUpdateOption) {
-	panic("implement me")
 }
 
 func (c companyRepository) Delete(companyId string) error {

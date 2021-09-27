@@ -12,6 +12,10 @@ type companyService struct {
 	repo repository.CompanyRepository
 }
 
+func (c companyService) GetRepositoryByRepositoryId(id string) v1.Repository {
+	return c.repo.GetRepositoryByRepositoryId(id)
+}
+
 func (c companyService) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
 	return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl)
 }
