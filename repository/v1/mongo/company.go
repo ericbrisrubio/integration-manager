@@ -276,7 +276,7 @@ func (c companyRepository) GetCompanies(option v1.CompanyQueryOption) ([]v1.Comp
 	return results, int64(len(results))
 }
 
-func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOption) v1.Company {
+func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64) {
 	var results v1.Company
 	query := bson.M{
 		"$and": []bson.M{},
@@ -322,12 +322,15 @@ func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOptio
 
 			results = elemValue.GetCompanyWithoutRepository()
 		}
-
 	}
-	return results
+	count, err := coll.CountDocuments(c.manager.Ctx, query)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	return results, count
 }
 
-func (c companyRepository) GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) []v1.Repository {
+func (c companyRepository) GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64) {
 	var results []v1.Repository
 	query := bson.M{
 		"$and": []bson.M{},
@@ -366,10 +369,11 @@ func (c companyRepository) GetRepositoriesByCompanyId(id string, option v1.Compa
 			}
 		}
 	}
-	return results
+	return results, int64(len(results))
 }
 
-func (c companyRepository) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) []v1.Application {
+func (c companyRepository) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Application, int64) {
+	var company v1.Company
 	var results []v1.Application
 	query := bson.M{
 		"$and": []bson.M{},
@@ -393,8 +397,14 @@ func (c companyRepository) GetApplicationsByCompanyId(id string, option v1.Compa
 			break
 		}
 		results = *elemValue
+		elem := new(v1.Company)
+		er := result.Decode(elem)
+		if er != nil {
+			log.Println("[ERROR]", er)
+		}
+		company = *elem
 	}
-	return results
+	return results, int64(len(company.Repositories))
 }
 
 func (c companyRepository) GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption) []v1.Application {

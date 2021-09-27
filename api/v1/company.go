@@ -3,6 +3,7 @@ package v1
 import (
 	"errors"
 	"fmt"
+	guuid "github.com/google/uuid"
 	"github.com/klovercloud-ci/api/common"
 	v1 "github.com/klovercloud-ci/core/v1"
 	"github.com/klovercloud-ci/core/v1/api"
@@ -11,6 +12,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"log"
 	"strconv"
+	"strings"
 )
 
 type companyApi struct {
@@ -24,6 +26,7 @@ func (c companyApi) Save(context echo.Context) error {
 		log.Println("Input Error:", err.Error())
 		return common.GenerateErrorResponse(context, nil, "Failed to Bind Input!")
 	}
+
 	var payload = v1.Company{
 		MetaData:     formData.MetaData,
 		Id:           formData.Id,
@@ -31,13 +34,37 @@ func (c companyApi) Save(context echo.Context) error {
 		Repositories: formData.Repositories,
 		Status:       enums.ACTIVE,
 	}
-	err := c.companyService.Store(payload)
+	contextData, er := validate(payload)
+	if er != nil {
+		return common.GenerateErrorResponse(context, nil, "invalid repository id!")
+	}
+	err := c.companyService.Store(contextData)
 	if err != nil {
 		log.Println("[Error]:", err.Error())
 		return common.GenerateErrorResponse(context, nil, "Failed!")
 	}
-	return common.GenerateSuccessResponse(context, payload,
+	return common.GenerateSuccessResponse(context, contextData,
 		nil, "saved Successfully")
+}
+
+func validate(payload v1.Company) (v1.Company, error) {
+	comp := v1.Company{}
+	comp = payload
+	for i, each := range payload.Repositories {
+		if each.Type == enums.BIT_BUCKET || each.Type == enums.GITHUB {
+			comp.Repositories[i].Id = guuid.New().String()
+			//each.Id = uuid.New().String()
+			for j, eachApp := range each.Applications {
+				comp.Repositories[i].Applications[j].MetaData.Id = guuid.New().String()
+				//eachApp.MetaData.Id = uuid.New().String()
+				fmt.Println("meta data----", eachApp)
+			}
+		} else {
+			return comp, errors.New("Ivalid repository id!")
+		}
+		fmt.Println("object----", comp)
+	}
+	return comp, nil
 }
 
 func (c companyApi) GetById(context echo.Context) error {
@@ -45,56 +72,27 @@ func (c companyApi) GetById(context echo.Context) error {
 	if id == "" {
 		return errors.New("Id required!")
 	}
-	limitStr := context.QueryParam("limit")
-	var limit int64 = 20
-	if limitStr != "" {
-		limitInt, err := strconv.ParseInt(limitStr, 10, 64)
-		if err != nil {
-			log.Println(err)
-		}
-		limit = limitInt
-	}
-	fmt.Println(limit)
-	pageStr := context.QueryParam("page")
-	var page int64 = 1
-	if pageStr != "" {
-		pageInt, err := strconv.ParseInt(pageStr, 10, 64)
-		if err != nil {
-			log.Println(err)
-		}
-		page = pageInt
-	}
-	fmt.Println(page)
+	option := getQueryOption(context)
 
-	loadRepos := context.QueryParam("LoadRepositories")
-	var lr bool = true
-	if loadRepos != "" {
-		LoadRepository, err := strconv.ParseBool(loadRepos)
-		if err != nil {
-			log.Println(err)
-		}
-		lr = LoadRepository
-	}
-	loadApps := context.QueryParam("LoadApplications")
-	var la bool = true
-	if loadRepos != "" {
-		LoadRepository, err := strconv.ParseBool(loadApps)
-		if err != nil {
-			log.Println(err)
-		}
-		la = LoadRepository
-	}
-
-	data := c.companyService.GetByCompanyId(id, v1.CompanyQueryOption{
-		Pagination: struct {
-			Page  int64
-			Limit int64
-		}{Page: page, Limit: limit},
-		LoadApplications: la,
-		LoadRepositories: lr,
-	})
-
+	data, _ := c.companyService.GetByCompanyId(id, option)
 	return common.GenerateSuccessResponse(context, data, nil, "Success!")
+}
+func getQueryOption(context echo.Context) v1.CompanyQueryOption {
+	option := v1.CompanyQueryOption{}
+	page := context.QueryParam("page")
+	limit := context.QueryParam("limit")
+	la := context.QueryParam("LoadApplications")
+	lr := context.QueryParam("LoadApplications")
+	if page == "" {
+		option.Pagination.Page = 0
+		option.Pagination.Limit = 10
+	} else {
+		option.Pagination.Page, _ = strconv.ParseInt(page, 10, 64)
+		option.Pagination.Limit, _ = strconv.ParseInt(limit, 10, 64)
+		option.LoadApplications, _ = strconv.ParseBool(la)
+		option.LoadRepositories, _ = strconv.ParseBool(lr)
+	}
+	return option
 }
 
 func (c companyApi) GetRepositoriesById(context echo.Context) error {
@@ -102,60 +100,19 @@ func (c companyApi) GetRepositoriesById(context echo.Context) error {
 	if id == "" {
 		return errors.New("Id required!")
 	}
-	limitStr := context.QueryParam("limit")
-	var limit int64 = 20
-	if limitStr != "" {
-		limitInt, err := strconv.ParseInt(limitStr, 10, 64)
-		if err != nil {
-			log.Println(err)
-		}
-		limit = limitInt
+	option := getQueryOption(context)
+	data, total := c.companyService.GetRepositoriesByCompanyId(id, option)
+	metadata := common.GetPaginationMetadata(option.Pagination.Page, option.Pagination.Limit, total, int64(len(data)))
+	uri := strings.Split(context.Request().RequestURI, "?")[0]
+	if option.Pagination.Page > 0 {
+		metadata.Links = append(metadata.Links, map[string]string{"prev": uri + "?order=" + context.QueryParam("order") + "&page=" + strconv.FormatInt(option.Pagination.Page-1, 10) + "&limit=" + strconv.FormatInt(option.Pagination.Limit, 10)})
 	}
-	fmt.Println(limit)
-	pageStr := context.QueryParam("page")
-	var page int64 = 1
-	if pageStr != "" {
-		pageInt, err := strconv.ParseInt(pageStr, 10, 64)
-		if err != nil {
-			log.Println(err)
-		}
-		page = pageInt
-	}
-	fmt.Println(page)
+	metadata.Links = append(metadata.Links, map[string]string{"self": uri + "?order=" + context.QueryParam("order") + "&page=" + strconv.FormatInt(option.Pagination.Page, 10) + "&limit=" + strconv.FormatInt(option.Pagination.Limit, 10)})
 
-	loadRepos := context.QueryParam("LoadRepositories")
-	var lr bool = true
-	if loadRepos != "" {
-		LoadRepository, err := strconv.ParseBool(loadRepos)
-		if err != nil {
-			log.Println(err)
-		}
-		lr = LoadRepository
+	if (option.Pagination.Page+1)*option.Pagination.Limit < metadata.TotalCount {
+		metadata.Links = append(metadata.Links, map[string]string{"next": uri + "?order=" + context.QueryParam("order") + "&page=" + strconv.FormatInt(option.Pagination.Page+1, 10) + "&limit=" + strconv.FormatInt(option.Pagination.Limit, 10)})
 	}
-	loadApps := context.QueryParam("LoadApplications")
-	var la bool = true
-	if loadRepos != "" {
-		LoadRepository, err := strconv.ParseBool(loadApps)
-		if err != nil {
-			log.Println(err)
-		}
-		la = LoadRepository
-	}
-	data := c.companyService.GetRepositoriesByCompanyId(id, v1.CompanyQueryOption{
-		Pagination: struct {
-			Page  int64
-			Limit int64
-		}{Page: page, Limit: limit},
-		LoadApplications: la,
-		LoadRepositories: lr,
-	})
-	if data == nil {
-		err := common.GenerateSuccessResponse(context, nil, nil, "Database Error!")
-		if err != nil {
-			return err
-		}
-	}
-	return common.GenerateSuccessResponse(context, data, nil, "Database Error!")
+	return common.GenerateSuccessResponse(context, data, &metadata, "")
 }
 
 func NewCompanyApi(companyService service.Company, observerList []service.Observer) api.Company {

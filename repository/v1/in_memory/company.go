@@ -13,7 +13,6 @@ var (
 type companyRepository struct {
 }
 
-
 func (c companyRepository) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
 	panic("implement me")
 }
@@ -163,7 +162,7 @@ func (c companyRepository) GetCompanies(option v1.CompanyQueryOption) ([]v1.Comp
 	return result, int64(len(result))
 }
 
-func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOption) v1.Company {
+func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64) {
 	var companies v1.Company
 	for _, each := range IndexedCompanies {
 		if each.Id == id {
@@ -172,7 +171,7 @@ func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOptio
 	}
 	if option.LoadRepositories {
 		if option.LoadApplications {
-			return companies
+			return companies, int64(len(IndexedCompanies))
 		} else {
 			for j, _ := range companies.Repositories {
 				companies.Repositories[j].Applications = nil
@@ -181,10 +180,10 @@ func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOptio
 	} else {
 		companies.Repositories = nil
 	}
-	return companies
+	return companies, int64(len(IndexedCompanies))
 }
 
-func (c companyRepository) GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) []v1.Repository {
+func (c companyRepository) GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64) {
 	var repository []v1.Repository
 	var companies v1.Company
 	for _, each := range IndexedCompanies {
@@ -206,10 +205,10 @@ func (c companyRepository) GetRepositoriesByCompanyId(id string, option v1.Compa
 	} else {
 		companies.Repositories = nil
 	}
-	return repository
+	return repository, int64(len(companies.Repositories))
 }
 
-func (c companyRepository) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) []v1.Application {
+func (c companyRepository) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Application, int64) {
 	var applications []v1.Application
 	var companies v1.Company
 	for _, each := range IndexedCompanies {
@@ -232,7 +231,7 @@ func (c companyRepository) GetApplicationsByCompanyId(id string, option v1.Compa
 	} else {
 		companies.Repositories = nil
 	}
-	return applications
+	return applications, int64(len(companies.Repositories))
 }
 func (c companyRepository) GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption) []v1.Application {
 	var applications []v1.Application

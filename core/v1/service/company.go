@@ -7,15 +7,15 @@ import (
 
 type Company interface {
 	Store(company v1.Company) error
-	UpdateRepositories(company v1.Company, companyUpdateOption v1.CompanyUpdateOption)
+	UpdateRepositories(company v1.Company, companyUpdateOption v1.CompanyUpdateOption) error
 	UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.CompanyUpdateOption)
 	Delete(companyId string) error
 	GetCompanies(option v1.CompanyQueryOption) []v1.Company
-	GetByCompanyId(id string, option v1.CompanyQueryOption) v1.Company
-	GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) []v1.Repository
-	GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) []v1.Application
+	GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64)
+	GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64)
+	GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Application, int64)
 	GetCompanyByApplicationUrl(url string) v1.Company
 	GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption) []v1.Application
-	GetRepositoryByCompanyIdAndApplicationUrl(id,url string)v1.Repository
-	GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId,repositoryId,applicationUrl string)v1.Application
+	GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository
+	GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application
 }
