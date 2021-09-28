@@ -6,10 +6,10 @@ import (
 )
 
 type MetaData struct {
-	Page       int64                 `json:"page"`
-	PerPage    int64                 `json:"per_page"`
-	PageCount  int64                 `json:"page_count"`
-	TotalCount int64                 `json:"total_count"`
+	Page       int64               `json:"page"`
+	PerPage    int64               `json:"per_page"`
+	PageCount  int64               `json:"page_count"`
+	TotalCount int64               `json:"total_count"`
 	Links      []map[string]string `json:"links"`
 }
 

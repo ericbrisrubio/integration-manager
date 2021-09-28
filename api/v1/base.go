@@ -11,22 +11,20 @@ func Router(g *echo.Group) {
 	RepositoryRouter(g.Group("/repositories"))
 }
 
-
 func GithubEventRouter(g *echo.Group) {
-	githubApi:=NewGithubApi(dependency.GetGithubService(),dependency.GetCompanyService(),dependency.GetObservers())
+	githubApi := NewV1GithubApi(dependency.GetV1GithubService(), dependency.GetV1CompanyService(), dependency.GetV1Observers())
 	g.POST("", githubApi.ListenEvent)
 }
-
-func CompanyRouter(g *echo.Group){
-	companyApi:=NewCompanyApi(dependency.GetCompanyService(),nil)
-	g.POST("",companyApi.Save)
-	g.GET("/:id",companyApi.GetById)
-	g.GET("/:id/repositories",companyApi.GetRepositoriesById)
+func CompanyRouter(g *echo.Group) {
+	companyApi := NewCompanyApi(dependency.GetV1CompanyService(), nil)
+	g.POST("", companyApi.Save)
+	g.GET("/:id", companyApi.GetById)
+	g.GET("/:id/repositories", companyApi.GetRepositoriesById)
 }
 
-func RepositoryRouter(g *echo.Group){
-	repositoryApi:=NewRepositoryApi(dependency.GetCompanyService(),nil)
-	g.POST("",repositoryApi.Save)
-	g.GET("/:id",repositoryApi.GetById)
-	g.GET("/:id/applications",repositoryApi.GetApplicationsById)
+func RepositoryRouter(g *echo.Group) {
+	repositoryApi := NewRepositoryApi(dependency.GetV1CompanyService(), nil)
+	g.POST("", repositoryApi.Save)
+	g.GET("/:id", repositoryApi.GetById)
+	g.GET("/:id/applications", repositoryApi.GetApplicationsById)
 }

@@ -16,7 +16,7 @@ func (a ciCoreEventService) Listen(subject v1.Subject) {
 	if subject.CoreRequestQueryParam == nil {
 		return
 	}
-	url := config.KlovercloudCiCoreUrl + "/pipelines?url="+subject.CoreRequestQueryParam["url"]+"&revision="+subject.CoreRequestQueryParam["revision"]+"&purging="+subject.CoreRequestQueryParam["purging"]
+	url := config.KlovercloudCiCoreUrl + "/pipelines?url=" + subject.CoreRequestQueryParam["url"] + "&revision=" + subject.CoreRequestQueryParam["revision"] + "&purging=" + subject.CoreRequestQueryParam["purging"]
 
 	header := make(map[string]string)
 	header["token"] = config.KlovercloudCiCoreToken

@@ -182,12 +182,12 @@ func (c companyRepository) GetCompanies(option v1.CompanyQueryOption) ([]v1.Comp
 	for _, each := range IndexedCompanies {
 		companies = append(companies, each)
 	}
-	for i, _ := range companies {
+	for i := range companies {
 		if option.LoadRepositories {
 			if option.LoadApplications {
 				result = companies
 			} else {
-				for j, _ := range companies[i].Repositories {
+				for j := range companies[i].Repositories {
 					companies[i].Repositories[j].Applications = nil
 				}
 				result = append(result, companies[i])
@@ -211,7 +211,7 @@ func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOptio
 		if option.LoadApplications {
 			return companies, int64(len(IndexedCompanies))
 		} else {
-			for j, _ := range companies.Repositories {
+			for j := range companies.Repositories {
 				companies.Repositories[j].Applications = nil
 			}
 		}
@@ -231,11 +231,11 @@ func (c companyRepository) GetRepositoriesByCompanyId(id string, option v1.Compa
 	}
 	if option.LoadRepositories {
 		if option.LoadApplications {
-			for j, _ := range companies.Repositories {
+			for j := range companies.Repositories {
 				repository = append(repository, companies.Repositories[j])
 			}
 		} else {
-			for j, _ := range companies.Repositories {
+			for j := range companies.Repositories {
 				companies.Repositories[j].Applications = nil
 			}
 			repository = companies.Repositories
@@ -255,11 +255,11 @@ func (c companyRepository) GetApplicationsByCompanyId(id string, option v1.Compa
 		}
 	}
 	if option.LoadRepositories {
-		for j, _ := range companies.Repositories {
+		for j := range companies.Repositories {
 			if option.LoadApplications {
 				applications = append(applications, companies.Repositories[j].Applications...)
 			} else {
-				for j, _ := range companies.Repositories {
+				for j := range companies.Repositories {
 					companies.Repositories[j].Applications = nil
 				}
 				applications = companies.Repositories[j].Applications
@@ -280,12 +280,12 @@ func (c companyRepository) GetApplicationsByCompanyIdAndRepositoryType(id string
 		}
 	}
 	if option.LoadRepositories {
-		for j, _ := range companies.Repositories {
+		for j := range companies.Repositories {
 			if _type == companies.Repositories[j].Type {
 				if option.LoadApplications {
 					applications = append(applications, companies.Repositories[j].Applications...)
 				} else {
-					for j, _ := range companies.Repositories {
+					for j := range companies.Repositories {
 						companies.Repositories[j].Applications = nil
 					}
 					applications = companies.Repositories[j].Applications

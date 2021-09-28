@@ -30,17 +30,18 @@ const (
 	INACTIVE = COMPANY_STATUS("INACTIVE")
 )
 
-type PIPELINE_RESOURCE_TYPE string
-
-const (
-	GIT         = PIPELINE_RESOURCE_TYPE("git")
-	IMAGE       = PIPELINE_RESOURCE_TYPE("image")
-	DEPLOYMENT  = PIPELINE_RESOURCE_TYPE("deployment")
-	STATEFULSET = PIPELINE_RESOURCE_TYPE("statefulset")
-	DAEMONSET   = PIPELINE_RESOURCE_TYPE("daemonset")
-	POD         = PIPELINE_RESOURCE_TYPE("pod")
-	REPLICASET  = PIPELINE_RESOURCE_TYPE("replicaset")
-)
+//
+//type PIPELINE_RESOURCE_TYPE string
+//
+//const (
+//	GIT         = PIPELINE_RESOURCE_TYPE("git")
+//	IMAGE       = PIPELINE_RESOURCE_TYPE("image")
+//	DEPLOYMENT  = PIPELINE_RESOURCE_TYPE("deployment")
+//	STATEFULSET = PIPELINE_RESOURCE_TYPE("statefulset")
+//	DAEMONSET   = PIPELINE_RESOURCE_TYPE("daemonset")
+//	POD         = PIPELINE_RESOURCE_TYPE("pod")
+//	REPLICASET  = PIPELINE_RESOURCE_TYPE("replicaset")
+//)
 
 type STEP_TYPE string
 
@@ -67,5 +68,22 @@ const (
 type GIT_FILE_NAME string
 
 const (
-	PIPELINE_FILE_NAME = "pipeline.yaml"
+	PIPELINE_FILE_NAME = "pipeline"
 )
+
+type TRIGGER string
+
+const (
+	AUTO   = TRIGGER("AUTO")
+	MANUAL = TRIGGER("MANUAL")
+)
+
+type PARAMS string
+
+const (
+	_TYPE = PARAMS("type")
+	ENV   = PARAMS("env")
+)
+
+const PIPELINE_FILE_BASE_DIRECTORY = "klovercloud/pipeline"
+const PIPELINE_DESCRIPTORS_BASE_DIRECTORY = "klovercloud/pipeline/descriptors"

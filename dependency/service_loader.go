@@ -9,26 +9,26 @@ import (
 	"github.com/klovercloud-ci/repository/v1/mongo"
 )
 
-func GetGithubService()service.Git{
-	var observers [] service.Observer
-	observers= append(observers, logic.NewCiCoreEventService(logic.NewHttpClientService()))
-	observers= append(observers, logic.NewProcessInventoryEventService(logic.NewHttpClientService()))
-	return logic.NewGithubService(GetCompanyService(),nil,logic.NewHttpClientService())
+func GetV1GithubService() service.Git {
+	var observers []service.Observer
+	observers = append(observers, logic.NewCiCoreEventService(logic.NewHttpClientService()))
+	observers = append(observers, logic.NewProcessInventoryEventService(logic.NewHttpClientService()))
+	return logic.NewGithubService(GetV1CompanyService(), nil, logic.NewHttpClientService())
 }
 
-func GetObservers()[]service.Observer{
-	var observers [] service.Observer
-	observers= append(observers, logic.NewCiCoreEventService(logic.NewHttpClientService()))
-	observers= append(observers, logic.NewProcessInventoryEventService(logic.NewHttpClientService()))
+func GetV1Observers() []service.Observer {
+	var observers []service.Observer
+	observers = append(observers, logic.NewCiCoreEventService(logic.NewHttpClientService()))
+	observers = append(observers, logic.NewProcessInventoryEventService(logic.NewHttpClientService()))
 	return observers
 }
 
-func GetCompanyService()service.Company{
+func GetV1CompanyService() service.Company {
 	var company service.Company
-	if config.Database==enums.Mongo{
-		company=logic.NewCompanyService(mongo.NewCompanyRepository(3000))
-	}else{
-		company=logic.NewCompanyService(in_memory.NewCompanyRepository(3000))
+	if config.Database == enums.Mongo {
+		company = logic.NewCompanyService(mongo.NewCompanyRepository(3000))
+	} else {
+		company = logic.NewCompanyService(in_memory.NewCompanyRepository(3000))
 	}
 	return company
 }

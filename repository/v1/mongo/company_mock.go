@@ -8,15 +8,13 @@ import (
 
 var data []v1.Company
 
-
-
-func InitCompanyData() [] v1.Company{
-	var data [] v1.Company
+func InitCompanyData() []v1.Company {
+	var data []v1.Company
 	//add object to data
 	return data
 }
-func NewMockCompanyRepository() repository.CompanyRepository{
-	manager:=GetMockDmManager()
+func NewMockCompanyRepository() repository.CompanyRepository {
+	manager := GetMockDmManager()
 	manager.Db.Drop(context.Background())
 	return &companyRepository{
 		manager: GetMockDmManager(),

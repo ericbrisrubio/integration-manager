@@ -23,4 +23,3 @@ func index(c echo.Context) error {
 func health(c echo.Context) error {
 	return c.String(http.StatusOK, "I am live!")
 }
-

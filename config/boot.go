@@ -5,7 +5,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func New() *echo.Echo{
+func New() *echo.Echo {
 	InitEnvironmentVariables()
 
 	echoInstance := echo.New()

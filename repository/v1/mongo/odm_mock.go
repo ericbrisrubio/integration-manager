@@ -8,7 +8,6 @@ import (
 	"os"
 )
 
-
 func GetMockDmManager() *dmManager {
 	onceDmManager.Do(func() {
 		log.Println("[INFO] Starting Initializing Singleton DB Manager")
@@ -21,7 +20,7 @@ func GetMockDmManager() *dmManager {
 func (dm *dmManager) initMockMongoConnection() {
 	ctx := context.Background()
 	dm.Ctx = ctx
-	clientOpts := options.Client().ApplyURI( "mongodb://" + os.Getenv("MONGO_USERNAME") + ":" + os.Getenv("MONGO_PASSWORD") + "@" + os.Getenv("MONGO_SERVER") + ":" +  os.Getenv("MONGO_PORT"))
+	clientOpts := options.Client().ApplyURI("mongodb://" + os.Getenv("MONGO_USERNAME") + ":" + os.Getenv("MONGO_PASSWORD") + "@" + os.Getenv("MONGO_SERVER") + ":" + os.Getenv("MONGO_PORT"))
 	client, err := mongo.Connect(ctx, clientOpts)
 	if err != nil {
 		log.Println("[ERROR] DB Connection error:", err.Error())
@@ -33,5 +32,3 @@ func (dm *dmManager) initMockMongoConnection() {
 
 	log.Println("[INFO] Initialized Singleton DB Manager")
 }
-
-

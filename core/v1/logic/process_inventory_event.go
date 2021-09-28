@@ -22,7 +22,7 @@ func (p processInventoryEventService) Listen(subject v1.Subject) {
 	header["token"] = config.EventStoreToken
 	header["Content-Type"] = "application/json"
 
-	process:=v1.ProcessInventoryEvent{
+	process := v1.ProcessInventoryEvent{
 		ProcessId:    subject.Pipeline.ProcessId,
 		CompanyId:    subject.App.CompanyId,
 		AppId:        subject.App.AppId,

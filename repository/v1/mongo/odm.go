@@ -16,7 +16,6 @@ type SortParam struct {
 
 type Data interface{}
 
-
 type dmManager struct {
 	Ctx context.Context
 	Db  *mongo.Database
@@ -51,4 +50,3 @@ func (dm *dmManager) initConnection() {
 
 	log.Println("[INFO] Initialized Singleton DB Manager")
 }
-
