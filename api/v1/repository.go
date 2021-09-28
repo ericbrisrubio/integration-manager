@@ -21,7 +21,7 @@ type repositoryApi struct {
 }
 
 func (r repositoryApi) Save(context echo.Context) error {
-	formData := v1.Company{}
+	formData := v1.CompanyWithUpdateOption{}
 	if err := context.Bind(&formData); err != nil {
 		log.Println("Input Error:", err.Error())
 		return common.GenerateErrorResponse(context, nil, "Failed to Bind Input!")
@@ -34,13 +34,18 @@ func (r repositoryApi) Save(context echo.Context) error {
 		Repositories: formData.Repositories,
 		Status:       enums.ACTIVE,
 	}
+	var options v1.CompanyUpdateOption
+	options.Option = formData.Option
 	contextData, er := validator(payload)
 	if er != nil {
 		return common.GenerateErrorResponse(context, nil, "invalid repository id!")
 	}
+	err := r.companyService.UpdateRepositories(payload, options)
+	if err != nil {
+		return common.GenerateErrorResponse(context, nil, "Database error!")
+	}
 	return common.GenerateSuccessResponse(context, contextData,
 		nil, "saved Successfully")
-	//not implemented
 }
 func validator(payload v1.Company) (v1.Company, error) {
 	comp := v1.Company{}
@@ -63,7 +68,12 @@ func validator(payload v1.Company) (v1.Company, error) {
 }
 
 func (r repositoryApi) GetById(context echo.Context) error {
-	panic("implement me")
+	id := context.Param("id")
+	if id == "" {
+		return errors.New("Id required!")
+	}
+	data := r.companyService.GetRepositoryByRepositoryId(id)
+	return common.GenerateSuccessResponse(context, data, nil, "Success!")
 }
 
 func (r repositoryApi) GetApplicationsById(context echo.Context) error {

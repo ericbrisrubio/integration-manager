@@ -13,8 +13,46 @@ var (
 type companyRepository struct {
 }
 
+func (c companyRepository) GetRepositoryByRepositoryId(id string) v1.Repository {
+	var companies []v1.Company
+	var repo v1.Repository
+	for _, each := range IndexedCompanies {
+		companies = append(companies, each)
+	}
+	for _, each := range companies {
+		for _, eachrepo := range each.Repositories {
+			if id == eachrepo.Id {
+				repo.Type = eachrepo.Type
+				repo.Token = eachrepo.Token
+				repo.Id = eachrepo.Id
+				repo.Applications = eachrepo.Applications
+			}
+		}
+	}
+	return repo
+}
+
 func (c companyRepository) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
-	panic("implement me")
+	var companies []v1.Company
+	var app v1.Application
+	for _, each := range IndexedCompanies {
+		companies = append(companies, each)
+	}
+	for _, eachCompany := range companies {
+		if companyId == eachCompany.Id {
+			for _, eachrepo := range eachCompany.Repositories {
+				if eachrepo.Id == repositoryId {
+					for _, eachApp := range eachrepo.Applications {
+						if applicationUrl == eachApp.Url {
+							app.MetaData = eachApp.MetaData
+							app.Url = eachApp.Url
+						}
+					}
+				}
+			}
+		}
+	}
+	return app
 }
 func (c companyRepository) AppendRepositories(companyId string, repos []v1.Repository) error {
 	var companies []v1.Company
@@ -267,9 +305,6 @@ func (c companyRepository) Store(company v1.Company) error {
 	}
 	IndexedCompanies[company.Id] = company
 	return nil
-}
-func (c companyRepository) Update(company v1.Company, companyUpdateOption v1.CompanyUpdateOption) {
-	panic("implement me")
 }
 
 func (c companyRepository) Delete(companyId string) error {
