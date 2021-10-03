@@ -23,7 +23,7 @@ func (githubService githubService) GetPipeline(repogitory_name, username, revisi
 	if err != nil {
 		return nil, err
 	}
-	pipelneFile := ""
+	var pipelneFile string
 
 	for _, each := range contents {
 		if each.Name == enums.PIPELINE_FILE_NAME+".yaml" || each.Name == enums.PIPELINE_FILE_NAME+".yml" || each.Name == enums.PIPELINE_FILE_NAME+".json" {
