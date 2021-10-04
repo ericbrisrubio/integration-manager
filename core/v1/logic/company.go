@@ -17,12 +17,7 @@ func (c companyService) GetRepositoryByRepositoryId(id string) v1.Repository {
 }
 
 func (c companyService) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
-	return v1.Application{
-		MetaData: v1.ApplicationMetadata{
-			Id: "1001",
-		},
-	}
-	//return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl)
+	return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl)
 }
 func (c companyService) UpdateRepositories(company v1.Company, companyUpdateOption v1.CompanyUpdateOption) error {
 	if companyUpdateOption.Option == enums.APPEND_REPOSITORY {
@@ -71,11 +66,7 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 }
 
 func (c companyService) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {
-	//return c.repo.GetRepositoryByCompanyIdAndApplicationUrl(id, url)
-	return v1.Repository{
-		Id:    "1",
-		Token: "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",
-	}
+	return c.repo.GetRepositoryByCompanyIdAndApplicationUrl(id, url)
 }
 
 func (c companyService) GetCompanyByApplicationUrl(url string) v1.Company {
