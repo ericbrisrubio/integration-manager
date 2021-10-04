@@ -29,7 +29,7 @@ func (a ciCoreEventService) Listen(subject v1.Subject) {
 	go a.httpClient.Post(url, header, b)
 }
 
-func NewCiCoreEventService(httpPublisher service.HttpClient) service.CiCoreEvent {
+func NewCiCoreEventService(httpPublisher service.HttpClient) service.Observer {
 	return &ciCoreEventService{
 		httpClient: httpPublisher,
 	}

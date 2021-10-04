@@ -37,7 +37,7 @@ func (p processInventoryEventService) Listen(subject v1.Subject) {
 	go p.httpClient.Post(url, header, b)
 }
 
-func NewProcessInventoryEventService(httpPublisher service.HttpClient) service.ProcessInventoryEvent {
+func NewProcessInventoryEventService(httpPublisher service.HttpClient) service.Observer {
 	return &processInventoryEventService{
 		httpClient: httpPublisher,
 	}
