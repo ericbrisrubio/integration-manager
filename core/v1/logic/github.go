@@ -28,6 +28,7 @@ func (githubService githubService) GetPipeline(repogitory_name, username, revisi
 	for _, each := range contents {
 		if each.Name == enums.PIPELINE_FILE_NAME+".yaml" || each.Name == enums.PIPELINE_FILE_NAME+".yml" || each.Name == enums.PIPELINE_FILE_NAME+".json" {
 			pipelneFile = each.Name
+			break
 		}
 	}
 	url := enums.GITHUB_RAW_CONTENT_BASE_URL + username + "/" + repogitory_name + "/" + revision + "/klovercloud/pipeline/" + pipelneFile
@@ -41,7 +42,7 @@ func (githubService githubService) GetPipeline(repogitory_name, username, revisi
 		return nil, err
 	}
 	pipeline := v1.Pipeline{}
-	if strings.HasSuffix(pipelneFile, "yaml") || strings.HasSuffix(pipelneFile, "yml") || strings.HasSuffix(pipelneFile, "json") {
+	if strings.HasSuffix(pipelneFile, "yaml") || strings.HasSuffix(pipelneFile, "yml") {
 		err = yaml.Unmarshal(data, &pipeline)
 		if err != nil {
 			log.Println(err.Error())
@@ -59,7 +60,7 @@ func (githubService githubService) GetPipeline(repogitory_name, username, revisi
 	return &pipeline, nil
 }
 
-func (githubService githubService) GetDescriptors(repogitory_name, username, revision, token, path string) ([]unstructured.Unstructured, error) {
+func (githubService githubService) GetDescriptors(repogitory_name, username, revision, token, path,env string) ([]unstructured.Unstructured, error) {
 	contents, err := githubService.GetDirectoryContents(repogitory_name, username, revision, token, path)
 	if err != nil {
 		return nil, err
@@ -70,9 +71,12 @@ func (githubService githubService) GetDescriptors(repogitory_name, username, rev
 		if each.Type != "file" {
 			continue
 		}
-		if !strings.HasSuffix(each.Name, ".yaml") && !strings.HasSuffix(each.Name, ".yml") {
+		if each.Name!=env+".yaml" && each.Name!=env+".yml" && each.Name!=env+".json"{
 			continue
 		}
+		//if !strings.HasSuffix(each.Name, ".yaml") && !strings.HasSuffix(each.Name, ".yml") {
+		//	continue
+		//}
 		url := fmt.Sprint(each.DownloadURL)
 		header := make(map[string]string)
 		header["Authorization"] = "token " + token
@@ -85,14 +89,17 @@ func (githubService githubService) GetDescriptors(repogitory_name, username, rev
 		}
 
 		fileAsString := string(data)[:]
-		sepYamlfiles := strings.Split(fileAsString, "---")
-		for _, each := range sepYamlfiles {
+		sepfiles := strings.Split(fileAsString, "---")
+		for _, each := range sepfiles {
 			obj := &unstructured.Unstructured{
 				Object: map[string]interface{}{},
 			}
 			if err := yaml.Unmarshal([]byte(each), &obj.Object); err != nil {
 				log.Println(err.Error())
-				return nil, err
+				if err := json.Unmarshal([]byte(each), &obj.Object); err != nil {
+					log.Println(err.Error())
+					return nil, err
+				}
 			}
 			files = append(files, *obj)
 		}

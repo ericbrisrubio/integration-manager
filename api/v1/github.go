@@ -42,7 +42,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		for i := range data.Steps {
 			if data.Steps[i].Type == enums.DEPLOY {
 				if val, ok := data.Steps[i].Params["env"]; ok {
-					contentsData, err := g.gitService.GetDescriptors(repoName, owner, revision, repository.Token, enums.PIPELINE_DESCRIPTORS_BASE_DIRECTORY+"/"+val)
+					contentsData, err := g.gitService.GetDescriptors(repoName, owner, revision, repository.Token, enums.PIPELINE_DESCRIPTORS_BASE_DIRECTORY+"/",val)
 					if err != nil {
 						return common.GenerateErrorResponse(context, err.Error(), "Failed to trigger pipeline process!")
 					}

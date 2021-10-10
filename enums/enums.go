@@ -86,4 +86,4 @@ const (
 )
 
 const PIPELINE_FILE_BASE_DIRECTORY = "klovercloud/pipeline"
-const PIPELINE_DESCRIPTORS_BASE_DIRECTORY = "klovercloud/pipeline/descriptors"
+const PIPELINE_DESCRIPTORS_BASE_DIRECTORY = "klovercloud/pipeline/configs"

@@ -7,6 +7,6 @@ import (
 
 type Git interface {
 	GetPipeline(repogitory_name, username, revision, token string) (*v1.Pipeline, error)
-	GetDescriptors(repogitory_name, username, revision, token, path string) ([]unstructured.Unstructured, error)
+	GetDescriptors(repogitory_name, username, revision, token, path,env string) ([]unstructured.Unstructured, error)
 	GetDirectoryContents(repogitory_name, username, revision, token, path string) ([]v1.GithubDirectoryContent, error)
 }
