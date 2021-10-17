@@ -74,7 +74,7 @@ func (c companyService) GetRepositoryByCompanyIdAndApplicationUrl(id, url string
 	//return c.repo.GetRepositoryByCompanyIdAndApplicationUrl(id, url)
 	return v1.Repository{
 		Id:    "1",
-		Token: "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",
+		Token: "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",
 	}
 }
 
