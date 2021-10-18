@@ -87,7 +87,6 @@ func (c companyService) Delete(companyId string) error {
 
 func (c companyService) GetCompanies(option v1.CompanyQueryOption) []v1.Company {
 	companies, _ := c.repo.GetCompanies(option)
-
 	return companies
 }
 

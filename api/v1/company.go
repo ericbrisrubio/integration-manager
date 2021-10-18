@@ -20,6 +20,12 @@ type companyApi struct {
 	observerList   []service.Observer
 }
 
+func (c companyApi) GetCompanies(context echo.Context) error {
+	option := getQueryOption(context)
+	data := c.companyService.GetCompanies(option)
+	return common.GenerateSuccessResponse(context, data, nil, "Success!")
+}
+
 func (c companyApi) Save(context echo.Context) error {
 	formData := v1.Company{}
 	if err := context.Bind(&formData); err != nil {
@@ -82,10 +88,12 @@ func getQueryOption(context echo.Context) v1.CompanyQueryOption {
 	page := context.QueryParam("page")
 	limit := context.QueryParam("limit")
 	la := context.QueryParam("LoadApplications")
-	lr := context.QueryParam("LoadApplications")
+	lr := context.QueryParam("LoadRepositories")
 	if page == "" {
 		option.Pagination.Page = 0
 		option.Pagination.Limit = 10
+		option.LoadApplications, _ = strconv.ParseBool(la)
+		option.LoadRepositories, _ = strconv.ParseBool(lr)
 	} else {
 		option.Pagination.Page, _ = strconv.ParseInt(page, 10, 64)
 		option.Pagination.Limit, _ = strconv.ParseInt(limit, 10, 64)

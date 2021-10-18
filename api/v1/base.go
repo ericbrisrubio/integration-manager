@@ -18,6 +18,7 @@ func GithubEventRouter(g *echo.Group) {
 func CompanyRouter(g *echo.Group) {
 	companyApi := NewCompanyApi(dependency.GetV1CompanyService(), nil)
 	g.POST("", companyApi.Save)
+	g.GET("", companyApi.GetCompanies)
 	g.GET("/:id", companyApi.GetById)
 	g.GET("/:id/repositories", companyApi.GetRepositoriesById)
 }

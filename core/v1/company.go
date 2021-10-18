@@ -10,6 +10,6 @@ type Company struct {
 	Status       enums.COMPANY_STATUS `bson:"status" json:"status"`
 }
 
-func (company Company) Validate() error {
+func (dto Company) Validate() error {
 	return nil
 }

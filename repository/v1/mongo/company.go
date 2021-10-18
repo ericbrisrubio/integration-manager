@@ -33,13 +33,15 @@ func (c companyRepository) GetRepositoryByRepositoryId(id string) v1.Repository 
 		log.Println(err.Error())
 	}
 	for result.Next(context.TODO()) {
-		elemValues := new(v1.Repository)
+		elemValues := new(v1.Company)
 		err := result.Decode(elemValues)
 		if err != nil {
 			log.Println("[ERROR]", err)
 			break
 		}
-		repo = *elemValues
+		for _, each := range elemValues.Repositories {
+			repo = each
+		}
 	}
 	return repo
 }
@@ -57,13 +59,17 @@ func (c companyRepository) GetApplicationByCompanyIdAndRepositoryIdAndApplicatio
 		log.Println(err.Error())
 	}
 	for result.Next(context.TODO()) {
-		elemValues := new(v1.Application)
+		elemValues := new(v1.Company)
 		err := result.Decode(elemValues)
 		if err != nil {
 			log.Println("[ERROR]", err)
 			break
 		}
-		app = *elemValues
+		for _, each := range elemValues.Repositories {
+			for _, eachApp := range each.Applications {
+				app = eachApp
+			}
+		}
 	}
 	return app
 }
@@ -89,9 +95,9 @@ func (c companyRepository) AppendRepositories(companyId string, repos []v1.Repos
 		for _, eachRepo := range repos {
 			elemValues.Repositories = append(elemValues.Repositories, eachRepo)
 		}
-		error := c.Store(*elemValues)
-		if err != nil {
-			return error
+		err2 := c.Store(*elemValues)
+		if err2 != nil {
+			return err2
 		}
 	}
 	return nil
@@ -118,8 +124,8 @@ func (c companyRepository) DeleteRepositories(companyId string, repos []v1.Repos
 		}
 		if isSoftDelete {
 			elemValues.Status = enums.INACTIVE
-			error := c.Store(*elemValues)
-			if error == nil {
+			err2 := c.Store(*elemValues)
+			if err2 == nil {
 				return nil
 			}
 		} else {
@@ -131,9 +137,9 @@ func (c companyRepository) DeleteRepositories(companyId string, repos []v1.Repos
 				}
 			}
 			elemValues.Repositories = repositories
-			error := c.Store(*elemValues)
-			if error != nil {
-				return error
+			er := c.Store(*elemValues)
+			if er != nil {
+				return er
 			}
 		}
 	}
@@ -144,7 +150,7 @@ func (c companyRepository) AppendApplications(companyId, repositoryId string, ap
 	query := bson.M{
 		"$and": []bson.M{},
 	}
-	and := []bson.M{{"id": companyId}}
+	and := []bson.M{{"id": companyId, "repositories.id": repositoryId}}
 	query["$and"] = and
 	coll := c.manager.Db.Collection(CompanyCollection)
 	result, err := coll.Find(c.manager.Ctx, query)
@@ -163,9 +169,9 @@ func (c companyRepository) AppendApplications(companyId, repositoryId string, ap
 				eachRepo.Applications = append(eachRepo.Applications, eachApp)
 			}
 		}
-		error := c.Store(*elemValues)
-		if err != nil {
-			return error
+		er := c.Store(*elemValues)
+		if er != nil {
+			return er
 		}
 	}
 	return nil
@@ -192,8 +198,8 @@ func (c companyRepository) DeleteApplications(companyId, repositoryId string, ap
 		}
 		if isSoftDelete {
 			elemValues.Status = enums.INACTIVE
-			error := c.Store(*elemValues)
-			if error == nil {
+			err2 := c.Store(*elemValues)
+			if err2 == nil {
 				return nil
 			}
 		} else {
@@ -209,9 +215,9 @@ func (c companyRepository) DeleteApplications(companyId, repositoryId string, ap
 				}
 				eachRepo.Applications = applications
 			}
-			error := c.Store(*elemValues)
-			if error != nil {
-				return error
+			err2 := c.Store(*elemValues)
+			if err2 != nil {
+				return err2
 			}
 		}
 	}
@@ -231,13 +237,13 @@ func (c companyRepository) GetRepositoryByCompanyIdAndApplicationUrl(id, url str
 		log.Println(err.Error())
 	}
 	for result.Next(context.TODO()) {
-		elemValue := new([]v1.Repository)
+		elemValue := new(v1.Company)
 		err := result.Decode(elemValue)
 		if err != nil {
 			log.Println("[ERROR]", err)
 			break
 		}
-		for _, each := range *elemValue {
+		for _, each := range elemValue.Repositories {
 			for _, eachApp := range each.Applications {
 				if url == eachApp.Url {
 					results = each
@@ -275,44 +281,30 @@ func (c companyRepository) GetCompanyByApplicationUrl(url string) v1.Company {
 func (c companyRepository) GetCompanies(option v1.CompanyQueryOption) ([]v1.Company, int64) {
 	var results []v1.Company
 	coll := c.manager.Db.Collection(CompanyCollection)
-	result, err := coll.Find(c.manager.Ctx, nil, nil)
+	skip := option.Pagination.Page * option.Pagination.Limit
+	result, err := coll.Find(c.manager.Ctx, bson.D{}, &options.FindOptions{
+		Limit: &option.Pagination.Limit,
+		Skip:  &skip,
+	})
 	if err != nil {
 		log.Println(err.Error())
 	}
 	for result.Next(context.TODO()) {
+		elemValue := new(v1.Company)
+		err := result.Decode(elemValue)
+		if err != nil {
+			log.Println("[ERROR]", err)
+			break
+		}
 		if option.LoadRepositories {
 			if option.LoadApplications {
-				elemValue := new([]v1.Company)
-				err := result.Decode(elemValue)
-				if err != nil {
-					log.Println("[ERROR]", err)
-					break
-				}
-				results = *elemValue
+				results = append(results, *elemValue)
 			} else {
-				elemValue := new([]v1.CompanyWiseRepositoriesDto)
-				err := result.Decode(elemValue)
-				if err != nil {
-					log.Println("[ERROR]", err)
-					break
-				}
-				for _, each := range *elemValue {
-					results = append(results, each.GetCompanyWithRepository())
-				}
+				results = append(results, elemValue.GetCompanyWithRepository())
 			}
 		} else {
-			elemValue := new([]v1.OnlyCompanyDto)
-			err := result.Decode(elemValue)
-			if err != nil {
-				log.Println("[ERROR]", err)
-				break
-			}
-			for _, each := range *elemValue {
-				results = append(results, each.GetCompanyWithoutRepository())
-			}
-
+			results = append(results, elemValue.GetCompanyWithoutRepository())
 		}
-
 	}
 	return results, int64(len(results))
 }
@@ -334,33 +326,19 @@ func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOptio
 		log.Println(err.Error())
 	}
 	for result.Next(context.TODO()) {
+		elemValue := new(v1.Company)
+		err := result.Decode(elemValue)
+		if err != nil {
+			log.Println("[ERROR]", err)
+			break
+		}
 		if option.LoadRepositories {
 			if option.LoadApplications {
-				elemValue := new(v1.Company)
-				err := result.Decode(elemValue)
-				if err != nil {
-					log.Println("[ERROR]", err)
-					break
-				}
 				results = *elemValue
 			} else {
-				elemValue := new(v1.CompanyWiseRepositoriesDto)
-				err := result.Decode(elemValue)
-				if err != nil {
-					log.Println("[ERROR]", err)
-					break
-				}
-
 				results = elemValue.GetCompanyWithRepository()
 			}
 		} else {
-			elemValue := new(v1.OnlyCompanyDto)
-			err := result.Decode(elemValue)
-			if err != nil {
-				log.Println("[ERROR]", err)
-				break
-			}
-
 			results = elemValue.GetCompanyWithoutRepository()
 		}
 	}
@@ -388,26 +366,27 @@ func (c companyRepository) GetRepositoriesByCompanyId(id string, option v1.Compa
 		log.Println(err.Error())
 	}
 	for result.Next(context.TODO()) {
-		if option.LoadRepositories {
-			if option.LoadApplications {
-				elemValue := new([]v1.Repository)
-				err := result.Decode(elemValue)
-				if err != nil {
-					log.Println("[ERROR]", err)
-					break
-				}
-				results = *elemValue
+		elemValue := new(v1.Company)
+		err := result.Decode(elemValue)
+		if err != nil {
+			log.Println("[ERROR]", err)
+			break
+		}
+		if option.LoadRepositories == true {
+			if option.LoadApplications == true {
+				results = elemValue.Repositories
 			} else {
-				elemValue := new([]v1.RepositoryWithOutApplication)
-				err := result.Decode(elemValue)
-				if err != nil {
-					log.Println("[ERROR]", err)
-					break
-				}
-				for _, each := range *elemValue {
-					results = append(results, each.GetRepositoryWithoutApplication())
+				var rep v1.Repository
+				for _, each := range elemValue.Repositories {
+					rep.Type = each.Type
+					rep.Id = each.Id
+					rep.Token = each.Token
+					rep.Applications = nil
+
+					results = append(results, rep)
 				}
 			}
+			return results, int64(len(results))
 		}
 	}
 	return results, int64(len(results))
@@ -431,19 +410,18 @@ func (c companyRepository) GetApplicationsByCompanyId(id string, option v1.Compa
 		log.Println(err.Error())
 	}
 	for result.Next(context.TODO()) {
-		elemValue := new([]v1.Application)
+		elemValue := new(v1.Company)
 		err := result.Decode(elemValue)
 		if err != nil {
 			log.Println("[ERROR]", err)
 			break
 		}
-		results = *elemValue
-		elem := new(v1.Company)
-		er := result.Decode(elem)
-		if er != nil {
-			log.Println("[ERROR]", er)
+		for _, eachRepo := range elemValue.Repositories {
+			for _, eachApp := range eachRepo.Applications {
+				results = append(results, eachApp)
+			}
 		}
-		company = *elem
+		company = *elemValue
 	}
 	return results, int64(len(company.Repositories))
 }
@@ -465,17 +443,19 @@ func (c companyRepository) GetApplicationsByCompanyIdAndRepositoryType(id string
 		log.Println(err.Error())
 	}
 	for result.Next(context.TODO()) {
-		elemValue := new([]v1.Repository)
+		elemValue := new(v1.Company)
 		err := result.Decode(elemValue)
 		if err != nil {
 			log.Println("[ERROR]", err)
 			break
 		}
-		for _, each := range *elemValue {
+		var app []v1.Application
+		for _, each := range elemValue.Repositories {
 			if _type == each.Type {
-				results = append(results, each.Applications...)
+				app = each.Applications
 			}
 		}
+		results = app
 	}
 	return results
 }
