@@ -36,7 +36,7 @@ func (c companyApi) Save(context echo.Context) error {
 	}
 	contextData, er := validate(payload)
 	if er != nil {
-		return common.GenerateErrorResponse(context, nil, "invalid repository id!")
+		return common.GenerateErrorResponse(context, nil, "invalid repository type!")
 	}
 	err := c.companyService.Store(contextData)
 	if err != nil {
@@ -60,7 +60,7 @@ func validate(payload v1.Company) (v1.Company, error) {
 				fmt.Println("meta data----", eachApp)
 			}
 		} else {
-			return comp, errors.New("Ivalid repository id!")
+			return comp, errors.New("Ivalid repository type!")
 		}
 		fmt.Println("object----", comp)
 	}

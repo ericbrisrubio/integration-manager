@@ -38,7 +38,7 @@ func (r repositoryApi) Save(context echo.Context) error {
 	options.Option = formData.Option
 	contextData, er := validator(payload)
 	if er != nil {
-		return common.GenerateErrorResponse(context, nil, "invalid repository id!")
+		return common.GenerateErrorResponse(context, nil, "invalid repository type!")
 	}
 	err := r.companyService.UpdateRepositories(payload, options)
 	if err != nil {
@@ -60,7 +60,7 @@ func validator(payload v1.Company) (v1.Company, error) {
 				fmt.Println("meta data----", eachApp)
 			}
 		} else {
-			return comp, errors.New("Ivalid repository id!")
+			return comp, errors.New("Ivalid repository type!")
 		}
 		fmt.Println("object----", comp)
 	}
