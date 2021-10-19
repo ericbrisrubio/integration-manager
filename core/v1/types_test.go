@@ -3,6 +3,7 @@ package v1
 import (
 	"errors"
 	"fmt"
+	"github.com/klovercloud-ci/enums"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
@@ -17,7 +18,7 @@ func TestCompanyMetadata_Validate(t *testing.T) {
 	var testcase []TestCase
 
 	labelDemo1 := []map[string]string{{"key1": "value1", "key2": ""}, {"key1": "value1", "key2": "value2"}}
-	expectedDemo := []error{errors.New("Company metadata label is required!"), nil}
+	expectedDemo := []error{errors.New("Company metadata label is missing!"), nil}
 
 	for i := 0; i < 2; i++ {
 		testCase := TestCase{
@@ -46,7 +47,7 @@ func TestApplicationMetadata_Validate(t *testing.T) {
 	labelDemo1 := []map[string]string{{"key1": "value1", "key2": ""}, {"key1": "value1", "key2": "value2"}, {"key1": "value1", "key2": "value2"}}
 	IdDemo := []string{"011163003", "", "011163003"}
 	nameDemo := []string{"test1", "test2", ""}
-	expectedDemo := []error{errors.New("Application metadata label is required!"), errors.New("Application metadata id is required!"), errors.New("Application metadata name is required!")}
+	expectedDemo := []error{errors.New("Application metadata label is missing!"), errors.New("Application metadata id is required!"), errors.New("Application metadata name is required!")}
 
 	for i := 0; i < 3; i++ {
 		testcase := TestCase{
@@ -93,6 +94,47 @@ func TestApplication_Validate(t *testing.T) {
 		testdata = append(testdata, testcase)
 	}
 	for i := 0; i < 2; i++ {
+		testdata[i].actual = testdata[i].data.Validate()
+		if !reflect.DeepEqual(testdata[i].expected, testdata[i].actual) {
+			fmt.Println(testdata[i].actual, i)
+			assert.ElementsMatch(t, testdata[i].expected, testdata[i].actual)
+		}
+	}
+}
+
+func TestRepository_Validate(t *testing.T) {
+	type TestCase struct {
+		data     Repository
+		expected error
+		actual   error
+	}
+	var testdata []TestCase
+
+	id := []string{"", "011", "0564", "5478"}
+	token := []string{"jwt123", "", "asd555", "asd222"}
+	typeDemo := []string{"GITHUB", "BIT_BUCKET", "", "test"}
+	expecDemo := []error{errors.New("Repository id is required!"), errors.New("Repository token is required!"), errors.New("Repository type is required"), errors.New("Repository type is invalid!")}
+
+	for i := 0; i < 4; i++ {
+		testcase := TestCase{
+			data: Repository{
+				Id:    id[i],
+				Type:  enums.REPOSITORY_TYPE(typeDemo[i]),
+				Token: token[i],
+				Applications: []Application{{
+					MetaData: ApplicationMetadata{
+						Labels: nil,
+						Id:     "011",
+						Name:   "111",
+					},
+					Url: "www.example.com",
+				}},
+			},
+			expected: expecDemo[i],
+		}
+		testdata = append(testdata, testcase)
+	}
+	for i := 0; i < 4; i++ {
 		testdata[i].actual = testdata[i].data.Validate()
 		if !reflect.DeepEqual(testdata[i].expected, testdata[i].actual) {
 			fmt.Println(testdata[i].actual, i)

@@ -75,7 +75,7 @@ func (metadata ApplicationMetadata) Validate() error {
 	keys := reflect.ValueOf(metadata.Labels).MapKeys()
 	for i := 0; i < len(keys); i++ {
 		if metadata.Labels[keys[i].String()] == "" {
-			return errors.New("Application metadata label is required!")
+			return errors.New("Application metadata label is missing!")
 		}
 	}
 	if metadata.Id == "" {
@@ -95,7 +95,7 @@ func (metadata CompanyMetadata) Validate() error {
 	keys := reflect.ValueOf(metadata.Labels).MapKeys()
 	for i := 0; i < len(keys); i++ {
 		if metadata.Labels[keys[i].String()] == "" {
-			return errors.New("Company metadata label is required!")
+			return errors.New("Company metadata label is missing!")
 		}
 	}
 	return nil
