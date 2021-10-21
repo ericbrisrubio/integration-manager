@@ -44,25 +44,26 @@ func (c companyService) UpdateRepositories(company v1.Company, companyUpdateOpti
 	return nil
 }
 
-func (c companyService) UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.CompanyUpdateOption) {
+func (c companyService) UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.CompanyUpdateOption) error {
 	if companyUpdateOption.Option == enums.APPEND_APPLICATION {
 		err := c.repo.AppendApplications(companyId, repositoryId, apps)
 		if err != nil {
-			fmt.Println(err)
+			return err
 		}
 	}
 	if companyUpdateOption.Option == enums.SOFT_DELETE_APPLICATION {
 		err := c.repo.DeleteApplications(companyId, repositoryId, apps, true)
 		if err != nil {
-			fmt.Println(err)
+			return err
 		}
 	}
 	if companyUpdateOption.Option == enums.DELETE_APPLICATION {
 		err := c.repo.DeleteApplications(companyId, repositoryId, apps, false)
 		if err != nil {
-			fmt.Println(err)
+			return err
 		}
 	}
+	return nil
 }
 
 func (c companyService) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {

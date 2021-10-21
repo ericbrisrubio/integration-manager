@@ -8,7 +8,7 @@ import (
 type Company interface {
 	Store(company v1.Company) error
 	UpdateRepositories(company v1.Company, companyUpdateOption v1.CompanyUpdateOption) error
-	UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.CompanyUpdateOption)
+	UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.CompanyUpdateOption) error
 	Delete(companyId string) error
 	GetCompanies(option v1.CompanyQueryOption) []v1.Company
 	GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64)

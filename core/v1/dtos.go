@@ -43,6 +43,11 @@ type CompanyWithUpdateOption struct {
 	Option       enums.COMPANY_UPDATE_OPTION `json:"option"`
 }
 
+type ApplicationWithUpdateOption struct {
+	Applications []Application               `bson:"applications" json:"applications"`
+	Option       enums.COMPANY_UPDATE_OPTION `json:"option"`
+}
+
 func (dto Company) GetCompanyWithRepository() Company {
 	company := Company{
 		MetaData: dto.MetaData,

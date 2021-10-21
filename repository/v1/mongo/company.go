@@ -164,12 +164,27 @@ func (c companyRepository) AppendApplications(companyId, repositoryId string, ap
 			log.Println("[ERROR]", err)
 			break
 		}
-		for _, eachRepo := range elemValues.Repositories {
-			for _, eachApp := range apps {
-				eachRepo.Applications = append(eachRepo.Applications, eachApp)
-			}
+		var repo v1.Repository
+		for _, each := range elemValues.Repositories {
+			repo = each
+			repo.Applications = each.Applications
 		}
-		er := c.Store(*elemValues)
+		for _, each := range apps {
+			repo.Applications = append(repo.Applications, each)
+		}
+		var com v1.Company
+		com.Id = elemValues.Id
+		com.MetaData = elemValues.MetaData
+		com.Name = elemValues.Name
+		com.Repositories = append(com.Repositories, repo)
+		com.Status = elemValues.Status
+
+		//for _, eachRepo := range elemValues.Repositories {
+		//	for _, eachApp := range apps {
+		//		eachRepo.Applications = append(eachRepo.Applications, eachApp)
+		//	}
+		//}
+		er := c.Store(com)
 		if er != nil {
 			return er
 		}
@@ -219,6 +234,7 @@ func (c companyRepository) DeleteApplications(companyId, repositoryId string, ap
 			if err2 != nil {
 				return err2
 			}
+			break
 		}
 	}
 	return nil

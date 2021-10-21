@@ -20,6 +20,29 @@ type repositoryApi struct {
 	observerList   []service.Observer
 }
 
+func (r repositoryApi) UpdateApplication(context echo.Context) error {
+	var formData v1.ApplicationWithUpdateOption
+	id := context.Param("id")
+	if id == "" {
+		return errors.New("Id required!")
+	}
+	repoId := context.QueryParam("repoId")
+	if err := context.Bind(&formData); err != nil {
+		log.Println("Input Error:", err.Error())
+		return common.GenerateErrorResponse(context, nil, "Failed to Bind Input!")
+	}
+	var payload []v1.Application
+	payload = formData.Applications
+	var options v1.CompanyUpdateOption
+	options.Option = formData.Option
+	err := r.companyService.UpdateApplications(id, repoId, payload, options)
+	if err != nil {
+		return common.GenerateErrorResponse(context, nil, "Database error!")
+	}
+	return common.GenerateSuccessResponse(context, payload,
+		nil, "saved Successfully")
+}
+
 func (r repositoryApi) Save(context echo.Context) error {
 	formData := v1.CompanyWithUpdateOption{}
 	if err := context.Bind(&formData); err != nil {
@@ -36,15 +59,11 @@ func (r repositoryApi) Save(context echo.Context) error {
 	}
 	var options v1.CompanyUpdateOption
 	options.Option = formData.Option
-	contextData, er := validator(payload)
-	if er != nil {
-		return common.GenerateErrorResponse(context, nil, "invalid repository type!")
-	}
 	err := r.companyService.UpdateRepositories(payload, options)
 	if err != nil {
 		return common.GenerateErrorResponse(context, nil, "Database error!")
 	}
-	return common.GenerateSuccessResponse(context, contextData,
+	return common.GenerateSuccessResponse(context, payload,
 		nil, "saved Successfully")
 }
 func validator(payload v1.Company) (v1.Company, error) {
