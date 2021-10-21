@@ -99,6 +99,7 @@ func (c companyRepository) AppendRepositories(companyId string, repos []v1.Repos
 		if err2 != nil {
 			return err2
 		}
+		break
 	}
 	return nil
 }
@@ -178,12 +179,6 @@ func (c companyRepository) AppendApplications(companyId, repositoryId string, ap
 		com.Name = elemValues.Name
 		com.Repositories = append(com.Repositories, repo)
 		com.Status = elemValues.Status
-
-		//for _, eachRepo := range elemValues.Repositories {
-		//	for _, eachApp := range apps {
-		//		eachRepo.Applications = append(eachRepo.Applications, eachApp)
-		//	}
-		//}
 		er := c.Store(com)
 		if er != nil {
 			return er
