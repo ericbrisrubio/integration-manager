@@ -1,7 +1,9 @@
 package v1
 
 import (
+	"errors"
 	"github.com/klovercloud-ci/enums"
+	"reflect"
 )
 
 type Subject struct {
@@ -26,8 +28,25 @@ type Repository struct {
 }
 
 func (repository Repository) Validate() error {
-
-	return nil
+	if repository.Id == "" {
+		return errors.New("Repository id is required!")
+	}
+	if repository.Token == "" {
+		return errors.New("Repository token is required!")
+	}
+	for _, each := range repository.Applications {
+		err := each.Validate()
+		if err != nil {
+			return err
+		}
+	}
+	if repository.Type == enums.GITHUB || repository.Type == enums.BIT_BUCKET {
+		return nil
+	} else if repository.Type == "" {
+		return errors.New("Repository type is required")
+	} else {
+		return errors.New("Repository type is invalid!")
+	}
 }
 
 type Application struct {
@@ -36,7 +55,13 @@ type Application struct {
 }
 
 func (application Application) Validate() error {
-
+	if application.Url == "" {
+		return errors.New("Application url is required!")
+	}
+	err := application.MetaData.Validate()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -47,7 +72,18 @@ type ApplicationMetadata struct {
 }
 
 func (metadata ApplicationMetadata) Validate() error {
-
+	keys := reflect.ValueOf(metadata.Labels).MapKeys()
+	for i := 0; i < len(keys); i++ {
+		if metadata.Labels[keys[i].String()] == "" {
+			return errors.New("Application metadata label is missing!")
+		}
+	}
+	if metadata.Id == "" {
+		return errors.New("Application metadata id is required!")
+	}
+	if metadata.Name == "" {
+		return errors.New("Application metadata name is required!")
+	}
 	return nil
 }
 
@@ -56,7 +92,12 @@ type CompanyMetadata struct {
 }
 
 func (metadata CompanyMetadata) Validate() error {
-
+	keys := reflect.ValueOf(metadata.Labels).MapKeys()
+	for i := 0; i < len(keys); i++ {
+		if metadata.Labels[keys[i].String()] == "" {
+			return errors.New("Company metadata label is missing!")
+		}
+	}
 	return nil
 }
 

@@ -1,5 +1,10 @@
 package v1
 
+import (
+	"errors"
+	"fmt"
+)
+
 type Pipeline struct {
 	ApiVersion string `json:"api_version" yaml:"api_version"`
 	Name       string `json:"name"  yaml:"name"`
@@ -8,5 +13,23 @@ type Pipeline struct {
 }
 
 func (pipeline Pipeline) Validate() error {
+	fmt.Println("lau")
+
+	if pipeline.ApiVersion == "" {
+		return errors.New("Api version is required!")
+	}
+	if pipeline.Name == "" {
+		return errors.New("Pipeline name is required!")
+	}
+	if pipeline.ProcessId == "" {
+		return errors.New("Pipeline process id is required!")
+	}
+	for _, each := range pipeline.Steps {
+		err := each.Validate()
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

@@ -12,7 +12,7 @@ type OnlyCompanyDto struct {
 	Status   enums.COMPANY_STATUS `bson:"status" json:"status"`
 }
 
-func (dto OnlyCompanyDto) GetCompanyWithoutRepository() Company {
+func (dto Company) GetCompanyWithoutRepository() Company {
 	company := Company{
 		MetaData:     dto.MetaData,
 		Id:           dto.Id,
@@ -43,13 +43,17 @@ type CompanyWithUpdateOption struct {
 	Option       enums.COMPANY_UPDATE_OPTION `json:"option"`
 }
 
-func (dto CompanyWiseRepositoriesDto) GetCompanyWithRepository() Company {
+type ApplicationWithUpdateOption struct {
+	Applications []Application               `bson:"applications" json:"applications"`
+	Option       enums.COMPANY_UPDATE_OPTION `json:"option"`
+}
+
+func (dto Company) GetCompanyWithRepository() Company {
 	company := Company{
-		MetaData:     dto.MetaData,
-		Id:           dto.Id,
-		Name:         dto.Name,
-		Repositories: nil,
-		Status:       dto.Status,
+		MetaData: dto.MetaData,
+		Id:       dto.Id,
+		Name:     dto.Name,
+		Status:   dto.Status,
 	}
 	for _, each := range dto.Repositories {
 		company.Repositories = append(company.Repositories, Repository{
