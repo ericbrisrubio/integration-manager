@@ -1,5 +1,8 @@
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
+# github.com/dgrijalva/jwt-go v3.2.0+incompatible
+## explicit
+github.com/dgrijalva/jwt-go
 # github.com/go-logr/logr v0.4.0
 github.com/go-logr/logr
 # github.com/go-stack/stack v1.8.0
@@ -19,6 +22,9 @@ github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
 # github.com/google/gofuzz v1.1.0
 github.com/google/gofuzz
+# github.com/google/uuid v1.1.2
+## explicit
+github.com/google/uuid
 # github.com/joho/godotenv v1.3.0
 ## explicit
 github.com/joho/godotenv

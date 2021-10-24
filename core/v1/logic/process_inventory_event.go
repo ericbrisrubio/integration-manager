@@ -19,7 +19,7 @@ func (p processInventoryEventService) Listen(subject v1.Subject) {
 	url := config.EventStoreUrl + "/processes"
 
 	header := make(map[string]string)
-	header["token"] = config.EventStoreToken
+	header["token"]=config.Token
 	header["Content-Type"] = "application/json"
 
 	process := v1.ProcessInventoryEvent{

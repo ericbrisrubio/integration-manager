@@ -32,3 +32,6 @@ func GetV1CompanyService() service.Company {
 	}
 	return company
 }
+func GetJwtService()service.JwtService{
+	return logic.NewJwtService()
+}

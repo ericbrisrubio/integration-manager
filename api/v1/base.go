@@ -17,14 +17,14 @@ func GithubEventRouter(g *echo.Group) {
 }
 func CompanyRouter(g *echo.Group) {
 	companyApi := NewCompanyApi(dependency.GetV1CompanyService(), nil)
-	g.POST("", companyApi.Save)
-	g.GET("/:id", companyApi.GetById)
-	g.GET("/:id/repositories", companyApi.GetRepositoriesById)
+	g.POST("", companyApi.Save,AuthenticationAndAuthorizationHandler)
+	g.GET("/:id", companyApi.GetById,AuthenticationAndAuthorizationHandler)
+	g.GET("/:id/repositories", companyApi.GetRepositoriesById,AuthenticationAndAuthorizationHandler)
 }
 
 func RepositoryRouter(g *echo.Group) {
 	repositoryApi := NewRepositoryApi(dependency.GetV1CompanyService(), nil)
-	g.POST("", repositoryApi.Save)
-	g.GET("/:id", repositoryApi.GetById)
-	g.GET("/:id/applications", repositoryApi.GetApplicationsById)
+	g.POST("", repositoryApi.Save,AuthenticationAndAuthorizationHandler)
+	g.GET("/:id", repositoryApi.GetById,AuthenticationAndAuthorizationHandler)
+	g.GET("/:id/applications", repositoryApi.GetApplicationsById,AuthenticationAndAuthorizationHandler)
 }

@@ -19,8 +19,9 @@ func (a ciCoreEventService) Listen(subject v1.Subject) {
 	url := config.KlovercloudCiCoreUrl + "/pipelines?url=" + subject.CoreRequestQueryParam["url"] + "&revision=" + subject.CoreRequestQueryParam["revision"] + "&purging=" + subject.CoreRequestQueryParam["purging"]
 
 	header := make(map[string]string)
-	header["token"] = config.KlovercloudCiCoreToken
+	header["token"]=config.Token
 	header["Content-Type"] = "application/json"
+
 	b, err := json.Marshal(subject.Pipeline)
 	if err != nil {
 		log.Println(err.Error())

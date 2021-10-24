@@ -1,11 +1,11 @@
 package logic
 
 import (
-	"fmt"
 	v1 "github.com/klovercloud-ci/core/v1"
 	"github.com/klovercloud-ci/core/v1/repository"
 	"github.com/klovercloud-ci/core/v1/service"
 	"github.com/klovercloud-ci/enums"
+	"log"
 )
 
 type companyService struct {
@@ -17,27 +17,32 @@ func (c companyService) GetRepositoryByRepositoryId(id string) v1.Repository {
 }
 
 func (c companyService) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
-	return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl)
+	return v1.Application{
+		MetaData: v1.ApplicationMetadata{
+			Id: "1001",
+		},
+	}
+	//return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl)
 }
 func (c companyService) UpdateRepositories(company v1.Company, companyUpdateOption v1.CompanyUpdateOption) error {
 	if companyUpdateOption.Option == enums.APPEND_REPOSITORY {
 		err := c.repo.AppendRepositories(company.Id, company.Repositories)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return err
 		}
 	}
 	if companyUpdateOption.Option == enums.SOFT_DELETE_REPOSITORY {
 		err := c.repo.DeleteRepositories(company.Id, company.Repositories, true)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return err
 		}
 	}
 	if companyUpdateOption.Option == enums.DELETE_REPOSITORY {
 		err := c.repo.DeleteRepositories(company.Id, company.Repositories, false)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return err
 		}
 	}
@@ -48,25 +53,29 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 	if companyUpdateOption.Option == enums.APPEND_APPLICATION {
 		err := c.repo.AppendApplications(companyId, repositoryId, apps)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 	}
 	if companyUpdateOption.Option == enums.SOFT_DELETE_APPLICATION {
 		err := c.repo.DeleteApplications(companyId, repositoryId, apps, true)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 	}
 	if companyUpdateOption.Option == enums.DELETE_APPLICATION {
 		err := c.repo.DeleteApplications(companyId, repositoryId, apps, false)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 	}
 }
 
 func (c companyService) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {
-	return c.repo.GetRepositoryByCompanyIdAndApplicationUrl(id, url)
+	return v1.Repository{
+		Id:    "1",
+		Token: "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",
+	}
+	//return c.repo.GetRepositoryByCompanyIdAndApplicationUrl(id, url)
 }
 
 func (c companyService) GetCompanyByApplicationUrl(url string) v1.Company {
@@ -87,7 +96,6 @@ func (c companyService) Delete(companyId string) error {
 
 func (c companyService) GetCompanies(option v1.CompanyQueryOption) []v1.Company {
 	companies, _ := c.repo.GetCompanies(option)
-
 	return companies
 }
 
@@ -105,13 +113,11 @@ func (c companyService) GetRepositoriesByCompanyId(id string, option v1.CompanyQ
 
 func (c companyService) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Application, int64) {
 	applications, total := c.repo.GetApplicationsByCompanyId(id, option)
-
 	return applications, total
 }
 
 func (c companyService) GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption) []v1.Application {
 	applications := c.repo.GetApplicationsByCompanyIdAndRepositoryType(id, _type, option)
-
 	return applications
 }
 
