@@ -74,9 +74,6 @@ func (githubService githubService) GetDescriptors(repogitory_name, username, rev
 		if each.Name!=env+".yaml" && each.Name!=env+".yml" && each.Name!=env+".json"{
 			continue
 		}
-		//if !strings.HasSuffix(each.Name, ".yaml") && !strings.HasSuffix(each.Name, ".yml") {
-		//	continue
-		//}
 		url := fmt.Sprint(each.DownloadURL)
 		header := make(map[string]string)
 		header["Authorization"] = "token " + token
