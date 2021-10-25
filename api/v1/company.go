@@ -5,6 +5,7 @@ import (
 	"fmt"
 	guuid "github.com/google/uuid"
 	"github.com/klovercloud-ci/api/common"
+	"github.com/klovercloud-ci/config"
 	v1 "github.com/klovercloud-ci/core/v1"
 	"github.com/klovercloud-ci/core/v1/api"
 	"github.com/klovercloud-ci/core/v1/service"
@@ -39,6 +40,14 @@ func (c companyApi) Save(context echo.Context) error {
 		Name:         formData.Name,
 		Repositories: formData.Repositories,
 		Status:       enums.ACTIVE,
+	}
+	if payload.MetaData.NumberOfConcurrentBuild == 0 {
+		PerDayConcurrentBuild, _ := strconv.ParseInt(config.PerDayConcurrentBuild, 10, 64)
+		payload.MetaData.NumberOfConcurrentBuild = PerDayConcurrentBuild
+	}
+	if payload.MetaData.TotalBuildPerDay == 0 {
+		PerDayConcurrentBuild, _ := strconv.ParseInt(config.PerDayConcurrentBuild, 10, 64)
+		payload.MetaData.TotalBuildPerDay = PerDayConcurrentBuild
 	}
 	contextData, er := validate(payload)
 	if er != nil {

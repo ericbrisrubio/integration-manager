@@ -21,6 +21,8 @@ var EventStoreUrl string
 var Publickey string
 var EnableAuthentication bool
 var Token string
+var PerDayConcurrentBuild string
+
 func InitEnvironmentVariables() {
 	err := godotenv.Load()
 	if err != nil {
@@ -34,19 +36,20 @@ func InitEnvironmentVariables() {
 	DbPassword = os.Getenv("MONGO_PASSWORD")
 	DatabaseName = os.Getenv("DATABASE_NAME")
 	EventStoreUrl = os.Getenv("EVENT_STORE_URL")
+	PerDayConcurrentBuild = os.Getenv("PERDAYCONCURRENTBUILD")
 	Database = os.Getenv("DATABASE")
 	if Database == enums.Mongo {
 		DatabaseConnectionString = "mongodb://" + DbUsername + ":" + DbPassword + "@" + DbServer + ":" + DbPort
 	}
 	KlovercloudCiCoreUrl = os.Getenv("KLOVERCLOUD_CI_CORE_URL")
-	if os.Getenv("ENABLE_AUTHENTICATION")==""{
-		EnableAuthentication=false
-	}else{
-		if strings.ToLower(os.Getenv("ENABLE_AUTHENTICATION"))=="true"{
-			EnableAuthentication=true
-		}else{
-			EnableAuthentication=false
+	if os.Getenv("ENABLE_AUTHENTICATION") == "" {
+		EnableAuthentication = false
+	} else {
+		if strings.ToLower(os.Getenv("ENABLE_AUTHENTICATION")) == "true" {
+			EnableAuthentication = true
+		} else {
+			EnableAuthentication = false
 		}
 	}
-	Token=os.Getenv("TOKEN")
+	Token = os.Getenv("TOKEN")
 }

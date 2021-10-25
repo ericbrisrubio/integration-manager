@@ -88,7 +88,9 @@ func (metadata ApplicationMetadata) Validate() error {
 }
 
 type CompanyMetadata struct {
-	Labels map[string]string `bson:"labels" json:"labels"`
+	Labels                  map[string]string `bson:"labels" json:"labels"`
+	NumberOfConcurrentBuild int64             `bson:"number_of_concurrent_build" json:"number_of_concurrent_build"`
+	TotalBuildPerDay        int64             `bson:"total_build_per_day" json:"total_build_per_day"`
 }
 
 func (metadata CompanyMetadata) Validate() error {
