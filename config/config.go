@@ -5,6 +5,7 @@ import (
 	"github.com/klovercloud-ci/enums"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -21,8 +22,7 @@ var EventStoreUrl string
 var Publickey string
 var EnableAuthentication bool
 var Token string
-var PerDayConcurrentBuild string
-
+var DefaultPerDayTotalBuild,DefaultNumberOfConcurrentBuild int64
 func InitEnvironmentVariables() {
 	err := godotenv.Load()
 	if err != nil {
@@ -36,7 +36,6 @@ func InitEnvironmentVariables() {
 	DbPassword = os.Getenv("MONGO_PASSWORD")
 	DatabaseName = os.Getenv("DATABASE_NAME")
 	EventStoreUrl = os.Getenv("EVENT_STORE_URL")
-	PerDayConcurrentBuild = os.Getenv("PERDAYCONCURRENTBUILD")
 	Database = os.Getenv("DATABASE")
 	if Database == enums.Mongo {
 		DatabaseConnectionString = "mongodb://" + DbUsername + ":" + DbPassword + "@" + DbServer + ":" + DbPort
@@ -52,4 +51,13 @@ func InitEnvironmentVariables() {
 		}
 	}
 	Token = os.Getenv("TOKEN")
+
+	DefaultPerDayTotalBuild, err = strconv.ParseInt(os.Getenv("DEFAULT_PER_DAY_TOTAL_BUILD"), 10, 64)
+	if err!=nil{
+		DefaultPerDayTotalBuild=10
+	}
+	DefaultNumberOfConcurrentBuild, err = strconv.ParseInt(os.Getenv("DEFAULT_NUMBER_OF_CONCURRENT_BUILD"), 10, 64)
+	if err!=nil{
+		DefaultNumberOfConcurrentBuild=10
+	}
 }

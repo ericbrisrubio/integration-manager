@@ -42,12 +42,10 @@ func (c companyApi) Save(context echo.Context) error {
 		Status:       enums.ACTIVE,
 	}
 	if payload.MetaData.NumberOfConcurrentBuild == 0 {
-		PerDayConcurrentBuild, _ := strconv.ParseInt(config.PerDayConcurrentBuild, 10, 64)
-		payload.MetaData.NumberOfConcurrentBuild = PerDayConcurrentBuild
+		payload.MetaData.NumberOfConcurrentBuild = config.DefaultNumberOfConcurrentBuild
 	}
 	if payload.MetaData.TotalBuildPerDay == 0 {
-		PerDayConcurrentBuild, _ := strconv.ParseInt(config.PerDayConcurrentBuild, 10, 64)
-		payload.MetaData.TotalBuildPerDay = PerDayConcurrentBuild
+		payload.MetaData.TotalBuildPerDay = config.DefaultPerDayTotalBuild
 	}
 	contextData, er := validate(payload)
 	if er != nil {
