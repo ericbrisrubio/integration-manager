@@ -13,6 +13,11 @@ type ciCoreEventService struct {
 }
 
 func (a ciCoreEventService) Listen(subject v1.Subject) {
+	if subject.EventData!=nil && len(subject.EventData)>0{
+		if subject.EventData["trigger"]==false{
+			return
+		}
+	}
 	if subject.CoreRequestQueryParam == nil {
 		return
 	}

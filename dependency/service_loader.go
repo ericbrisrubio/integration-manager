@@ -12,14 +12,15 @@ import (
 func GetV1GithubService() service.Git {
 	var observers []service.Observer
 	observers = append(observers, logic.NewCiCoreEventService(logic.NewHttpClientService()))
-	observers = append(observers, logic.NewProcessInventoryEventService(logic.NewHttpClientService()))
+	observers = append(observers, logic.NewProcessInventoryEventObserverService(logic.NewHttpClientService()))
 	return logic.NewGithubService(GetV1CompanyService(), nil, logic.NewHttpClientService())
 }
 
 func GetV1Observers() []service.Observer {
 	var observers []service.Observer
 	observers = append(observers, logic.NewCiCoreEventService(logic.NewHttpClientService()))
-	observers = append(observers, logic.NewProcessInventoryEventService(logic.NewHttpClientService()))
+	observers = append(observers, logic.NewProcessInventoryEventObserverService(logic.NewHttpClientService()))
+	observers = append(observers, logic.NewLogEventService(logic.NewHttpClientService()))
 	return observers
 }
 
@@ -31,6 +32,9 @@ func GetV1CompanyService() service.Company {
 		company = logic.NewCompanyService(in_memory.NewCompanyRepository(3000))
 	}
 	return company
+}
+func GetV1ProcessInventoryEventService()service.ProcessInventoryEvent{
+	return logic.NewProcessInventoryEventService(logic.NewHttpClientService())
 }
 func GetJwtService()service.JwtService{
 	return logic.NewJwtService()

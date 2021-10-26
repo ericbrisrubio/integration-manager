@@ -12,7 +12,7 @@ func Router(g *echo.Group) {
 }
 
 func GithubEventRouter(g *echo.Group) {
-	githubApi := NewV1GithubApi(dependency.GetV1GithubService(), dependency.GetV1CompanyService(), dependency.GetV1Observers())
+	githubApi := NewV1GithubApi(dependency.GetV1GithubService(), dependency.GetV1CompanyService(),dependency.GetV1ProcessInventoryEventService(), dependency.GetV1Observers())
 	g.POST("", githubApi.ListenEvent)
 }
 func CompanyRouter(g *echo.Group) {

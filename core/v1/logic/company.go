@@ -17,7 +17,12 @@ func (c companyService) GetRepositoryByRepositoryId(id string) v1.Repository {
 }
 
 func (c companyService) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
-	return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl)
+	return v1.Application{
+		MetaData: v1.ApplicationMetadata{
+			Id: "1001",
+		},
+	}
+	//return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl)
 }
 func (c companyService) UpdateRepositories(company v1.Company, companyUpdateOption v1.CompanyUpdateOption) error {
 	if companyUpdateOption.Option == enums.APPEND_REPOSITORY {
@@ -67,7 +72,11 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 }
 
 func (c companyService) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {
-	return c.repo.GetRepositoryByCompanyIdAndApplicationUrl(id, url)
+	return v1.Repository{
+		Id:    "1",
+		Token: "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",
+	}
+	//return c.repo.GetRepositoryByCompanyIdAndApplicationUrl(id, url)
 }
 
 func (c companyService) GetCompanyByApplicationUrl(url string) v1.Company {
@@ -92,7 +101,14 @@ func (c companyService) GetCompanies(option v1.CompanyQueryOption) []v1.Company 
 }
 
 func (c companyService) GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64) {
-	return c.repo.GetByCompanyId(id, option)
+	company:=v1.Company{MetaData: struct {
+		Labels                  map[string]string `bson:"labels" json:"labels" yaml:"labels"`
+		NumberOfConcurrentBuild int64             `bson:"number_of_concurrent_build" json:"number_of_concurrent_build" yaml:"number_of_concurrent_build"`
+		TotalBuildPerDay        int64             `bson:"total_build_per_day" json:"total_build_per_day" yaml:"total_build_per_day"`
+	}{Labels: nil, NumberOfConcurrentBuild: 10, TotalBuildPerDay: 1}}
+	var total int64
+	//company, total := c.repo.GetByCompanyId(id, option)
+	return company, total
 }
 
 func (c companyService) GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64) {

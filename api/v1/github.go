@@ -14,6 +14,7 @@ import (
 type v1GithubApi struct {
 	gitService     service.Git
 	companyService service.Company
+	processInventoryEventService service.ProcessInventoryEvent
 	observerList   []service.Observer
 }
 
@@ -56,6 +57,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 	data.ProcessId = uuid.NewV4().String()
 	application := g.companyService.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repository.Id, resource.Repository.URL)
 	company,_:=g.companyService.GetByCompanyId(companyId,v1.CompanyQueryOption{v1.Pagination{},  false,false})
+	todaysRanProcess:=g.processInventoryEventService.CountTodaysRanProcessByCompanyId(companyId)
 	data.MetaData=v1.PipelineMetadata{
 		CompanyId:       companyId,
 		CompanyMetadata: company.MetaData,
@@ -75,6 +77,14 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 			RepositoryId: repository.Id,
 		},
 	}
+	if todaysRanProcess>=company.MetaData.TotalBuildPerDay{
+		subject.Log="No More process today, you've touched today's limit!"
+		if subject.EventData==nil{
+			subject.EventData= make(map[string]interface{})
+		}
+		subject.EventData["trigger"]=false
+	}
+
 	go g.notifyAll(subject)
 	return common.GenerateSuccessResponse(context, data.ProcessId, nil, "Pipeline triggered!")
 }
@@ -83,10 +93,11 @@ func (g v1GithubApi) notifyAll(listener v1.Subject) {
 		go observer.Listen(listener)
 	}
 }
-func NewV1GithubApi(gitService service.Git, companyService service.Company, observerList []service.Observer) api.Github {
+func NewV1GithubApi(gitService service.Git, companyService service.Company,	processInventoryEventService service.ProcessInventoryEvent, observerList []service.Observer) api.Github {
 	return &v1GithubApi{
 		gitService:     gitService,
 		companyService: companyService,
 		observerList:   observerList,
+		processInventoryEventService: processInventoryEventService,
 	}
 }
