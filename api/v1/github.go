@@ -55,7 +55,11 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 	}
 	data.ProcessId = uuid.NewV4().String()
 	application := g.companyService.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repository.Id, resource.Repository.URL)
-
+	company,_:=g.companyService.GetByCompanyId(companyId,v1.CompanyQueryOption{v1.Pagination{},  false,false})
+	data.MetaData=v1.PipelineMetadata{
+		CompanyId:       companyId,
+		CompanyMetadata: company.MetaData,
+	}
 	subject := v1.Subject{
 		Log:                   "Pipeline triggered",
 		CoreRequestQueryParam: map[string]string{"url": resource.Repository.URL, "revision": revision, "purging": "ENABLE"},

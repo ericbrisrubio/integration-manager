@@ -71,6 +71,7 @@ type ApplicationMetadata struct {
 	Name   string            `bson:"name" json:"name"`
 }
 
+
 func (metadata ApplicationMetadata) Validate() error {
 	keys := reflect.ValueOf(metadata.Labels).MapKeys()
 	for i := 0; i < len(keys); i++ {
@@ -88,9 +89,9 @@ func (metadata ApplicationMetadata) Validate() error {
 }
 
 type CompanyMetadata struct {
-	Labels                  map[string]string `bson:"labels" json:"labels"`
-	NumberOfConcurrentBuild int64             `bson:"number_of_concurrent_build" json:"number_of_concurrent_build"`
-	TotalBuildPerDay        int64             `bson:"total_build_per_day" json:"total_build_per_day"`
+	Labels                  map[string]string `bson:"labels" json:"labels" yaml:"labels"`
+	NumberOfConcurrentBuild int64             `bson:"number_of_concurrent_build" json:"number_of_concurrent_build" yaml:"number_of_concurrent_build"`
+	TotalBuildPerDay        int64             `bson:"total_build_per_day" json:"total_build_per_day" yaml:"total_build_per_day"`
 }
 
 func (metadata CompanyMetadata) Validate() error {
@@ -124,4 +125,8 @@ type ProcessInventoryEvent struct {
 	AppId        string                 `bson:"app_id" json:"app_id"`
 	RepositoryId string                 `bson:"repository_id" json:"repository_id"`
 	Data         map[string]interface{} `bson:"data" json:"data"`
+}
+type PipelineMetadata struct {
+	CompanyId string `json:"company_id" yaml:"company_id"`
+	CompanyMetadata CompanyMetadata `json:"company_metadata" yaml:"company_metadata"`
 }
