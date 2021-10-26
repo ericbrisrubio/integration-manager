@@ -1,11 +1,11 @@
 package logic
 
 import (
-	"fmt"
 	v1 "github.com/klovercloud-ci/core/v1"
 	"github.com/klovercloud-ci/core/v1/repository"
 	"github.com/klovercloud-ci/core/v1/service"
 	"github.com/klovercloud-ci/enums"
+	"log"
 )
 
 type companyService struct {
@@ -23,21 +23,21 @@ func (c companyService) UpdateRepositories(company v1.Company, companyUpdateOpti
 	if companyUpdateOption.Option == enums.APPEND_REPOSITORY {
 		err := c.repo.AppendRepositories(company.Id, company.Repositories)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return err
 		}
 	}
 	if companyUpdateOption.Option == enums.SOFT_DELETE_REPOSITORY {
 		err := c.repo.DeleteRepositories(company.Id, company.Repositories, true)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return err
 		}
 	}
 	if companyUpdateOption.Option == enums.DELETE_REPOSITORY {
 		err := c.repo.DeleteRepositories(company.Id, company.Repositories, false)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return err
 		}
 	}
