@@ -83,6 +83,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 			subject.EventData= make(map[string]interface{})
 		}
 		subject.EventData["trigger"]=false
+		subject.EventData["log"]=subject.Log
 	}
 
 	go g.notifyAll(subject)

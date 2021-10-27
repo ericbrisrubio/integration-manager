@@ -21,6 +21,7 @@ func GetV1Observers() []service.Observer {
 	observers = append(observers, logic.NewCiCoreEventService(logic.NewHttpClientService()))
 	observers = append(observers, logic.NewProcessInventoryEventObserverService(logic.NewHttpClientService()))
 	observers = append(observers, logic.NewLogEventService(logic.NewHttpClientService()))
+	observers = append(observers, logic.NewProcessEventService(logic.NewHttpClientService()))
 	return observers
 }
 
