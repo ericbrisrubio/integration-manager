@@ -77,7 +77,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 			RepositoryId: repository.Id,
 		},
 	}
-	if todaysRanProcess>=company.MetaData.TotalBuildPerDay{
+	if todaysRanProcess>=company.MetaData.TotalProcessPerDay {
 		subject.Log="No More process today, you've touched today's limit!"
 		if subject.EventData==nil{
 			subject.EventData= make(map[string]interface{})

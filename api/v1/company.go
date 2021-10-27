@@ -41,11 +41,11 @@ func (c companyApi) Save(context echo.Context) error {
 		Repositories: formData.Repositories,
 		Status:       enums.ACTIVE,
 	}
-	if payload.MetaData.NumberOfConcurrentBuild == 0 {
-		payload.MetaData.NumberOfConcurrentBuild = config.DefaultNumberOfConcurrentBuild
+	if payload.MetaData.NumberOfConcurrentProcess == 0 {
+		payload.MetaData.NumberOfConcurrentProcess = config.DefaultNumberOfConcurrentProcess
 	}
-	if payload.MetaData.TotalBuildPerDay == 0 {
-		payload.MetaData.TotalBuildPerDay = config.DefaultPerDayTotalBuild
+	if payload.MetaData.TotalProcessPerDay == 0 {
+		payload.MetaData.TotalProcessPerDay = config.DefaultPerDayTotalProcess
 	}
 	contextData, er := validate(payload)
 	if er != nil {
