@@ -9,6 +9,7 @@ func Router(g *echo.Group) {
 	GithubEventRouter(g.Group("/githubs"))
 	CompanyRouter(g.Group("/companies"))
 	RepositoryRouter(g.Group("/repositories"))
+	ApplicationRouter(g.Group("/applications"))
 }
 
 func GithubEventRouter(g *echo.Group) {
@@ -26,7 +27,12 @@ func CompanyRouter(g *echo.Group) {
 func RepositoryRouter(g *echo.Group) {
 	repositoryApi := NewRepositoryApi(dependency.GetV1CompanyService(), nil)
 	g.POST("", repositoryApi.Save,AuthenticationAndAuthorizationHandler)
-	g.PUT("/:id", repositoryApi.UpdateApplication,AuthenticationAndAuthorizationHandler)
 	g.GET("/:id", repositoryApi.GetById,AuthenticationAndAuthorizationHandler)
 	g.GET("/:id/applications", repositoryApi.GetApplicationsById,AuthenticationAndAuthorizationHandler)
+}
+
+func ApplicationRouter(g *echo.Group) {
+	repositoryApi := NewApplicationApi(dependency.GetV1CompanyService(), nil)
+	//companyId, repositoryId via query param
+	g.PUT("", repositoryApi.UpdateApplication,AuthenticationAndAuthorizationHandler)
 }
