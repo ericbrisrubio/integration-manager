@@ -19,7 +19,21 @@ type githubService struct {
 	client         service.HttpClient
 }
 
-func (githubService githubService) CreateRepositoryWebhook(username,repogitory_name, token string) error{
+func (githubService githubService) DeleteRepositoryWebhookId(username, repogitory_name, webhookId, token string) error {
+	url:=enums.GITHUB_API_BASE_URL+"repos/"+username+"/"+repogitory_name+"/hooks/"+webhookId
+	header := make(map[string]string)
+	header["Authorization"] = "token " + token
+	header["Content-Type"] = "application/json"
+	header["cache-control"] = "no-cache"
+	err:=githubService.client.Delete(url,header)
+	if err!=nil{
+		log.Println(err.Error())
+		return err
+	}
+	return nil
+}
+
+func (githubService githubService) CreateRepositoryWebhook(username,repogitory_name, token string) (v1.GithubWebhook,error){
 	url:=enums.GITHUB_API_BASE_URL+"repos/"+username+"/"+repogitory_name+"/hooks"
 	header := make(map[string]string)
 	header["Authorization"] = "token " + token
@@ -36,14 +50,20 @@ func (githubService githubService) CreateRepositoryWebhook(username,repogitory_n
 	b, err := json.Marshal(body)
 	if err!=nil{
 		log.Println(err.Error())
-		return err
+		return v1.GithubWebhook{},err
 	}
-	err=githubService.client.Post(url,header,b)
+	err,data:=githubService.client.Post(url,header,b)
 	if err!=nil{
 		log.Println(err.Error())
-		return err
+		return v1.GithubWebhook{},err
 	}
-	return nil
+	webhook:=v1.GithubWebhook{}
+	err = json.Unmarshal(data, &webhook)
+	if err != nil {
+		log.Println(err.Error())
+		return v1.GithubWebhook{}, err
+	}
+	return webhook,nil
 }
 
 func (githubService githubService) GetPipeline(repogitory_name, username, revision, token string) (*v1.Pipeline, error) {

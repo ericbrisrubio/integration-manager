@@ -13,6 +13,24 @@ import (
 type httpClientService struct {
 }
 
+func (h httpClientService) Delete(url string, header map[string]string) error {
+	req, err := http.NewRequest("DELETE", url,nil)
+	for k, v := range header {
+		req.Header.Set(k, v)
+	}
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("[ERROR] Failed communicate :", err.Error())
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 && resp.StatusCode != 201{
+		return err
+	}
+	return nil
+}
+
 func (h httpClientService) Get(url string, header map[string]string) (error, []byte) {
 	client := http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
@@ -42,7 +60,7 @@ func (h httpClientService) Get(url string, header map[string]string) (error, []b
 
 }
 
-func (h httpClientService) Post(url string, header map[string]string, body []byte) error {
+func (h httpClientService) Post(url string, header map[string]string, body []byte) (error,[]byte) {
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
 	for k, v := range header {
 		req.Header.Set(k, v)
@@ -51,19 +69,17 @@ func (h httpClientService) Post(url string, header map[string]string, body []byt
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("[ERROR] Failed communicate :", err.Error())
-		return err
+		return err,nil
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-			log.Println("[ERROR] Failed communicate ", err.Error())
-		} else {
-			log.Println("[ERROR] Failed communicate :", string(body))
-		}
+	body, err = ioutil.ReadAll(resp.Body)
+	if resp.StatusCode != 200 && resp.StatusCode != 201{
+			return err,nil
 	}
-	return nil
+	if err != nil {
+		return err,nil
+	}
+	return nil,body
 }
 
 func NewHttpClientService() service.HttpClient {

@@ -52,6 +52,7 @@ func (repository Repository) Validate() error {
 type Application struct {
 	MetaData ApplicationMetadata `bson:"_metadata" json:"_metadata"`
 	Url      string              `bson:"url" json:"url"`
+	Webhook GithubWebhook `bson:"webhook" json:"webhook"`
 }
 
 func (application Application) Validate() error {
