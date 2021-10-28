@@ -23,7 +23,7 @@ func (githubService githubService) DeleteRepositoryWebhookId(username, repogitor
 	url:=enums.GITHUB_API_BASE_URL+"repos/"+username+"/"+repogitory_name+"/hooks/"+webhookId
 	header := make(map[string]string)
 	header["Authorization"] = "token " + token
-	header["Content-Type"] = "application/json"
+	header["Accept"] = "application/vnd.github.v3+json"
 	header["cache-control"] = "no-cache"
 	err:=githubService.client.Delete(url,header)
 	if err!=nil{
