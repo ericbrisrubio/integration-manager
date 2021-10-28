@@ -10,6 +10,7 @@ import (
 
 type companyService struct {
 	repo repository.CompanyRepository
+	client service.HttpClient
 }
 
 func (c companyService) GetRepositoryByRepositoryId(id string) v1.Repository {
@@ -45,6 +46,16 @@ func (c companyService) UpdateRepositories(company v1.Company, companyUpdateOpti
 }
 
 func (c companyService) UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.CompanyUpdateOption) error {
+	 // get repository by repositoryId
+	// check if repository type is equal to github
+	// I.E= https://github.com/klovercloud-ci-cd/klovercloud-ci-core / https://github.com/klovercloud-ci-cd/klovercloud-ci-core.git
+	// remove .git from url suffix
+	// I.E=https://github.com/klovercloud-ci-cd/klovercloud-ci-core
+	// https: , github.com,klovercloud-ci-cd,klovercloud-ci-core
+	// then tokenize url by slash
+	// len-1=repo_name
+	// len-2=usename/orgname
+	//logic.NewGithubService(c,nil,c.client).CreateRepositoryWebhook()
 	if companyUpdateOption.Option == enums.APPEND_APPLICATION {
 		err := c.repo.AppendApplications(companyId, repositoryId, apps)
 		if err != nil {
@@ -107,8 +118,9 @@ func (c companyService) GetApplicationsByCompanyIdAndRepositoryType(id string, _
 	return c.repo.GetApplicationsByCompanyIdAndRepositoryType(id, _type, option)
 }
 
-func NewCompanyService(repo repository.CompanyRepository) service.Company {
+func NewCompanyService(repo repository.CompanyRepository,	client service.HttpClient) service.Company {
 	return &companyService{
 		repo: repo,
+		client: client,
 	}
 }

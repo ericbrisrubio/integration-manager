@@ -19,7 +19,7 @@ type githubService struct {
 	client         service.HttpClient
 }
 
-func (githubService githubService) CreateRepositoryWebhook(username,repogitory_name, token string, event []enums.GIT_EVENT) error{
+func (githubService githubService) CreateRepositoryWebhook(username,repogitory_name, token string) error{
 	url:=enums.GITHUB_API_BASE_URL+"repos/"+username+"/"+repogitory_name+"/hooks"
 	header := make(map[string]string)
 	header["Authorization"] = "token " + token

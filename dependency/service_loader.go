@@ -28,9 +28,9 @@ func GetV1Observers() []service.Observer {
 func GetV1CompanyService() service.Company {
 	var company service.Company
 	if config.Database == enums.Mongo {
-		company = logic.NewCompanyService(mongo.NewCompanyRepository(3000))
+		company = logic.NewCompanyService(mongo.NewCompanyRepository(3000),logic.NewHttpClientService())
 	} else {
-		company = logic.NewCompanyService(in_memory.NewCompanyRepository(3000))
+		company = logic.NewCompanyService(in_memory.NewCompanyRepository(3000),logic.NewHttpClientService())
 	}
 	return company
 }
