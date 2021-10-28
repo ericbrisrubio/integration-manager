@@ -2,8 +2,6 @@ package v1
 
 import (
 	"errors"
-	"fmt"
-	guuid "github.com/google/uuid"
 	"github.com/klovercloud-ci/api/common"
 	v1 "github.com/klovercloud-ci/core/v1"
 	"github.com/klovercloud-ci/core/v1/api"
@@ -66,25 +64,7 @@ func (r repositoryApi) Save(context echo.Context) error {
 	return common.GenerateSuccessResponse(context, payload,
 		nil, "saved Successfully")
 }
-func validator(payload v1.Company) (v1.Company, error) {
-	comp := v1.Company{}
-	comp = payload
-	for i, each := range payload.Repositories {
-		if each.Type == enums.BIT_BUCKET || each.Type == enums.GITHUB {
-			comp.Repositories[i].Id = guuid.New().String()
-			//each.Id = uuid.New().String()
-			for j, eachApp := range each.Applications {
-				comp.Repositories[i].Applications[j].MetaData.Id = guuid.New().String()
-				//eachApp.MetaData.Id = uuid.New().String()
-				fmt.Println("meta data----", eachApp)
-			}
-		} else {
-			return comp, errors.New("Ivalid repository type!")
-		}
-		fmt.Println("object----", comp)
-	}
-	return comp, nil
-}
+
 
 func (r repositoryApi) GetById(context echo.Context) error {
 	id := context.Param("id")

@@ -3,6 +3,7 @@ package logic
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/klovercloud-ci/config"
 	v1 "github.com/klovercloud-ci/core/v1"
 	"github.com/klovercloud-ci/core/v1/service"
 	"github.com/klovercloud-ci/enums"
@@ -16,6 +17,33 @@ type githubService struct {
 	companyService service.Company
 	observerList   []service.Observer
 	client         service.HttpClient
+}
+
+func (githubService githubService) CreateRepositoryWebhook(username,repogitory_name, token string, event []enums.GIT_EVENT) error{
+	url:=enums.GITHUB_API_BASE_URL+"repos/"+username+"/"+repogitory_name+"/hooks"
+	header := make(map[string]string)
+	header["Authorization"] = "token " + token
+	header["Content-Type"] = "application/json"
+	header["cache-control"] = "no-cache"
+	body:=v1.GithubCreateWebhookRequest{
+		Config: struct {
+			URL string `json:"url"`
+		}{
+			URL: config.GithubWebhookConsumingUrl,
+		},
+		Events: []enums.GIT_EVENT{enums.PUSH,enums.DELETE,enums.RELEASE},
+	}
+	b, err := json.Marshal(body)
+	if err!=nil{
+		log.Println(err.Error())
+		return err
+	}
+	err=githubService.client.Post(url,header,b)
+	if err!=nil{
+		log.Println(err.Error())
+		return err
+	}
+	return nil
 }
 
 func (githubService githubService) GetPipeline(repogitory_name, username, revision, token string) (*v1.Pipeline, error) {

@@ -1,8 +1,11 @@
 package v1
 
-import "time"
+import (
+	"github.com/klovercloud-ci/enums"
+	"time"
+)
 
-type GithubWebHook struct {
+type GithubWebHookEvent struct {
 	Ref        string `json:"ref"`
 	Before     string `json:"before"`
 	After      string `json:"after"`
@@ -176,4 +179,11 @@ type GithubWebHook struct {
 		Removed  []interface{} `json:"removed"`
 		Modified []string      `json:"modified"`
 	} `json:"head_commit"`
+}
+
+type GithubCreateWebhookRequest struct {
+	Config struct {
+		URL string `json:"url"`
+	} `json:"config"`
+	Events []enums.GIT_EVENT `json:"events"`
 }

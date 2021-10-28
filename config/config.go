@@ -23,6 +23,7 @@ var Publickey string
 var EnableAuthentication bool
 var Token string
 var DefaultPerDayTotalProcess, DefaultNumberOfConcurrentProcess int64
+var GithubWebhookConsumingUrl string
 func InitEnvironmentVariables() {
 	err := godotenv.Load()
 	if err != nil {
@@ -60,4 +61,5 @@ func InitEnvironmentVariables() {
 	if err!=nil{
 		DefaultNumberOfConcurrentProcess =10
 	}
+	GithubWebhookConsumingUrl=os.Getenv("GITHUB_WEBHOOK_CONSUMING_URL")
 }

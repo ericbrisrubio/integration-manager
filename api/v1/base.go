@@ -26,7 +26,7 @@ func CompanyRouter(g *echo.Group) {
 func RepositoryRouter(g *echo.Group) {
 	repositoryApi := NewRepositoryApi(dependency.GetV1CompanyService(), nil)
 	g.POST("", repositoryApi.Save,AuthenticationAndAuthorizationHandler)
-	g.POST("/:id", repositoryApi.UpdateApplication,AuthenticationAndAuthorizationHandler)
+	g.PUT("/:id", repositoryApi.UpdateApplication,AuthenticationAndAuthorizationHandler)
 	g.GET("/:id", repositoryApi.GetById,AuthenticationAndAuthorizationHandler)
 	g.GET("/:id/applications", repositoryApi.GetApplicationsById,AuthenticationAndAuthorizationHandler)
 }

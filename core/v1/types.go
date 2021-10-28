@@ -69,6 +69,7 @@ type ApplicationMetadata struct {
 	Labels map[string]string `bson:"labels" json:"labels"`
 	Id     string            `bson:"id" json:"id"`
 	Name   string            `bson:"name" json:"name"`
+	Branches   []string            `bson:"branches" json:"branches"`
 }
 
 

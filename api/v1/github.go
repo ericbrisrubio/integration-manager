@@ -19,7 +19,7 @@ type v1GithubApi struct {
 }
 
 func (g v1GithubApi) ListenEvent(context echo.Context) error {
-	resource := new(v1.GithubWebHook)
+	resource := new(v1.GithubWebHookEvent)
 	if err := context.Bind(resource); err != nil {
 		log.Println(err.Error())
 		return common.GenerateErrorResponse(context, err.Error(), "Operation Failed!")

@@ -74,3 +74,10 @@ const (
 
 const PIPELINE_FILE_BASE_DIRECTORY = "klovercloud/pipeline"
 const PIPELINE_DESCRIPTORS_BASE_DIRECTORY = "klovercloud/pipeline/configs"
+
+type GIT_EVENT string
+const (
+	PUSH = GIT_EVENT("push")
+	RELEASE   = GIT_EVENT("release")
+	DELETE   = GIT_EVENT("delete")
+)
