@@ -46,7 +46,7 @@ func (c companyService) UpdateRepositories(company v1.Company, companyUpdateOpti
 	return nil
 }
 
-func trimUrl(url string) (username string, repoName string) {
+func getUsernameAndRepoNameFromGithubRepositoryUrl(url string) (username string, repoName string) {
 	trim := strings.TrimSuffix(url, ".git")
 	urlArray := strings.Split(trim, "/")
 	repositoryName := urlArray[len(urlArray)-1]
@@ -59,7 +59,7 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 		repo := c.GetRepositoryByRepositoryId(repositoryId)
 		if repo.Type == enums.GITHUB {
 			for i, _ := range apps {
-				usernameOrorgName, repoName := trimUrl(apps[i].Url)
+				usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
 				gitWebhook, err := NewGithubService(c, nil, c.client).CreateRepositoryWebhook(usernameOrorgName, repoName, repo.Token)
 				if err != nil {
 					apps[i].Webhook = gitWebhook
