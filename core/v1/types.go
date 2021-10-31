@@ -52,7 +52,7 @@ func (repository Repository) Validate() error {
 type Application struct {
 	MetaData ApplicationMetadata `bson:"_metadata" json:"_metadata"`
 	Url      string              `bson:"url" json:"url"`
-	Webhook GithubWebhook `bson:"webhook" json:"webhook"`
+	Webhook  GithubWebhook       `bson:"webhook" json:"webhook"`
 }
 
 func (application Application) Validate() error {
@@ -67,12 +67,12 @@ func (application Application) Validate() error {
 }
 
 type ApplicationMetadata struct {
-	Labels map[string]string `bson:"labels" json:"labels"`
-	Id     string            `bson:"id" json:"id"`
-	Name   string            `bson:"name" json:"name"`
-	Branches   []string            `bson:"branches" json:"branches"`
+	Labels           map[string]string `bson:"labels" json:"labels"`
+	Id               string            `bson:"id" json:"id"`
+	Name             string            `bson:"name" json:"name"`
+	Branches         []string          `bson:"branches" json:"branches"`
+	IsWebhookEnabled bool              `bson:"is_webhook_enabled" json:"is_webhook_enabled"`
 }
-
 
 func (metadata ApplicationMetadata) Validate() error {
 	keys := reflect.ValueOf(metadata.Labels).MapKeys()
@@ -92,8 +92,8 @@ func (metadata ApplicationMetadata) Validate() error {
 
 type CompanyMetadata struct {
 	Labels                    map[string]string `bson:"labels" json:"labels" yaml:"labels"`
-	NumberOfConcurrentProcess int64 `bson:"number_of_concurrent_process" json:"number_of_concurrent_process" yaml:"number_of_concurrent_process"`
-	TotalProcessPerDay        int64 `bson:"total_process_per_day" json:"total_process_per_day" yaml:"total_process_per_day"`
+	NumberOfConcurrentProcess int64             `bson:"number_of_concurrent_process" json:"number_of_concurrent_process" yaml:"number_of_concurrent_process"`
+	TotalProcessPerDay        int64             `bson:"total_process_per_day" json:"total_process_per_day" yaml:"total_process_per_day"`
 }
 
 func (metadata CompanyMetadata) Validate() error {
@@ -129,6 +129,6 @@ type ProcessInventoryEvent struct {
 	Data         map[string]interface{} `bson:"data" json:"data"`
 }
 type PipelineMetadata struct {
-	CompanyId string `json:"company_id" yaml:"company_id"`
+	CompanyId       string          `json:"company_id" yaml:"company_id"`
 	CompanyMetadata CompanyMetadata `json:"company_metadata" yaml:"company_metadata"`
 }

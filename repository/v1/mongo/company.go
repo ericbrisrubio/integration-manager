@@ -229,7 +229,6 @@ func (c companyRepository) DeleteApplications(companyId, repositoryId string, ap
 			if err2 != nil {
 				return err2
 			}
-			break
 		}
 	}
 	return nil

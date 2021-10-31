@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"errors"
 	"github.com/klovercloud-ci/api/common"
 	v1 "github.com/klovercloud-ci/core/v1"
 	"github.com/klovercloud-ci/core/v1/api"
@@ -15,13 +14,9 @@ type applicationApi struct {
 	observerList   []service.Observer
 }
 
-
 func (a applicationApi) UpdateApplication(context echo.Context) error {
 	var formData v1.ApplicationWithUpdateOption
 	id := context.QueryParam("company_id")
-	if id == "" {
-		return errors.New("Id required!")
-	}
 	repoId := context.QueryParam("repository_Id")
 	if err := context.Bind(&formData); err != nil {
 		log.Println("Input Error:", err.Error())

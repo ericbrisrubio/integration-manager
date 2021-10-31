@@ -6,10 +6,11 @@ import (
 	"github.com/klovercloud-ci/core/v1/service"
 	"github.com/klovercloud-ci/enums"
 	"log"
+	"strings"
 )
 
 type companyService struct {
-	repo repository.CompanyRepository
+	repo   repository.CompanyRepository
 	client service.HttpClient
 }
 
@@ -45,18 +46,30 @@ func (c companyService) UpdateRepositories(company v1.Company, companyUpdateOpti
 	return nil
 }
 
+func trimUrl(url string) (username string, repoName string) {
+	trim := strings.TrimSuffix(url, ".git")
+	urlArray := strings.Split(trim, "/")
+	repositoryName := urlArray[len(urlArray)-1]
+	usernameOrorgName := urlArray[len(urlArray)-2]
+	return usernameOrorgName, repositoryName
+}
+
 func (c companyService) UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.CompanyUpdateOption) error {
-	 // get repository by repositoryId
-	// check if repository type is equal to github
-	// I.E= https://github.com/klovercloud-ci-cd/klovercloud-ci-core / https://github.com/klovercloud-ci-cd/klovercloud-ci-core.git
-	// remove .git from url suffix
-	// I.E=https://github.com/klovercloud-ci-cd/klovercloud-ci-core
-	// https: , github.com,klovercloud-ci-cd,klovercloud-ci-core
-	// then tokenize url by slash
-	// len-1=repo_name
-	// len-2=usename/orgname
-	//logic.NewGithubService(c,nil,c.client).CreateRepositoryWebhook()
 	if companyUpdateOption.Option == enums.APPEND_APPLICATION {
+		repo := c.GetRepositoryByRepositoryId(repositoryId)
+		if repo.Type == enums.GITHUB {
+			for i, _ := range apps {
+				usernameOrorgName, repoName := trimUrl(apps[i].Url)
+				gitWebhook, err := NewGithubService(c, nil, c.client).CreateRepositoryWebhook(usernameOrorgName, repoName, repo.Token)
+				if err != nil {
+					apps[i].Webhook = gitWebhook
+					apps[i].MetaData.IsWebhookEnabled = false
+				} else {
+					apps[i].Webhook = gitWebhook
+					apps[i].MetaData.IsWebhookEnabled = true
+				}
+			}
+		}
 		err := c.repo.AppendApplications(companyId, repositoryId, apps)
 		if err != nil {
 			return err
@@ -103,7 +116,7 @@ func (c companyService) GetCompanies(option v1.CompanyQueryOption) []v1.Company 
 }
 
 func (c companyService) GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64) {
-	return  c.repo.GetByCompanyId(id, option)
+	return c.repo.GetByCompanyId(id, option)
 }
 
 func (c companyService) GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64) {
@@ -111,16 +124,16 @@ func (c companyService) GetRepositoriesByCompanyId(id string, option v1.CompanyQ
 }
 
 func (c companyService) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Application, int64) {
-	return  c.repo.GetApplicationsByCompanyId(id, option)
+	return c.repo.GetApplicationsByCompanyId(id, option)
 }
 
 func (c companyService) GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption) []v1.Application {
 	return c.repo.GetApplicationsByCompanyIdAndRepositoryType(id, _type, option)
 }
 
-func NewCompanyService(repo repository.CompanyRepository,	client service.HttpClient) service.Company {
+func NewCompanyService(repo repository.CompanyRepository, client service.HttpClient) service.Company {
 	return &companyService{
-		repo: repo,
+		repo:   repo,
 		client: client,
 	}
 }
