@@ -19,7 +19,7 @@ type githubService struct {
 	client         service.HttpClient
 }
 
-func (githubService githubService) DeleteRepositoryWebhookId(username, repogitory_name, webhookId, token string) error {
+func (githubService githubService) DeleteRepositoryWebhookById(username, repogitory_name, webhookId, token string) error {
 	url:=enums.GITHUB_API_BASE_URL+"repos/"+username+"/"+repogitory_name+"/hooks/"+webhookId
 	header := make(map[string]string)
 	header["Authorization"] = "token " + token
