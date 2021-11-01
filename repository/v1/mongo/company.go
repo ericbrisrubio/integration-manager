@@ -75,161 +75,158 @@ func (c companyRepository) GetApplicationByCompanyIdAndRepositoryIdAndApplicatio
 }
 
 func (c companyRepository) AppendRepositories(companyId string, repos []v1.Repository) error {
-	query := bson.M{
-		"$and": []bson.M{},
+
+	option := v1.CompanyQueryOption{
+		Pagination:       v1.Pagination{},
+		LoadRepositories: true,
+		LoadApplications: true,
 	}
-	and := []bson.M{{"id": companyId}}
-	query["$and"] = and
+	company, _ := c.GetByCompanyId(companyId, option)
+
+	company.Repositories = append(company.Repositories, repos...)
+	filter := bson.M{
+		"$and": []bson.M{
+			{"id": companyId},
+		},
+	}
+	update := bson.M{
+		"$set": company,
+	}
+	upsert := true
+	after := options.After
+	opt := options.FindOneAndUpdateOptions{
+		ReturnDocument: &after,
+		Upsert:         &upsert,
+	}
 	coll := c.manager.Db.Collection(CompanyCollection)
-	result, err := coll.Find(c.manager.Ctx, query)
+	err := coll.FindOneAndUpdate(c.manager.Ctx, filter, update, &opt)
 	if err != nil {
-		log.Println(err.Error())
-	}
-	for result.Next(context.TODO()) {
-		elemValues := new(v1.Company)
-		err := result.Decode(elemValues)
-		if err != nil {
-			log.Println("[ERROR]", err)
-			break
-		}
-		for _, eachRepo := range repos {
-			elemValues.Repositories = append(elemValues.Repositories, eachRepo)
-		}
-		err2 := c.Store(*elemValues)
-		if err2 != nil {
-			return err2
-		}
-		break
+		log.Println("[ERROR]", err.Err())
 	}
 	return nil
 }
 
 func (c companyRepository) DeleteRepositories(companyId string, repos []v1.Repository, isSoftDelete bool) error {
 	var repositories []v1.Repository
-	query := bson.M{
-		"$and": []bson.M{},
+	option := v1.CompanyQueryOption{
+		Pagination:       v1.Pagination{},
+		LoadRepositories: true,
+		LoadApplications: true,
 	}
-	and := []bson.M{{"id": companyId}}
-	query["$and"] = and
-	coll := c.manager.Db.Collection(CompanyCollection)
-	result, err := coll.Find(c.manager.Ctx, query)
-	if err != nil {
-		log.Println(err.Error())
-	}
-	for result.Next(context.TODO()) {
-		elemValues := new(v1.Company)
-		err := result.Decode(elemValues)
-		if err != nil {
-			log.Println("[ERROR]", err)
-			break
-		}
-		if isSoftDelete {
-			elemValues.Status = enums.INACTIVE
-			err2 := c.Store(*elemValues)
-			if err2 == nil {
-				return nil
-			}
-		} else {
-			for i, eachRepo := range elemValues.Repositories {
-				for _, deleteRepo := range repos {
-					if eachRepo.Id == deleteRepo.Id {
-						repositories = RemoveRepository(elemValues.Repositories, i)
-					}
+	company, _ := c.GetByCompanyId(companyId, option)
+
+	if isSoftDelete {
+		company.Status = enums.INACTIVE
+	} else {
+		repositories = company.Repositories
+		for i, _ := range repos {
+			for j, each := range company.Repositories {
+				if repos[i].Id == each.Id {
+					repositories = RemoveRepository(company.Repositories, j)
 				}
 			}
-			elemValues.Repositories = repositories
-			er := c.Store(*elemValues)
-			if er != nil {
-				return er
-			}
 		}
+		company.Repositories = repositories
+	}
+
+	filter := bson.M{
+		"$and": []bson.M{
+			{"id": companyId},
+		},
+	}
+	update := bson.M{
+		"$set": company,
+	}
+	upsert := true
+	after := options.After
+	opt := options.FindOneAndUpdateOptions{
+		ReturnDocument: &after,
+		Upsert:         &upsert,
+	}
+	coll := c.manager.Db.Collection(CompanyCollection)
+	err := coll.FindOneAndUpdate(c.manager.Ctx, filter, update, &opt)
+	if err != nil {
+		log.Println("[ERROR]", err.Err())
 	}
 	return nil
 }
 
 func (c companyRepository) AppendApplications(companyId, repositoryId string, apps []v1.Application) error {
-	query := bson.M{
-		"$and": []bson.M{},
+	option := v1.CompanyQueryOption{
+		Pagination:       v1.Pagination{},
+		LoadRepositories: true,
+		LoadApplications: true,
 	}
-	and := []bson.M{{"id": companyId, "repositories.id": repositoryId}}
-	query["$and"] = and
+	company, _ := c.GetByCompanyId(companyId, option)
+
+	for i, _ := range company.Repositories {
+		if company.Repositories[i].Id == repositoryId {
+			company.Repositories[i].Applications = append(company.Repositories[i].Applications, apps...)
+		}
+	}
+	filter := bson.M{
+		"$and": []bson.M{
+			{"id": companyId, "repositories.id": repositoryId},
+		},
+	}
+	update := bson.M{
+		"$set": company,
+	}
+	upsert := true
+	after := options.After
+	opt := options.FindOneAndUpdateOptions{
+		ReturnDocument: &after,
+		Upsert:         &upsert,
+	}
 	coll := c.manager.Db.Collection(CompanyCollection)
-	result, err := coll.Find(c.manager.Ctx, query)
+	err := coll.FindOneAndUpdate(c.manager.Ctx, filter, update, &opt)
 	if err != nil {
-		log.Println(err.Error())
-	}
-	for result.Next(context.TODO()) {
-		elemValues := new(v1.Company)
-		err := result.Decode(elemValues)
-		if err != nil {
-			log.Println("[ERROR]", err)
-			break
-		}
-		var repo v1.Repository
-		for _, each := range elemValues.Repositories {
-			repo = each
-			repo.Applications = each.Applications
-		}
-		for _, each := range apps {
-			repo.Applications = append(repo.Applications, each)
-		}
-		var com v1.Company
-		com.Id = elemValues.Id
-		com.MetaData = elemValues.MetaData
-		com.Name = elemValues.Name
-		com.Repositories = append(com.Repositories, repo)
-		com.Status = elemValues.Status
-		er := c.Store(com)
-		if er != nil {
-			return er
-		}
+		log.Println("[ERROR]", err.Err())
 	}
 	return nil
 }
 
 func (c companyRepository) DeleteApplications(companyId, repositoryId string, apps []v1.Application, isSoftDelete bool) error {
 	var applications []v1.Application
-	query := bson.M{
-		"$and": []bson.M{},
+	option := v1.CompanyQueryOption{
+		Pagination:       v1.Pagination{},
+		LoadRepositories: true,
+		LoadApplications: true,
 	}
-	and := []bson.M{{"id": companyId}}
-	query["$and"] = and
-	coll := c.manager.Db.Collection(CompanyCollection)
-	result, err := coll.Find(c.manager.Ctx, query)
-	if err != nil {
-		log.Println(err.Error())
-	}
-	for result.Next(context.TODO()) {
-		elemValues := new(v1.Company)
-		err := result.Decode(elemValues)
-		if err != nil {
-			log.Println("[ERROR]", err)
-			break
-		}
-		if isSoftDelete {
-			elemValues.Status = enums.INACTIVE
-			err2 := c.Store(*elemValues)
-			if err2 == nil {
-				return nil
-			}
-		} else {
-			for _, eachRepo := range elemValues.Repositories {
-				if repositoryId == eachRepo.Id {
-					for i, eachApp := range eachRepo.Applications {
-						for _, deleteApp := range apps {
-							if eachApp.MetaData.Id == deleteApp.MetaData.Id {
-								applications = RemoveApplication(eachRepo.Applications, i)
-							}
-						}
+	company, _ := c.GetByCompanyId(companyId, option)
+	for i, each := range company.Repositories {
+		applications = each.Applications
+		if company.Repositories[i].Id == repositoryId {
+			for j, _ := range apps {
+				for k, _ := range applications {
+					if each.Applications[k].MetaData.Id == apps[j].MetaData.Id {
+						app := RemoveApplication(applications, k)
+						applications = app
 					}
 				}
-				eachRepo.Applications = applications
-			}
-			err2 := c.Store(*elemValues)
-			if err2 != nil {
-				return err2
 			}
 		}
+		company.Repositories[i].Applications = applications
+	}
+
+	filter := bson.M{
+		"$and": []bson.M{
+			{"id": companyId, "repositories.id": repositoryId},
+		},
+	}
+	update := bson.M{
+		"$set": company,
+	}
+	upsert := true
+	after := options.After
+	opt := options.FindOneAndUpdateOptions{
+		ReturnDocument: &after,
+		Upsert:         &upsert,
+	}
+	coll := c.manager.Db.Collection(CompanyCollection)
+	err := coll.FindOneAndUpdate(c.manager.Ctx, filter, update, &opt)
+	if err != nil {
+		log.Println("[ERROR]", err.Err())
 	}
 	return nil
 }

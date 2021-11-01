@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"github.com/google/uuid"
 	v1 "github.com/klovercloud-ci/core/v1"
 	"github.com/klovercloud-ci/core/v1/repository"
 	"github.com/klovercloud-ci/core/v1/service"
@@ -23,6 +24,12 @@ func (c companyService) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUr
 }
 func (c companyService) UpdateRepositories(company v1.Company, companyUpdateOption v1.CompanyUpdateOption) error {
 	if companyUpdateOption.Option == enums.APPEND_REPOSITORY {
+		for i, each := range company.Repositories {
+			company.Repositories[i].Id = uuid.New().String()
+			for j, _ := range each.Applications {
+				each.Applications[j].MetaData.Id = uuid.New().String()
+			}
+		}
 		err := c.repo.AppendRepositories(company.Id, company.Repositories)
 		if err != nil {
 			log.Println(err)
@@ -49,8 +56,8 @@ func (c companyService) UpdateRepositories(company v1.Company, companyUpdateOpti
 func getUsernameAndRepoNameFromGithubRepositoryUrl(url string) (username string, repoName string) {
 	trim := strings.TrimSuffix(url, ".git")
 	urlArray := strings.Split(trim, "/")
-	if len(urlArray)<3{
-		return "",""
+	if len(urlArray) < 3 {
+		return "", ""
 	}
 	repositoryName := urlArray[len(urlArray)-1]
 	usernameOrorgName := urlArray[len(urlArray)-2]
@@ -59,6 +66,9 @@ func getUsernameAndRepoNameFromGithubRepositoryUrl(url string) (username string,
 
 func (c companyService) UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.CompanyUpdateOption) error {
 	if companyUpdateOption.Option == enums.APPEND_APPLICATION {
+		for i, _ := range apps {
+			apps[i].MetaData.Id = uuid.New().String()
+		}
 		repo := c.GetRepositoryByRepositoryId(repositoryId)
 		if repo.Type == enums.GITHUB {
 			for i, _ := range apps {
