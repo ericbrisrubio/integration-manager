@@ -400,7 +400,6 @@ func (c companyRepository) GetRepositoriesByCompanyId(id string, option v1.Compa
 }
 
 func (c companyRepository) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Application, int64) {
-	var company v1.Company
 	var results []v1.Application
 	query := bson.M{
 		"$and": []bson.M{},
@@ -428,9 +427,8 @@ func (c companyRepository) GetApplicationsByCompanyId(id string, option v1.Compa
 				results = append(results, eachApp)
 			}
 		}
-		company = *elemValue
 	}
-	return results, int64(len(company.Repositories))
+	return results, int64(len(results))
 }
 
 func (c companyRepository) GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption) []v1.Application {

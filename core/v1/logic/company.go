@@ -2,6 +2,7 @@ package logic
 
 import (
 	"github.com/google/uuid"
+	"github.com/klovercloud-ci/config"
 	v1 "github.com/klovercloud-ci/core/v1"
 	"github.com/klovercloud-ci/core/v1/repository"
 	"github.com/klovercloud-ci/core/v1/service"
@@ -24,6 +25,12 @@ func (c companyService) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUr
 }
 func (c companyService) UpdateRepositories(company v1.Company, companyUpdateOption v1.CompanyUpdateOption) error {
 	if companyUpdateOption.Option == enums.APPEND_REPOSITORY {
+		if company.MetaData.NumberOfConcurrentProcess == 0 {
+			company.MetaData.NumberOfConcurrentProcess = config.DefaultNumberOfConcurrentProcess
+		}
+		if company.MetaData.TotalProcessPerDay == 0 {
+			company.MetaData.TotalProcessPerDay = config.DefaultPerDayTotalProcess
+		}
 		for i, each := range company.Repositories {
 			company.Repositories[i].Id = uuid.New().String()
 			for j, _ := range each.Applications {
