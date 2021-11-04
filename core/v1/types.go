@@ -50,9 +50,10 @@ func (repository Repository) Validate() error {
 }
 
 type Application struct {
-	MetaData ApplicationMetadata `bson:"_metadata" json:"_metadata"`
-	Url      string              `bson:"url" json:"url"`
-	Webhook  GithubWebhook       `bson:"webhook" json:"webhook"`
+	MetaData ApplicationMetadata  `bson:"_metadata" json:"_metadata"`
+	Url      string               `bson:"url" json:"url"`
+	Webhook  GithubWebhook        `bson:"webhook" json:"webhook"`
+	Status   enums.COMPANY_STATUS `bson:"status" json:"status"`
 }
 
 func (application Application) Validate() error {

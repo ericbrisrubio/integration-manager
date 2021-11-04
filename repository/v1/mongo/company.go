@@ -116,7 +116,13 @@ func (c companyRepository) DeleteRepositories(companyId string, repos []v1.Repos
 	company, _ := c.GetByCompanyId(companyId, option)
 
 	if isSoftDelete {
-		company.Status = enums.INACTIVE
+		for i, each := range company.Repositories {
+			if each.Id == repos[i].Id {
+				for j, _ := range each.Applications {
+					each.Applications[j].Status = enums.INACTIVE
+				}
+			}
+		}
 	} else {
 		repositories = company.Repositories
 		for i, _ := range repos {
@@ -194,19 +200,31 @@ func (c companyRepository) DeleteApplications(companyId, repositoryId string, ap
 		LoadApplications: true,
 	}
 	company, _ := c.GetByCompanyId(companyId, option)
-	for i, each := range company.Repositories {
-		applications = each.Applications
-		if company.Repositories[i].Id == repositoryId {
-			for j, _ := range apps {
-				for k, _ := range applications {
-					if each.Applications[k].MetaData.Id == apps[j].MetaData.Id {
-						app := RemoveApplication(applications, k)
-						applications = app
+	if isSoftDelete {
+		for _, each := range company.Repositories {
+			for j, eachApp := range each.Applications {
+				for k, _ := range apps {
+					if apps[k].MetaData.Id == eachApp.MetaData.Id {
+						each.Applications[j].Status = enums.INACTIVE
 					}
 				}
 			}
 		}
-		company.Repositories[i].Applications = applications
+	} else {
+		for i, each := range company.Repositories {
+			applications = each.Applications
+			if company.Repositories[i].Id == repositoryId {
+				for j, _ := range apps {
+					for k, _ := range applications {
+						if each.Applications[k].MetaData.Id == apps[j].MetaData.Id {
+							app := RemoveApplication(applications, k)
+							applications = app
+						}
+					}
+				}
+			}
+			company.Repositories[i].Applications = applications
+		}
 	}
 
 	filter := bson.M{
