@@ -648,3 +648,71 @@ func TestCompanyRepository_DeleteApplicationsSoftDelete(t *testing.T) {
 		assert.ElementsMatch(t, testCase.expected, testCase.actual)
 	}
 }
+
+func TestCompanyRepository_DeleteRepositoriesSoftDelete(t *testing.T) {
+	type TestData struct {
+		companyId    string
+		repositories []v1.Repository
+		expected     enums.COMPANY_STATUS
+		actual       enums.COMPANY_STATUS
+	}
+	option := v1.CompanyQueryOption{
+		Pagination:       v1.Pagination{},
+		LoadRepositories: true,
+		LoadApplications: true,
+	}
+	testCase := TestData{
+		companyId: "07",
+		repositories: []v1.Repository{
+			{
+				Id:    "07",
+				Type:  enums.GITHUB,
+				Token: "011127",
+				Applications: []v1.Application{
+					{
+						MetaData: v1.ApplicationMetadata{
+							Labels:           map[string]string{"compId": "123", "teamId": "123"},
+							Id:               "07",
+							Name:             "test7",
+							Branches:         nil,
+							IsWebhookEnabled: false,
+						},
+						Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+					},
+				},
+			},
+		},
+		expected: "INACTIVE",
+	}
+	err := loadEnv(t)
+	if err != nil {
+		log.Println("ERROR:", err.Error())
+		t.Fail()
+	}
+	repo := NewMockCompanyRepository()
+	data := InitCompanyData()
+	for _, each := range data {
+		err := repo.Store(each)
+		if err != nil {
+			log.Println("ERROR:", err.Error())
+			t.Fail()
+		}
+	}
+	err = repo.DeleteRepositories(testCase.companyId, testCase.repositories, true)
+	if err != nil {
+		return
+	}
+	repos, _ := repo.GetRepositoriesByCompanyId("07", option)
+	for _, each := range repos {
+		if each.Id == "07" {
+			for _, each := range each.Applications {
+				testCase.actual = each.Status
+				break
+			}
+		}
+	}
+	if !reflect.DeepEqual(testCase.expected, testCase.actual) {
+		log.Println("ERROR:", "expected:", testCase.expected, "actual:", testCase.actual)
+		assert.ElementsMatch(t, testCase.expected, testCase.actual)
+	}
+}
