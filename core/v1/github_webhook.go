@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+
 type GithubWebHookEvent struct {
 	Ref        string `json:"ref"`
 	Before     string `json:"before"`

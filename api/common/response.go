@@ -43,6 +43,14 @@ func GenerateErrorResponse(c echo.Context, data interface{}, message string) err
 		Data:    data,
 	})
 }
+func GenerateForbiddenResponse(c echo.Context, data interface{}, message string) error {
+	return c.JSON(http.StatusForbidden, ResponseDTO{
+		Status:  "forbidden",
+		Message: message,
+		Data:    data,
+	})
+}
+
 func GetPaginationMetadata(page, limit, totalRecords, totalPaginatedRecords int64) MetaData {
 	metaData := MetaData{
 		Page:       page,

@@ -70,6 +70,7 @@ type PARAMS string
 const (
 	_TYPE = PARAMS("type")
 	ENV   = PARAMS("env")
+	REVISION   = PARAMS("revision")
 )
 
 const PIPELINE_FILE_BASE_DIRECTORY = "klovercloud/pipeline"
