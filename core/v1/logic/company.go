@@ -102,6 +102,18 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 		}
 	}
 	if companyUpdateOption.Option == enums.DELETE_APPLICATION {
+		repo := c.GetRepositoryByRepositoryId(repositoryId)
+		if repo.Type == enums.GITHUB {
+			for i, _ := range apps {
+				usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
+				err := NewGithubService(c, nil, c.client).DeleteRepositoryWebhookById(usernameOrorgName, repoName, string(rune(apps[i].Webhook.ID)), repo.Token)
+				if err != nil {
+					return err
+				} else {
+					apps[i].MetaData.IsWebhookEnabled = false
+				}
+			}
+		}
 		err := c.repo.DeleteApplications(companyId, repositoryId, apps, false)
 		if err != nil {
 			return err
