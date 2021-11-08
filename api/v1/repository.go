@@ -18,6 +18,14 @@ type repositoryApi struct {
 	observerList   []service.Observer
 }
 
+// Save... Save repositories
+// @Summary Save repositories
+// @Description Saves repositories
+// @Tags Repository
+// @Produce json
+// @Param data body v1.CompanyWithUpdateOption true "CompanyWithUpdateOption data"
+// @Success 200 {object} common.ResponseDTO
+// @Router /api/v1/repositories [POST]
 func (r repositoryApi) Save(context echo.Context) error {
 	formData := v1.CompanyWithUpdateOption{}
 	if err := context.Bind(&formData); err != nil {
@@ -36,13 +44,20 @@ func (r repositoryApi) Save(context echo.Context) error {
 	options.Option = formData.Option
 	err := r.companyService.UpdateRepositories(payload, options)
 	if err != nil {
-		return common.GenerateErrorResponse(context, nil, "Database error!")
+		return common.GenerateErrorResponse(context, nil, "Operation Failed!")
 	}
 	return common.GenerateSuccessResponse(context, payload,
-		nil, "saved Successfully")
+		nil, "Operation Successful")
 }
 
-
+// Get.. Get Repository by id
+// @Summary Get Repository by id
+// @Description Gets Repository by id
+// @Tags Repository
+// @Produce json
+// @Param id path string true "Repository id"
+// @Success 200 {object} common.ResponseDTO
+// @Router /api/v1/repositories/{id} [GET]
 func (r repositoryApi) GetById(context echo.Context) error {
 	id := context.Param("id")
 	if id == "" {
@@ -52,6 +67,14 @@ func (r repositoryApi) GetById(context echo.Context) error {
 	return common.GenerateSuccessResponse(context, data, nil, "Success!")
 }
 
+// Get.. Get Applications by repository id
+// @Summary Get Applications by repository id
+// @Description Gets Applications by repository id
+// @Tags Repository
+// @Produce json
+// @Param id path string true "Repository id"
+// @Success 200 {object} common.ResponseDTO
+// @Router /api/v1/repositories/{id}/applications [GET]
 func (r repositoryApi) GetApplicationsById(context echo.Context) error {
 	id := context.Param("id")
 	if id == "" {

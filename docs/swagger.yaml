@@ -1,0 +1,710 @@
+definitions:
+  common.MetaData:
+    properties:
+      links:
+        items:
+          additionalProperties:
+            type: string
+          type: object
+        type: array
+      page:
+        type: integer
+      page_count:
+        type: integer
+      per_page:
+        type: integer
+      total_count:
+        type: integer
+    type: object
+  common.ResponseDTO:
+    properties:
+      _metadata:
+        $ref: '#/definitions/common.MetaData'
+      data: {}
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  v1.Application:
+    properties:
+      _metadata:
+        $ref: '#/definitions/v1.ApplicationMetadata'
+      status:
+        type: string
+      url:
+        type: string
+      webhook:
+        $ref: '#/definitions/v1.GithubWebhook'
+    type: object
+  v1.ApplicationMetadata:
+    properties:
+      id:
+        type: string
+      is_webhook_enabled:
+        type: boolean
+      labels:
+        additionalProperties:
+          type: string
+        type: object
+      name:
+        type: string
+    type: object
+  v1.ApplicationWithUpdateOption:
+    properties:
+      applications:
+        items:
+          $ref: '#/definitions/v1.Application'
+        type: array
+      option:
+        type: string
+    type: object
+  v1.Company:
+    properties:
+      _metadata:
+        $ref: '#/definitions/v1.CompanyMetadata'
+      id:
+        type: string
+      name:
+        type: string
+      repositories:
+        items:
+          $ref: '#/definitions/v1.Repository'
+        type: array
+      status:
+        type: string
+    type: object
+  v1.CompanyMetadata:
+    properties:
+      labels:
+        additionalProperties:
+          type: string
+        type: object
+      number_of_concurrent_process:
+        type: integer
+      total_process_per_day:
+        type: integer
+    type: object
+  v1.CompanyWithUpdateOption:
+    properties:
+      _metadata:
+        $ref: '#/definitions/v1.CompanyMetadata'
+      id:
+        type: string
+      name:
+        type: string
+      option:
+        type: string
+      repositories:
+        items:
+          $ref: '#/definitions/v1.Repository'
+        type: array
+      status:
+        type: string
+    type: object
+  v1.GithubWebHookEvent:
+    properties:
+      after:
+        type: string
+      base_ref: {}
+      before:
+        type: string
+      commits:
+        items:
+          properties:
+            added:
+              items: {}
+              type: array
+            author:
+              properties:
+                email:
+                  type: string
+                name:
+                  type: string
+                username:
+                  type: string
+              type: object
+            committer:
+              properties:
+                email:
+                  type: string
+                name:
+                  type: string
+                username:
+                  type: string
+              type: object
+            distinct:
+              type: boolean
+            id:
+              type: string
+            message:
+              type: string
+            modified:
+              items:
+                type: string
+              type: array
+            removed:
+              items: {}
+              type: array
+            timestamp:
+              type: string
+            tree_id:
+              type: string
+            url:
+              type: string
+          type: object
+        type: array
+      compare:
+        type: string
+      created:
+        type: boolean
+      deleted:
+        type: boolean
+      forced:
+        type: boolean
+      head_commit:
+        properties:
+          added:
+            items: {}
+            type: array
+          author:
+            properties:
+              email:
+                type: string
+              name:
+                type: string
+              username:
+                type: string
+            type: object
+          committer:
+            properties:
+              email:
+                type: string
+              name:
+                type: string
+              username:
+                type: string
+            type: object
+          distinct:
+            type: boolean
+          id:
+            type: string
+          message:
+            type: string
+          modified:
+            items:
+              type: string
+            type: array
+          removed:
+            items: {}
+            type: array
+          timestamp:
+            type: string
+          tree_id:
+            type: string
+          url:
+            type: string
+        type: object
+      pusher:
+        properties:
+          email:
+            type: string
+          name:
+            type: string
+        type: object
+      ref:
+        type: string
+      repository:
+        properties:
+          allow_forking:
+            type: boolean
+          archive_url:
+            type: string
+          archived:
+            type: boolean
+          assignees_url:
+            type: string
+          blobs_url:
+            type: string
+          branches_url:
+            type: string
+          clone_url:
+            type: string
+          collaborators_url:
+            type: string
+          comments_url:
+            type: string
+          commits_url:
+            type: string
+          compare_url:
+            type: string
+          contents_url:
+            type: string
+          contributors_url:
+            type: string
+          created_at:
+            type: integer
+          default_branch:
+            type: string
+          deployments_url:
+            type: string
+          description: {}
+          disabled:
+            type: boolean
+          downloads_url:
+            type: string
+          events_url:
+            type: string
+          fork:
+            type: boolean
+          forks:
+            type: integer
+          forks_count:
+            type: integer
+          forks_url:
+            type: string
+          full_name:
+            type: string
+          git_commits_url:
+            type: string
+          git_refs_url:
+            type: string
+          git_tags_url:
+            type: string
+          git_url:
+            type: string
+          has_downloads:
+            type: boolean
+          has_issues:
+            type: boolean
+          has_pages:
+            type: boolean
+          has_projects:
+            type: boolean
+          has_wiki:
+            type: boolean
+          homepage: {}
+          hooks_url:
+            type: string
+          html_url:
+            type: string
+          id:
+            type: integer
+          issue_comment_url:
+            type: string
+          issue_events_url:
+            type: string
+          issues_url:
+            type: string
+          keys_url:
+            type: string
+          labels_url:
+            type: string
+          language:
+            type: string
+          languages_url:
+            type: string
+          license: {}
+          master_branch:
+            type: string
+          merges_url:
+            type: string
+          milestones_url:
+            type: string
+          mirror_url: {}
+          name:
+            type: string
+          node_id:
+            type: string
+          notifications_url:
+            type: string
+          open_issues:
+            type: integer
+          open_issues_count:
+            type: integer
+          owner:
+            properties:
+              avatar_url:
+                type: string
+              email:
+                type: string
+              events_url:
+                type: string
+              followers_url:
+                type: string
+              following_url:
+                type: string
+              gists_url:
+                type: string
+              gravatar_id:
+                type: string
+              html_url:
+                type: string
+              id:
+                type: integer
+              login:
+                type: string
+              name:
+                type: string
+              node_id:
+                type: string
+              organizations_url:
+                type: string
+              received_events_url:
+                type: string
+              repos_url:
+                type: string
+              site_admin:
+                type: boolean
+              starred_url:
+                type: string
+              subscriptions_url:
+                type: string
+              type:
+                type: string
+              url:
+                type: string
+            type: object
+          private:
+            type: boolean
+          pulls_url:
+            type: string
+          pushed_at:
+            type: integer
+          releases_url:
+            type: string
+          size:
+            type: integer
+          ssh_url:
+            type: string
+          stargazers:
+            type: integer
+          stargazers_count:
+            type: integer
+          stargazers_url:
+            type: string
+          statuses_url:
+            type: string
+          subscribers_url:
+            type: string
+          subscription_url:
+            type: string
+          svn_url:
+            type: string
+          tags_url:
+            type: string
+          teams_url:
+            type: string
+          trees_url:
+            type: string
+          updated_at:
+            type: string
+          url:
+            type: string
+          watchers:
+            type: integer
+          watchers_count:
+            type: integer
+        type: object
+      sender:
+        properties:
+          avatar_url:
+            type: string
+          events_url:
+            type: string
+          followers_url:
+            type: string
+          following_url:
+            type: string
+          gists_url:
+            type: string
+          gravatar_id:
+            type: string
+          html_url:
+            type: string
+          id:
+            type: integer
+          login:
+            type: string
+          node_id:
+            type: string
+          organizations_url:
+            type: string
+          received_events_url:
+            type: string
+          repos_url:
+            type: string
+          site_admin:
+            type: boolean
+          starred_url:
+            type: string
+          subscriptions_url:
+            type: string
+          type:
+            type: string
+          url:
+            type: string
+        type: object
+    type: object
+  v1.GithubWebhook:
+    properties:
+      active:
+        type: boolean
+      config:
+        properties:
+          content_type:
+            type: string
+          insecure_ssl:
+            type: string
+          url:
+            type: string
+        type: object
+      created_at:
+        type: string
+      deliveries_url:
+        type: string
+      events:
+        items:
+          type: string
+        type: array
+      id:
+        type: integer
+      ping_url:
+        type: string
+      test_url:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+      url:
+        type: string
+    type: object
+  v1.Repository:
+    properties:
+      applications:
+        items:
+          $ref: '#/definitions/v1.Application'
+        type: array
+      id:
+        type: string
+      token:
+        type: string
+      type:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: Klovercloud-ci-integration-manager API
+  title: Klovercloud-ci-integration-manager API
+paths:
+  /api/v1/applications:
+    post:
+      consumes:
+      - application/json
+      description: Update Application by company id and  repository id
+      parameters:
+      - description: ApplicationWithUpdateOption Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.ApplicationWithUpdateOption'
+      - description: company id
+        in: query
+        name: company_id
+        required: true
+        type: string
+      - description: repository id
+        in: query
+        name: repository_Id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Update Application
+      tags:
+      - Application
+  /api/v1/companies:
+    post:
+      description: Saves company
+      parameters:
+      - description: Company data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.Company'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Save company
+      tags:
+      - Company
+  /api/v1/companies/:
+    get:
+      description: Gets companies
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Record count
+        in: query
+        name: limit
+        type: integer
+      - description: Loads Repositories
+        in: query
+        name: loadRepositories
+        type: integer
+      - description: Loads Applications
+        in: query
+        name: loadApplications
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Get companies
+      tags:
+      - Company
+  /api/v1/companies/{id}:
+    get:
+      description: Gets company by id
+      parameters:
+      - description: Company id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Get company by id
+      tags:
+      - Company
+  /api/v1/companies/{id}/repositories:
+    get:
+      description: Gets Repositories by company id
+      parameters:
+      - description: Company id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Get Repositories by company id
+      tags:
+      - Company
+  /api/v1/githubs:
+    post:
+      consumes:
+      - application/json
+      description: Listens Github Web hook events. Register this endpoint as github
+        web hook endpoint
+      parameters:
+      - description: GithubWebHookEvent Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GithubWebHookEvent'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Listen Github Web hook event
+      tags:
+      - Github
+  /api/v1/repositories:
+    post:
+      description: Saves repositories
+      parameters:
+      - description: CompanyWithUpdateOption data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CompanyWithUpdateOption'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Save repositories
+      tags:
+      - Repository
+  /api/v1/repositories/{id}:
+    get:
+      description: Gets Repository by id
+      parameters:
+      - description: Repository id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Get Repository by id
+      tags:
+      - Repository
+  /api/v1/repositories/{id}/applications:
+    get:
+      description: Gets Applications by repository id
+      parameters:
+      - description: Repository id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Get Applications by repository id
+      tags:
+      - Repository
+swagger: "2.0"

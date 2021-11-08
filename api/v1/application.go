@@ -14,6 +14,18 @@ type applicationApi struct {
 	observerList   []service.Observer
 }
 
+// Update ... Update Application
+// @Summary  Update Application
+// @Description Update Application by company id and  repository id
+// @Tags Application
+// @Accept json
+// @Produce json
+// @Param data body v1.ApplicationWithUpdateOption true "ApplicationWithUpdateOption Data"
+// @Param company_id query string true "company id"
+// @Param repository_Id query string true "repository id"
+// @Success 200 {object} common.ResponseDTO
+// @Failure 404 {object} common.ResponseDTO
+// @Router /api/v1/applications [POST]
 func (a applicationApi) UpdateApplication(context echo.Context) error {
 	var formData v1.ApplicationWithUpdateOption
 	id := context.QueryParam("company_id")

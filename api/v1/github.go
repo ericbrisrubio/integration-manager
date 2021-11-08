@@ -19,6 +19,16 @@ type v1GithubApi struct {
 	observerList   []service.Observer
 }
 
+// Listen ... Listen Github Web hook event
+// @Summary  Listen Github Web hook event
+// @Description Listens Github Web hook events. Register this endpoint as github web hook endpoint
+// @Tags Github
+// @Accept json
+// @Produce json
+// @Param data body v1.GithubWebHookEvent true "GithubWebHookEvent Data"
+// @Success 200 {object} common.ResponseDTO
+// @Failure 404 {object} common.ResponseDTO
+// @Router /api/v1/githubs [POST]
 func (g v1GithubApi) ListenEvent(context echo.Context) error {
 	resource := new(v1.GithubWebHookEvent)
 	if err := context.Bind(resource); err != nil {
