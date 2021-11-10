@@ -22,11 +22,11 @@ func CompanyRouter(g *echo.Group) {
 	g.GET("", companyApi.GetCompanies, AuthenticationAndAuthorizationHandler)
 	g.GET("/:id", companyApi.GetById, AuthenticationAndAuthorizationHandler)
 	g.GET("/:id/repositories", companyApi.GetRepositoriesById, AuthenticationAndAuthorizationHandler)
+	g.PUT("/:id/repositories", companyApi.UpdateRepositories, AuthenticationAndAuthorizationHandler)
 }
 
 func RepositoryRouter(g *echo.Group) {
 	repositoryApi := NewRepositoryApi(dependency.GetV1CompanyService(), nil)
-	g.POST("", repositoryApi.Save, AuthenticationAndAuthorizationHandler)
 	g.GET("/:id", repositoryApi.GetById, AuthenticationAndAuthorizationHandler)
 	g.GET("/:id/applications", repositoryApi.GetApplicationsById, AuthenticationAndAuthorizationHandler)
 }

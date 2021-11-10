@@ -19,6 +19,41 @@ type companyApi struct {
 	companyService service.Company
 	observerList   []service.Observer
 }
+
+// Update... Update repositories
+// @Summary Update repositories by company id
+// @Description updates repositories
+// @Tags Company
+// @Produce json
+// @Param data body v1.ListOfRepositories true "ListOfRepositories data"
+// @Param id path string true "Company id"
+// @Param companyUpdateOption query string true "Company Update Option"
+// @Success 200 {object} common.ResponseDTO
+// @Router /api/v1/companies/{id}/repositories [PUT]
+func (c companyApi) UpdateRepositories(context echo.Context) error {
+	var formData v1.ListOfRepositories
+	if err := context.Bind(&formData); err != nil {
+		log.Println("Input Error:", err.Error())
+		return common.GenerateErrorResponse(context, nil, "Failed to Bind Input!")
+	}
+	id := context.Param("id")
+	if id == "" {
+		return errors.New("Id required!")
+	}
+	var payload []v1.Repository
+	payload = formData.Repositories
+	var options v1.CompanyUpdateOption
+	Option := context.QueryParam("companyUpdateOption")
+	options.Option = enums.COMPANY_UPDATE_OPTION(Option)
+	err := c.companyService.UpdateRepositories(id, payload, options)
+	if err != nil {
+		log.Println("Update Error:", err.Error())
+		return common.GenerateErrorResponse(context, nil, err.Error())
+	}
+	return common.GenerateSuccessResponse(context, formData,
+		nil, "Operation Successful")
+}
+
 // Get... Get companies
 // @Summary Get companies
 // @Description Gets companies
@@ -26,10 +61,10 @@ type companyApi struct {
 // @Produce json
 // @Param page query int64 false "Page number"
 // @Param limit query int64 false "Record count"
-// @Param loadRepositories query int64 false "Loads Repositories"
-// @Param loadApplications query int64 false "Loads Applications"
+// @Param loadRepositories query bool false "Loads Repositories"
+// @Param loadApplications query bool false "Loads Applications"
 // @Success 200 {object} common.ResponseDTO
-// @Router /api/v1/companies/ [GET]
+// @Router /api/v1/companies [GET]
 func (c companyApi) GetCompanies(context echo.Context) error {
 	option := getQueryOption(context)
 	data := c.companyService.GetCompanies(option)
@@ -92,6 +127,7 @@ func (c companyApi) GetById(context echo.Context) error {
 	data, _ := c.companyService.GetByCompanyId(id, option)
 	return common.GenerateSuccessResponse(context, data, nil, "Success!")
 }
+
 // Get.. Get Repositories by company id
 // @Summary Get Repositories by company id
 // @Description Gets Repositories by company id
@@ -120,13 +156,12 @@ func (c companyApi) GetRepositoriesById(context echo.Context) error {
 	return common.GenerateSuccessResponse(context, data, &metadata, "")
 }
 
-
-func generateRepositoryAndApplicationId(payload v1.Company) v1.Company{
+func generateRepositoryAndApplicationId(payload v1.Company) v1.Company {
 	comp := v1.Company{}
 	comp = payload
 	for i, each := range payload.Repositories {
 		comp.Repositories[i].Id = guuid.New().String()
-		for j, _ := range each.Applications {
+		for j := range each.Applications {
 			comp.Repositories[i].Applications[j].MetaData.Id = guuid.New().String()
 		}
 	}

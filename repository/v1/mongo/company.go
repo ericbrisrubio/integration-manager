@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"errors"
 	v1 "github.com/klovercloud-ci/core/v1"
 	"github.com/klovercloud-ci/core/v1/repository"
 	"github.com/klovercloud-ci/enums"
@@ -107,6 +108,7 @@ func (c companyRepository) AppendRepositories(companyId string, repos []v1.Repos
 }
 
 func (c companyRepository) DeleteRepositories(companyId string, repos []v1.Repository, isSoftDelete bool) error {
+	var count int64
 	var repositories []v1.Repository
 	option := v1.CompanyQueryOption{
 		Pagination:       v1.Pagination{},
@@ -129,10 +131,15 @@ func (c companyRepository) DeleteRepositories(companyId string, repos []v1.Repos
 			for j, each := range company.Repositories {
 				if repos[i].Id == each.Id {
 					repositories = RemoveRepository(company.Repositories, j)
+					count++
 				}
 			}
+			company.Repositories = repositories
 		}
-		company.Repositories = repositories
+	}
+
+	if count < 1 {
+		return errors.New("Repository Id is not matched!")
 	}
 
 	filter := bson.M{
@@ -211,6 +218,7 @@ func (c companyRepository) DeleteApplications(companyId, repositoryId string, ap
 			}
 		}
 	} else {
+		var count int64 = 0
 		for i, each := range company.Repositories {
 			applications = each.Applications
 			if company.Repositories[i].Id == repositoryId {
@@ -219,11 +227,15 @@ func (c companyRepository) DeleteApplications(companyId, repositoryId string, ap
 						if each.Applications[k].MetaData.Id == apps[j].MetaData.Id {
 							app := RemoveApplication(applications, k)
 							applications = app
+							count++
 						}
 					}
 				}
 			}
 			company.Repositories[i].Applications = applications
+		}
+		if count < 1 {
+			return errors.New("Application Id is not matched!")
 		}
 	}
 

@@ -38,12 +38,12 @@ var doc = `{
                 "summary": "Update Application",
                 "parameters": [
                     {
-                        "description": "ApplicationWithUpdateOption Data",
+                        "description": "ListOfApplications Data",
                         "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.ApplicationWithUpdateOption"
+                            "$ref": "#/definitions/v1.ListOfApplications"
                         }
                     },
                     {
@@ -78,37 +78,6 @@ var doc = `{
             }
         },
         "/api/v1/companies": {
-            "post": {
-                "description": "Saves company",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Company"
-                ],
-                "summary": "Save company",
-                "parameters": [
-                    {
-                        "description": "Company data",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.Company"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/companies/": {
             "get": {
                 "description": "Gets companies",
                 "produces": [
@@ -132,16 +101,45 @@ var doc = `{
                         "in": "query"
                     },
                     {
-                        "type": "integer",
+                        "type": "boolean",
                         "description": "Loads Repositories",
                         "name": "loadRepositories",
                         "in": "query"
                     },
                     {
-                        "type": "integer",
+                        "type": "boolean",
                         "description": "Loads Applications",
                         "name": "loadApplications",
                         "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Saves company",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Save company",
+                "parameters": [
+                    {
+                        "description": "Company data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.Company"
+                        }
                     }
                 ],
                 "responses": {
@@ -210,6 +208,49 @@ var doc = `{
                         }
                     }
                 }
+            },
+            "put": {
+                "description": "updates repositories",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Update repositories by company id",
+                "parameters": [
+                    {
+                        "description": "ListOfRepositories data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.ListOfRepositories"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Company id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Company Update Option",
+                        "name": "companyUpdateOption",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    }
+                }
             }
         },
         "/api/v1/githubs": {
@@ -245,37 +286,6 @@ var doc = `{
                     },
                     "404": {
                         "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/repositories": {
-            "post": {
-                "description": "Saves repositories",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Repository"
-                ],
-                "summary": "Save repositories",
-                "parameters": [
-                    {
-                        "description": "CompanyWithUpdateOption data",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.CompanyWithUpdateOption"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/common.ResponseDTO"
                         }
@@ -421,20 +431,6 @@ var doc = `{
                 }
             }
         },
-        "v1.ApplicationWithUpdateOption": {
-            "type": "object",
-            "properties": {
-                "applications": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/v1.Application"
-                    }
-                },
-                "option": {
-                    "type": "string"
-                }
-            }
-        },
         "v1.Company": {
             "type": "object",
             "properties": {
@@ -472,32 +468,6 @@ var doc = `{
                 },
                 "total_process_per_day": {
                     "type": "integer"
-                }
-            }
-        },
-        "v1.CompanyWithUpdateOption": {
-            "type": "object",
-            "properties": {
-                "_metadata": {
-                    "$ref": "#/definitions/v1.CompanyMetadata"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "option": {
-                    "type": "string"
-                },
-                "repositories": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/v1.Repository"
-                    }
-                },
-                "status": {
-                    "type": "string"
                 }
             }
         },
@@ -1067,6 +1037,28 @@ var doc = `{
                 },
                 "url": {
                     "type": "string"
+                }
+            }
+        },
+        "v1.ListOfApplications": {
+            "type": "object",
+            "properties": {
+                "applications": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.Application"
+                    }
+                }
+            }
+        },
+        "v1.ListOfRepositories": {
+            "type": "object",
+            "properties": {
+                "repositories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.Repository"
+                    }
                 }
             }
         },

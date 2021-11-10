@@ -19,9 +19,9 @@ require (
 	github.com/swaggo/swag v1.7.4
 	github.com/twinj/uuid v1.0.0
 	go.mongodb.org/mongo-driver v1.7.2
-	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
-	golang.org/x/net v0.0.0-20211105192438-b53810dc28af // indirect
-	golang.org/x/sys v0.0.0-20211107104306-e0b2ad06fe42 // indirect
+	golang.org/x/crypto v0.0.0-20211108221036-ceb1ce70b4fa // indirect
+	golang.org/x/net v0.0.0-20211108170745-6635138e15ea // indirect
+	golang.org/x/sys v0.0.0-20211109065445-02f5c0300f6e // indirect
 	golang.org/x/tools v0.1.7 // indirect
 	gopkg.in/stretchr/testify.v1 v1.2.2 // indirect
 	k8s.io/apimachinery v0.22.2

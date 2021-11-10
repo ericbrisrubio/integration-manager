@@ -5,7 +5,6 @@ import (
 )
 
 type Repository interface {
-	Save(context echo.Context) error
 	GetById(context echo.Context) error
 	GetApplicationsById(context echo.Context) error
 }

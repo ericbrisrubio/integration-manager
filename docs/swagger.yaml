@@ -50,15 +50,6 @@ definitions:
       name:
         type: string
     type: object
-  v1.ApplicationWithUpdateOption:
-    properties:
-      applications:
-        items:
-          $ref: '#/definitions/v1.Application'
-        type: array
-      option:
-        type: string
-    type: object
   v1.Company:
     properties:
       _metadata:
@@ -84,23 +75,6 @@ definitions:
         type: integer
       total_process_per_day:
         type: integer
-    type: object
-  v1.CompanyWithUpdateOption:
-    properties:
-      _metadata:
-        $ref: '#/definitions/v1.CompanyMetadata'
-      id:
-        type: string
-      name:
-        type: string
-      option:
-        type: string
-      repositories:
-        items:
-          $ref: '#/definitions/v1.Repository'
-        type: array
-      status:
-        type: string
     type: object
   v1.GithubWebHookEvent:
     properties:
@@ -480,6 +454,20 @@ definitions:
       url:
         type: string
     type: object
+  v1.ListOfApplications:
+    properties:
+      applications:
+        items:
+          $ref: '#/definitions/v1.Application'
+        type: array
+    type: object
+  v1.ListOfRepositories:
+    properties:
+      repositories:
+        items:
+          $ref: '#/definitions/v1.Repository'
+        type: array
+    type: object
   v1.Repository:
     properties:
       applications:
@@ -504,12 +492,12 @@ paths:
       - application/json
       description: Update Application by company id and  repository id
       parameters:
-      - description: ApplicationWithUpdateOption Data
+      - description: ListOfApplications Data
         in: body
         name: data
         required: true
         schema:
-          $ref: '#/definitions/v1.ApplicationWithUpdateOption'
+          $ref: '#/definitions/v1.ListOfApplications'
       - description: company id
         in: query
         name: company_id
@@ -535,6 +523,35 @@ paths:
       tags:
       - Application
   /api/v1/companies:
+    get:
+      description: Gets companies
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Record count
+        in: query
+        name: limit
+        type: integer
+      - description: Loads Repositories
+        in: query
+        name: loadRepositories
+        type: boolean
+      - description: Loads Applications
+        in: query
+        name: loadApplications
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Get companies
+      tags:
+      - Company
     post:
       description: Saves company
       parameters:
@@ -552,36 +569,6 @@ paths:
           schema:
             $ref: '#/definitions/common.ResponseDTO'
       summary: Save company
-      tags:
-      - Company
-  /api/v1/companies/:
-    get:
-      description: Gets companies
-      parameters:
-      - description: Page number
-        in: query
-        name: page
-        type: integer
-      - description: Record count
-        in: query
-        name: limit
-        type: integer
-      - description: Loads Repositories
-        in: query
-        name: loadRepositories
-        type: integer
-      - description: Loads Applications
-        in: query
-        name: loadApplications
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/common.ResponseDTO'
-      summary: Get companies
       tags:
       - Company
   /api/v1/companies/{id}:
@@ -622,6 +609,35 @@ paths:
       summary: Get Repositories by company id
       tags:
       - Company
+    put:
+      description: updates repositories
+      parameters:
+      - description: ListOfRepositories data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.ListOfRepositories'
+      - description: Company id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Company Update Option
+        in: query
+        name: companyUpdateOption
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Update repositories by company id
+      tags:
+      - Company
   /api/v1/githubs:
     post:
       consumes:
@@ -649,26 +665,6 @@ paths:
       summary: Listen Github Web hook event
       tags:
       - Github
-  /api/v1/repositories:
-    post:
-      description: Saves repositories
-      parameters:
-      - description: CompanyWithUpdateOption data
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/v1.CompanyWithUpdateOption'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/common.ResponseDTO'
-      summary: Save repositories
-      tags:
-      - Repository
   /api/v1/repositories/{id}:
     get:
       description: Gets Repository by id

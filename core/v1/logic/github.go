@@ -20,50 +20,49 @@ type githubService struct {
 }
 
 func (githubService githubService) DeleteRepositoryWebhookById(username, repogitory_name, webhookId, token string) error {
-	url:=enums.GITHUB_API_BASE_URL+"repos/"+username+"/"+repogitory_name+"/hooks/"+webhookId
+	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repogitory_name + "/hooks/" + webhookId
 	header := make(map[string]string)
 	header["Authorization"] = "token " + token
 	header["Accept"] = "application/vnd.github.v3+json"
 	header["cache-control"] = "no-cache"
-	err:=githubService.client.Delete(url,header)
-	if err!=nil{
-		log.Println(err.Error())
+	err := githubService.client.Delete(url, header)
+	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (githubService githubService) CreateRepositoryWebhook(username,repogitory_name, token string) (v1.GithubWebhook,error){
-	url:=enums.GITHUB_API_BASE_URL+"repos/"+username+"/"+repogitory_name+"/hooks"
+func (githubService githubService) CreateRepositoryWebhook(username, repogitory_name, token string) (v1.GithubWebhook, error) {
+	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repogitory_name + "/hooks"
 	header := make(map[string]string)
 	header["Authorization"] = "token " + token
 	header["Content-Type"] = "application/json"
 	header["cache-control"] = "no-cache"
-	body:=v1.GithubCreateWebhookRequest{
+	body := v1.GithubCreateWebhookRequest{
 		Config: struct {
 			URL string `json:"url"`
 		}{
 			URL: config.GithubWebhookConsumingUrl,
 		},
-		Events: []enums.GIT_EVENT{enums.PUSH,enums.DELETE,enums.RELEASE},
+		Events: []enums.GIT_EVENT{enums.PUSH, enums.DELETE, enums.RELEASE},
 	}
 	b, err := json.Marshal(body)
-	if err!=nil{
+	if err != nil {
 		log.Println(err.Error())
-		return v1.GithubWebhook{},err
+		return v1.GithubWebhook{}, err
 	}
-	err,data:=githubService.client.Post(url,header,b)
-	if err!=nil{
+	err, data := githubService.client.Post(url, header, b)
+	if err != nil {
 		log.Println(err.Error())
-		return v1.GithubWebhook{},err
+		return v1.GithubWebhook{}, err
 	}
-	webhook:=v1.GithubWebhook{}
+	webhook := v1.GithubWebhook{}
 	err = json.Unmarshal(data, &webhook)
 	if err != nil {
 		log.Println(err.Error())
 		return v1.GithubWebhook{}, err
 	}
-	return webhook,nil
+	return webhook, nil
 }
 
 func (githubService githubService) GetPipeline(repogitory_name, username, revision, token string) (*v1.Pipeline, error) {
@@ -108,7 +107,7 @@ func (githubService githubService) GetPipeline(repogitory_name, username, revisi
 	return &pipeline, nil
 }
 
-func (githubService githubService) GetDescriptors(repogitory_name, username, revision, token, path,env string) ([]unstructured.Unstructured, error) {
+func (githubService githubService) GetDescriptors(repogitory_name, username, revision, token, path, env string) ([]unstructured.Unstructured, error) {
 	contents, err := githubService.GetDirectoryContents(repogitory_name, username, revision, token, path)
 	if err != nil {
 		return nil, err
@@ -119,7 +118,7 @@ func (githubService githubService) GetDescriptors(repogitory_name, username, rev
 		if each.Type != "file" {
 			continue
 		}
-		if each.Name!=env+".yaml" && each.Name!=env+".yml" && each.Name!=env+".json"{
+		if each.Name != env+".yaml" && each.Name != env+".yml" && each.Name != env+".json" {
 			continue
 		}
 		url := fmt.Sprint(each.DownloadURL)

@@ -2,7 +2,6 @@ package logic
 
 import (
 	"github.com/google/uuid"
-	"github.com/klovercloud-ci/config"
 	v1 "github.com/klovercloud-ci/core/v1"
 	"github.com/klovercloud-ci/core/v1/repository"
 	"github.com/klovercloud-ci/core/v1/service"
@@ -23,35 +22,29 @@ func (c companyService) GetRepositoryByRepositoryId(id string) v1.Repository {
 func (c companyService) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
 	return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl)
 }
-func (c companyService) UpdateRepositories(company v1.Company, companyUpdateOption v1.CompanyUpdateOption) error {
+func (c companyService) UpdateRepositories(companyId string, repositories []v1.Repository, companyUpdateOption v1.CompanyUpdateOption) error {
 	if companyUpdateOption.Option == enums.APPEND_REPOSITORY {
-		if company.MetaData.NumberOfConcurrentProcess == 0 {
-			company.MetaData.NumberOfConcurrentProcess = config.DefaultNumberOfConcurrentProcess
-		}
-		if company.MetaData.TotalProcessPerDay == 0 {
-			company.MetaData.TotalProcessPerDay = config.DefaultPerDayTotalProcess
-		}
-		for i, each := range company.Repositories {
-			company.Repositories[i].Id = uuid.New().String()
+		for i, each := range repositories {
+			repositories[i].Id = uuid.New().String()
 			for j, _ := range each.Applications {
 				each.Applications[j].MetaData.Id = uuid.New().String()
 			}
 		}
-		err := c.repo.AppendRepositories(company.Id, company.Repositories)
+		err := c.repo.AppendRepositories(companyId, repositories)
 		if err != nil {
 			log.Println(err)
 			return err
 		}
 	}
 	if companyUpdateOption.Option == enums.SOFT_DELETE_REPOSITORY {
-		err := c.repo.DeleteRepositories(company.Id, company.Repositories, true)
+		err := c.repo.DeleteRepositories(companyId, repositories, true)
 		if err != nil {
 			log.Println(err)
 			return err
 		}
 	}
 	if companyUpdateOption.Option == enums.DELETE_REPOSITORY {
-		err := c.repo.DeleteRepositories(company.Id, company.Repositories, false)
+		err := c.repo.DeleteRepositories(companyId, repositories, false)
 		if err != nil {
 			log.Println(err)
 			return err
