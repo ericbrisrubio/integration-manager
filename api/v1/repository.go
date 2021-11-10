@@ -15,38 +15,6 @@ type repositoryApi struct {
 	observerList   []service.Observer
 }
 
-// Save... Save repositories
-// @Summary Save repositories
-// @Description Saves repositories
-// @Tags Repository
-// @Produce json
-// @Param data body v1.CompanyWithUpdateOption true "CompanyWithUpdateOption data"
-// @Success 200 {object} common.ResponseDTO
-// @Router /api/v1/repositories [POST]
-//func (r repositoryApi) Save(context echo.Context) error {
-//	//formData := v1.CompanyWithUpdateOption{}
-//	//if err := context.Bind(&formData); err != nil {
-//	//	log.Println("Input Error:", err.Error())
-//	//	return common.GenerateErrorResponse(context, nil, "Failed to Bind Input!")
-//	//}
-//	//
-//	//var payload = v1.Company{
-//	//	MetaData:     formData.MetaData,
-//	//	Id:           formData.Id,
-//	//	Name:         formData.Name,
-//	//	Repositories: formData.Repositories,
-//	//	Status:       enums.ACTIVE,
-//	//}
-//	//var options v1.CompanyUpdateOption
-//	//options.Option = formData.Option
-//	//err := r.companyService.UpdateRepositories(payload, options)
-//	//if err != nil {
-//	//	return common.GenerateErrorResponse(context, nil, "Operation Failed!")
-//	//}
-//	//return common.GenerateSuccessResponse(context, payload,
-//	//	nil, "Operation Successful")
-//}
-
 // Get.. Get Repository by id
 // @Summary Get Repository by id
 // @Description Gets Repository by id
