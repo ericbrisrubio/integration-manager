@@ -3,7 +3,7 @@ package v1
 import (
 	"errors"
 	"fmt"
-	"github.com/klovercloud-ci/enums"
+	"github.com/klovercloud-ci-cd/integration-manager/enums"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"

@@ -2,9 +2,9 @@ package v1
 
 import (
 	"errors"
-	"github.com/klovercloud-ci/api/common"
-	"github.com/klovercloud-ci/core/v1/api"
-	"github.com/klovercloud-ci/core/v1/service"
+	"github.com/klovercloud-ci-cd/integration-manager/api/common"
+	"github.com/klovercloud-ci-cd/integration-manager/core/v1/api"
+	"github.com/klovercloud-ci-cd/integration-manager/core/v1/service"
 	"github.com/labstack/echo/v4"
 	"strconv"
 	"strings"

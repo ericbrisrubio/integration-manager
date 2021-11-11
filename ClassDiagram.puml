@@ -1,0 +1,545 @@
+@startuml
+namespace api {
+    interface Application  {
+        + Update(context echo.Context) error
+
+    }
+    interface Company  {
+        + Save(context echo.Context) error
+        + GetById(context echo.Context) error
+        + Get(context echo.Context) error
+        + GetRepositoriesById(context echo.Context) error
+        + UpdateRepositories(context echo.Context) error
+
+    }
+    interface Git  {
+        + ListenEvent(context echo.Context) error
+
+    }
+    interface Repository  {
+        + GetById(context echo.Context) error
+        + GetApplicationsById(context echo.Context) error
+
+    }
+}
+
+
+namespace common {
+    class MetaData << (S,Aquamarine) >> {
+        + Page int64
+        + PerPage int64
+        + PageCount int64
+        + TotalCount int64
+        + Links []<font color=blue>map</font>[string]string
+
+    }
+    class ResponseDTO << (S,Aquamarine) >> {
+        + Metadata *MetaData
+        + Data <font color=blue>interface</font>{}
+        + Status string
+        + Message string
+
+    }
+}
+
+
+namespace docs {
+    class s << (S,Aquamarine) >> {
+        + ReadDoc() string
+
+    }
+    class swaggerInfo << (S,Aquamarine) >> {
+        + Version string
+        + Host string
+        + BasePath string
+        + Schemes []string
+        + Title string
+        + Description string
+
+    }
+}
+
+
+namespace enums {
+    class enums.COMPANY_STATUS << (T, #FF7700) >>  {
+    }
+    class enums.COMPANY_UPDATE_OPTION << (T, #FF7700) >>  {
+    }
+    class enums.GITHUB_URL << (T, #FF7700) >>  {
+    }
+    class enums.GIT_EVENT << (T, #FF7700) >>  {
+    }
+    class enums.PARAMS << (T, #FF7700) >>  {
+    }
+    class enums.REPOSITORY_TYPE << (T, #FF7700) >>  {
+    }
+    class enums.STEP_TYPE << (T, #FF7700) >>  {
+    }
+    class enums.TRIGGER << (T, #FF7700) >>  {
+    }
+}
+
+
+namespace inmemory {
+    class companyRepository << (S,Aquamarine) >> {
+        + GetRepositoryByRepositoryId(id string) v1.Repository
+        + GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId string, repositoryId string, applicationUrl string) v1.Application
+        + AppendRepositories(companyId string, repos []v1.Repository) error
+        + DeleteRepositories(companyId string, repos []v1.Repository, isSoftDelete bool) error
+        + AppendApplications(companyId string, repositoryId string, apps []v1.Application) error
+        + DeleteApplications(companyId string, repositoryId string, apps []v1.Application, isSoftDelete bool) error
+        + GetRepositoryByCompanyIdAndApplicationUrl(id string, url string) v1.Repository
+        + GetCompanyByApplicationUrl(url string) v1.Company
+        + GetCompanies(option v1.CompanyQueryOption) ([]v1.Company, int64)
+        + GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64)
+        + GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64)
+        + GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Application, int64)
+        + GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption) []v1.Application
+        + Store(company v1.Company) error
+        + Delete(companyId string) error
+
+    }
+}
+
+"repository.CompanyRepository" <|-- "inmemory.companyRepository"
+
+namespace logic {
+    class ciCoreEventService << (S,Aquamarine) >> {
+        - httpClient service.HttpClient
+
+        + Listen(subject v1.Subject) 
+
+    }
+    class companyService << (S,Aquamarine) >> {
+        - repo repository.CompanyRepository
+        - client service.HttpClient
+
+        + GetRepositoryByRepositoryId(id string) v1.Repository
+        + GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId string, repositoryId string, applicationUrl string) v1.Application
+        + UpdateRepositories(companyId string, repositories []v1.Repository, companyUpdateOption v1.CompanyUpdateOption) error
+        + UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.CompanyUpdateOption) error
+        + GetRepositoryByCompanyIdAndApplicationUrl(id string, url string) v1.Repository
+        + GetCompanyByApplicationUrl(url string) v1.Company
+        + Store(company v1.Company) error
+        + Delete(companyId string) error
+        + GetCompanies(option v1.CompanyQueryOption) []v1.Company
+        + GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64)
+        + GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64)
+        + GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Application, int64)
+        + GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption) []v1.Application
+
+    }
+    class githubService << (S,Aquamarine) >> {
+        - companyService service.Company
+        - observerList []service.Observer
+        - client service.HttpClient
+
+        - notifyAll(listener v1.Subject) 
+
+        + DeleteRepositoryWebhookById(username string, repositoryName string, webhookId string, token string) error
+        + CreateRepositoryWebhook(username string, repositoryName string, token string) (v1.GithubWebhook, error)
+        + GetPipeline(repositoryName string, username string, revision string, token string) (*v1.Pipeline, error)
+        + GetDescriptors(repositoryName string, username string, revision string, token string, path string, env string) ([]unstructured.Unstructured, error)
+        + GetDirectoryContents(repositoryName string, username string, revision string, token string, path string) ([]v1.GithubDirectoryContent, error)
+
+    }
+    class httpClientService << (S,Aquamarine) >> {
+        + Delete(url string, header <font color=blue>map</font>[string]string) error
+        + Get(url string, header <font color=blue>map</font>[string]string) ([]byte, error)
+        + Post(url string, header <font color=blue>map</font>[string]string, body []byte) ([]byte, error)
+
+    }
+    class jwtService << (S,Aquamarine) >> {
+        + Jwt v1.Jwt
+
+        + ValidateToken(tokenString string) (bool, *jwt.Token)
+
+    }
+    class logEventService << (S,Aquamarine) >> {
+        - httpPublisher service.HttpClient
+
+        + Listen(subject v1.Subject) 
+
+    }
+    class processEventService << (S,Aquamarine) >> {
+        - httpPublisher service.HttpClient
+
+        + Listen(subject v1.Subject) 
+
+    }
+    class processInventoryEventService << (S,Aquamarine) >> {
+        - httpClient service.HttpClient
+
+        + CountTodaysRanProcessByCompanyId(companyId string) int64
+        + Listen(subject v1.Subject) 
+
+    }
+}
+
+"service.Observer" <|-- "logic.ciCoreEventService"
+"service.Company" <|-- "logic.companyService"
+"service.Git" <|-- "logic.githubService"
+"service.HttpClient" <|-- "logic.httpClientService"
+"service.Jwt" <|-- "logic.jwtService"
+"service.Observer" <|-- "logic.logEventService"
+"service.Observer" <|-- "logic.processEventService"
+"service.Observer" <|-- "logic.processInventoryEventService"
+"service.ProcessInventoryEvent" <|-- "logic.processInventoryEventService"
+
+namespace mongo {
+    class companyRepository << (S,Aquamarine) >> {
+        - manager *dmManager
+        - timeout time.Duration
+
+        + GetRepositoryByRepositoryId(id string) v1.Repository
+        + GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId string, repositoryId string, applicationUrl string) v1.Application
+        + AppendRepositories(companyId string, repos []v1.Repository) error
+        + DeleteRepositories(companyId string, repos []v1.Repository, isSoftDelete bool) error
+        + AppendApplications(companyId string, repositoryId string, apps []v1.Application) error
+        + DeleteApplications(companyId string, repositoryId string, apps []v1.Application, isSoftDelete bool) error
+        + GetRepositoryByCompanyIdAndApplicationUrl(id string, url string) v1.Repository
+        + GetCompanyByApplicationUrl(url string) v1.Company
+        + GetCompanies(option v1.CompanyQueryOption) ([]v1.Company, int64)
+        + GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64)
+        + GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64)
+        + GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Application, int64)
+        + GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption) []v1.Application
+        + Store(company v1.Company) error
+        + Delete(companyId string) error
+
+    }
+    class dmManager << (S,Aquamarine) >> {
+        + Ctx context.Context
+        + Db *mongo.Database
+
+        - initConnection() 
+        - initMockMongoConnection() 
+
+    }
+}
+
+"repository.CompanyRepository" <|-- "mongo.companyRepository"
+
+namespace repository {
+    interface CompanyRepository  {
+        + Store(company v1.Company) error
+        + AppendRepositories(companyId string, repos []v1.Repository) error
+        + DeleteRepositories(companyId string, repos []v1.Repository, isSoftDelete bool) error
+        + AppendApplications(companyId string, repositoryId string, apps []v1.Application) error
+        + DeleteApplications(companyId string, repositoryId string, apps []v1.Application, isSoftDelete bool) error
+        + Delete(companyId string) error
+        + GetCompanies(option v1.CompanyQueryOption) ([]v1.Company, int64)
+        + GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64)
+        + GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64)
+        + GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Application, int64)
+        + GetCompanyByApplicationUrl(url string) v1.Company
+        + GetRepositoryByRepositoryId(id string) v1.Repository
+        + GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption) []v1.Application
+        + GetRepositoryByCompanyIdAndApplicationUrl(id string, url string) v1.Repository
+        + GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId string, repositoryId string, applicationUrl string) v1.Application
+
+    }
+}
+
+
+namespace service {
+    interface Company  {
+        + Store(company v1.Company) error
+        + UpdateRepositories(companyId string, repositories []v1.Repository, companyUpdateOption v1.CompanyUpdateOption) error
+        + UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.CompanyUpdateOption) error
+        + Delete(companyId string) error
+        + GetCompanies(option v1.CompanyQueryOption) []v1.Company
+        + GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64)
+        + GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64)
+        + GetRepositoryByRepositoryId(id string) v1.Repository
+        + GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Application, int64)
+        + GetCompanyByApplicationUrl(url string) v1.Company
+        + GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption) []v1.Application
+        + GetRepositoryByCompanyIdAndApplicationUrl(id string, url string) v1.Repository
+        + GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId string, repositoryId string, applicationUrl string) v1.Application
+
+    }
+    interface Git  {
+        + GetPipeline(repositoryName string, username string, revision string, token string) (*v1.Pipeline, error)
+        + GetDescriptors(repositoryName string, username string, revision string, token string, path string, env string) ([]unstructured.Unstructured, error)
+        + GetDirectoryContents(repositoryName string, username string, revision string, token string, path string) ([]v1.GithubDirectoryContent, error)
+        + CreateRepositoryWebhook(username string, repositoryName string, token string) (v1.GithubWebhook, error)
+        + DeleteRepositoryWebhookById(username string, repositoryName string, webhookId string, token string) error
+
+    }
+    interface HttpClient  {
+        + Get(url string, header <font color=blue>map</font>[string]string) ([]byte, error)
+        + Post(url string, header <font color=blue>map</font>[string]string, body []byte) ([]byte, error)
+        + Delete(url string, header <font color=blue>map</font>[string]string) error
+
+    }
+    interface Jwt  {
+        + ValidateToken(tokenString string) (bool, *jwt.Token)
+
+    }
+    interface Observer  {
+        + Listen(subject v1.Subject) 
+
+    }
+    interface ProcessInventoryEvent  {
+        + CountTodaysRanProcessByCompanyId(companyId string) int64
+
+    }
+}
+
+
+namespace v1 {
+    class Application << (S,Aquamarine) >> {
+        + MetaData ApplicationMetadata
+        + Url string
+        + Webhook GithubWebhook
+        + Status enums.COMPANY_STATUS
+
+        + Validate() error
+
+    }
+    class ApplicationMetadata << (S,Aquamarine) >> {
+        + Labels <font color=blue>map</font>[string]string
+        + Id string
+        + Name string
+        + IsWebhookEnabled bool
+
+        + Validate() error
+
+    }
+    class ApplicationsDto << (S,Aquamarine) >> {
+        + Applications []Application
+
+    }
+    class Company << (S,Aquamarine) >> {
+        + MetaData CompanyMetadata
+        + Id string
+        + Name string
+        + Repositories []Repository
+        + Status enums.COMPANY_STATUS
+
+        + Validate() error
+        + GetCompanyWithoutRepository() Company
+        + GetCompanyWithRepository() Company
+
+    }
+    class CompanyMetadata << (S,Aquamarine) >> {
+        + Labels <font color=blue>map</font>[string]string
+        + NumberOfConcurrentProcess int64
+        + TotalProcessPerDay int64
+
+        + Validate() error
+
+    }
+    class CompanyQueryOption << (S,Aquamarine) >> {
+        + Pagination Pagination
+        + LoadRepositories bool
+        + LoadApplications bool
+
+    }
+    class CompanyUpdateOption << (S,Aquamarine) >> {
+        + Option enums.COMPANY_UPDATE_OPTION
+
+    }
+    class CompanyWiseRepositoriesDto << (S,Aquamarine) >> {
+        + MetaData CompanyMetadata
+        + Id string
+        + Name string
+        + Status enums.COMPANY_STATUS
+        + Repositories []<font color=blue>struct</font>{string, enums.REPOSITORY_TYPE, string}
+
+    }
+    class GithubCreateWebhookRequest << (S,Aquamarine) >> {
+        + Config <font color=blue>struct</font>{string}
+        + Events []enums.GIT_EVENT
+
+    }
+    class GithubDirectoryContent << (S,Aquamarine) >> {
+        + Name string
+        + Path string
+        + Sha string
+        + Size int
+        + URL string
+        + HTMLURL string
+        + GitURL string
+        + DownloadURL <font color=blue>interface</font>{}
+        + Type string
+        + Links <font color=blue>struct</font>{string, string, string}
+
+    }
+    class GithubWebHookEvent << (S,Aquamarine) >> {
+        + Ref string
+        + Before string
+        + After string
+        + Repository <font color=blue>struct</font>{int, string, string, string, bool, <font color=blue>struct</font>{string, string, string, int, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, bool}, string, <font color=blue>interface</font>{}, bool, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, int, time.Time, int, string, string, string, string, <font color=blue>interface</font>{}, int, int, int, string, bool, bool, bool, bool, bool, int, <font color=blue>interface</font>{}, bool, bool, int, <font color=blue>interface</font>{}, bool, int, int, int, string, int, string}
+        + Pusher <font color=blue>struct</font>{string, string}
+        + Sender <font color=blue>struct</font>{string, int, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, bool}
+        + Created bool
+        + Deleted bool
+        + Forced bool
+        + BaseRef <font color=blue>interface</font>{}
+        + Compare string
+        + Commits []<font color=blue>struct</font>{string, string, bool, string, time.Time, string, <font color=blue>struct</font>{string, string, string}, <font color=blue>struct</font>{string, string, string}, []<font color=blue>interface</font>{}, []<font color=blue>interface</font>{}, []string}
+        + HeadCommit <font color=blue>struct</font>{string, string, bool, string, time.Time, string, <font color=blue>struct</font>{string, string, string}, <font color=blue>struct</font>{string, string, string}, []<font color=blue>interface</font>{}, []<font color=blue>interface</font>{}, []string}
+
+    }
+    class GithubWebhook << (S,Aquamarine) >> {
+        + Type string
+        + ID int
+        + Active bool
+        + Events []string
+        + Config <font color=blue>struct</font>{string, string, string}
+        + UpdatedAt time.Time
+        + CreatedAt time.Time
+        + URL string
+        + TestURL string
+        + PingURL string
+        + DeliveriesURL string
+
+    }
+    class Jwt << (S,Aquamarine) >> {
+        + PublicKey *rsa.PublicKey
+
+    }
+    class LogEvent << (S,Aquamarine) >> {
+        + ProcessId string
+        + Log string
+        + Step string
+        + CreatedAt time.Time
+
+    }
+    class OnlyCompanyDto << (S,Aquamarine) >> {
+        + MetaData CompanyMetadata
+        + Id string
+        + Name string
+        + Status enums.COMPANY_STATUS
+
+    }
+    class OnlyRepository << (S,Aquamarine) >> {
+        + Id string
+        + Type enums.REPOSITORY_TYPE
+        + Token string
+
+        + GetRepositoryWithoutApplication() Repository
+
+    }
+    class Pagination << (S,Aquamarine) >> {
+        + Page int64
+        + Limit int64
+
+    }
+    class Pipeline << (S,Aquamarine) >> {
+        + MetaData PipelineMetadata
+        + ApiVersion string
+        + Name string
+        + ProcessId string
+        + Steps []Step
+
+        + Validate() error
+
+    }
+    class PipelineMetadata << (S,Aquamarine) >> {
+        + CompanyId string
+        + CompanyMetadata CompanyMetadata
+
+    }
+    class Process << (S,Aquamarine) >> {
+        + ProcessId string
+        + CompanyId string
+        + AppId string
+        + RepositoryId string
+        + Data <font color=blue>map</font>[string]<font color=blue>interface</font>{}
+
+    }
+    class ProcessEvent << (S,Aquamarine) >> {
+        + ProcessId string
+        + Data <font color=blue>map</font>[string]<font color=blue>interface</font>{}
+
+    }
+    class RepositoriesDto << (S,Aquamarine) >> {
+        + Repositories []Repository
+
+    }
+    class Repository << (S,Aquamarine) >> {
+        + Id string
+        + Type enums.REPOSITORY_TYPE
+        + Token string
+        + Applications []Application
+
+        + Validate() error
+
+    }
+    class Step << (S,Aquamarine) >> {
+        + Name string
+        + Type enums.STEP_TYPE
+        + Trigger enums.TRIGGER
+        + Params <font color=blue>map</font>[enums.PARAMS]string
+        + Next []string
+        + Descriptors *[]unstructured.Unstructured
+
+        + Validate() error
+
+    }
+    class Subject << (S,Aquamarine) >> {
+        + Step string
+        + CoreRequestQueryParam <font color=blue>map</font>[string]string
+        + StepType enums.STEP_TYPE
+        + EventData <font color=blue>map</font>[string]<font color=blue>interface</font>{}
+        + ProcessLabel <font color=blue>map</font>[string]string
+        + Pipeline Pipeline
+        + App <font color=blue>struct</font>{string, string, string}
+
+    }
+    class applicationApi << (S,Aquamarine) >> {
+        - companyService service.Company
+        - observerList []service.Observer
+
+        + Update(context echo.Context) error
+
+    }
+    class companyApi << (S,Aquamarine) >> {
+        - companyService service.Company
+        - observerList []service.Observer
+
+        + UpdateRepositories(context echo.Context) error
+        + Get(context echo.Context) error
+        + Save(context echo.Context) error
+        + GetById(context echo.Context) error
+        + GetRepositoriesById(context echo.Context) error
+
+    }
+    class repositoryApi << (S,Aquamarine) >> {
+        - companyService service.Company
+        - observerList []service.Observer
+
+        + GetById(context echo.Context) error
+        + GetApplicationsById(context echo.Context) error
+
+    }
+    class v1GithubApi << (S,Aquamarine) >> {
+        - gitService service.Git
+        - companyService service.Company
+        - processInventoryEventService service.ProcessInventoryEvent
+        - observerList []service.Observer
+
+        - notifyAll(listener v1.Subject) 
+
+        + ListenEvent(context echo.Context) error
+
+    }
+}
+
+"api.Application" <|-- "v1.applicationApi"
+"api.Company" <|-- "v1.companyApi"
+"api.Repository" <|-- "v1.repositoryApi"
+"api.Git" <|-- "v1.v1GithubApi"
+
+"__builtin__.string" #.. "enums.COMPANY_STATUS"
+"__builtin__.string" #.. "enums.COMPANY_UPDATE_OPTION"
+"__builtin__.string" #.. "enums.GITHUB_URL"
+"__builtin__.string" #.. "enums.GIT_EVENT"
+"__builtin__.string" #.. "enums.PARAMS"
+"__builtin__.string" #.. "enums.REPOSITORY_TYPE"
+"__builtin__.string" #.. "enums.STEP_TYPE"
+"__builtin__.string" #.. "enums.TRIGGER"
+@enduml

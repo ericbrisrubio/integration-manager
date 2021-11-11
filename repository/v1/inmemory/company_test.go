@@ -2,8 +2,8 @@ package inmemory
 
 import (
 	"fmt"
-	v1 "github.com/klovercloud-ci/core/v1"
-	"github.com/klovercloud-ci/enums"
+	v1 "github.com/klovercloud-ci-cd/integration-manager/core/v1"
+	"github.com/klovercloud-ci-cd/integration-manager/enums"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"reflect"

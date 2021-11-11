@@ -2,10 +2,10 @@ package logic
 
 import (
 	"github.com/google/uuid"
-	v1 "github.com/klovercloud-ci/core/v1"
-	"github.com/klovercloud-ci/core/v1/repository"
-	"github.com/klovercloud-ci/core/v1/service"
-	"github.com/klovercloud-ci/enums"
+	v1 "github.com/klovercloud-ci-cd/integration-manager/core/v1"
+	"github.com/klovercloud-ci-cd/integration-manager/core/v1/repository"
+	"github.com/klovercloud-ci-cd/integration-manager/core/v1/service"
+	"github.com/klovercloud-ci-cd/integration-manager/enums"
 	"log"
 	"strings"
 )

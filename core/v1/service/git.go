@@ -1,7 +1,7 @@
 package service
 
 import (
-	v1 "github.com/klovercloud-ci/core/v1"
+	v1 "github.com/klovercloud-ci-cd/integration-manager/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 

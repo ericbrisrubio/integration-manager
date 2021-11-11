@@ -15,7 +15,7 @@ func Test_trimUrl(t *testing.T) {
 	}
 
 	testdata := TestCase{
-		url:      "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager.git",
+		url:      "https://github.com/klovercloud-ci-cd/integration-manager.git",
 		expected: "klovercloud-ci-cd",
 	}
 	testdata.actual, _ = getUsernameAndRepoNameFromGithubRepositoryUrl(testdata.url)
@@ -24,7 +24,7 @@ func Test_trimUrl(t *testing.T) {
 		assert.ElementsMatch(t, testdata.expected, testdata.actual)
 	}
 	_, testdata.actual = getUsernameAndRepoNameFromGithubRepositoryUrl(testdata.url)
-	testdata.expected = "klovercloud-ci-integration-manager"
+	testdata.expected = "integration-manager"
 	if !reflect.DeepEqual(testdata.expected, testdata.actual) {
 		fmt.Println(testdata.actual)
 		assert.ElementsMatch(t, testdata.expected, testdata.actual)

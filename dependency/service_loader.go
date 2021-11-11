@@ -1,12 +1,12 @@
 package dependency
 
 import (
-	"github.com/klovercloud-ci/config"
-	"github.com/klovercloud-ci/core/v1/logic"
-	"github.com/klovercloud-ci/core/v1/service"
-	"github.com/klovercloud-ci/enums"
-	"github.com/klovercloud-ci/repository/v1/inmemory"
-	"github.com/klovercloud-ci/repository/v1/mongo"
+	"github.com/klovercloud-ci-cd/integration-manager/config"
+	"github.com/klovercloud-ci-cd/integration-manager/core/v1/logic"
+	"github.com/klovercloud-ci-cd/integration-manager/core/v1/service"
+	"github.com/klovercloud-ci-cd/integration-manager/enums"
+	"github.com/klovercloud-ci-cd/integration-manager/repository/v1/inmemory"
+	"github.com/klovercloud-ci-cd/integration-manager/repository/v1/mongo"
 )
 
 // GetV1GithubService returns Git service

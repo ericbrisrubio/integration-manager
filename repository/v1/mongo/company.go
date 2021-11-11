@@ -3,9 +3,9 @@ package mongo
 import (
 	"context"
 	"errors"
-	v1 "github.com/klovercloud-ci/core/v1"
-	"github.com/klovercloud-ci/core/v1/repository"
-	"github.com/klovercloud-ci/enums"
+	v1 "github.com/klovercloud-ci-cd/integration-manager/core/v1"
+	"github.com/klovercloud-ci-cd/integration-manager/core/v1/repository"
+	"github.com/klovercloud-ci-cd/integration-manager/enums"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"

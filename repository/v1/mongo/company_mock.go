@@ -2,9 +2,9 @@ package mongo
 
 import (
 	"context"
-	v1 "github.com/klovercloud-ci/core/v1"
-	"github.com/klovercloud-ci/core/v1/repository"
-	"github.com/klovercloud-ci/enums"
+	v1 "github.com/klovercloud-ci-cd/integration-manager/core/v1"
+	"github.com/klovercloud-ci-cd/integration-manager/core/v1/repository"
+	"github.com/klovercloud-ci-cd/integration-manager/enums"
 )
 
 var data []v1.Company
@@ -35,7 +35,7 @@ func InitCompanyData() []v1.Company {
 								Name:             "test1",
 								IsWebhookEnabled: false,
 							},
-							Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+							Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 						},
 					},
 				},
@@ -63,7 +63,7 @@ func InitCompanyData() []v1.Company {
 								Name:             "test2",
 								IsWebhookEnabled: false,
 							},
-							Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+							Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 						},
 					},
 				},
@@ -91,7 +91,7 @@ func InitCompanyData() []v1.Company {
 								Name:             "test3",
 								IsWebhookEnabled: false,
 							},
-							Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+							Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 						},
 					},
 				},
@@ -119,7 +119,7 @@ func InitCompanyData() []v1.Company {
 								Name:             "test4",
 								IsWebhookEnabled: false,
 							},
-							Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+							Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 						},
 					},
 				},
@@ -147,7 +147,7 @@ func InitCompanyData() []v1.Company {
 								Name:             "test5",
 								IsWebhookEnabled: false,
 							},
-							Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+							Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 						},
 					},
 				},
@@ -175,7 +175,7 @@ func InitCompanyData() []v1.Company {
 								Name:             "test6",
 								IsWebhookEnabled: false,
 							},
-							Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+							Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 						},
 					},
 				},
@@ -203,7 +203,7 @@ func InitCompanyData() []v1.Company {
 								Name:             "test7",
 								IsWebhookEnabled: false,
 							},
-							Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+							Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 						},
 					},
 				},

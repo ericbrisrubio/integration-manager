@@ -1,11 +1,11 @@
 package v1
 
 import (
-	"github.com/klovercloud-ci/api/common"
-	v1 "github.com/klovercloud-ci/core/v1"
-	"github.com/klovercloud-ci/core/v1/api"
-	"github.com/klovercloud-ci/core/v1/service"
-	"github.com/klovercloud-ci/enums"
+	"github.com/klovercloud-ci-cd/integration-manager/api/common"
+	v1 "github.com/klovercloud-ci-cd/integration-manager/core/v1"
+	"github.com/klovercloud-ci-cd/integration-manager/core/v1/api"
+	"github.com/klovercloud-ci-cd/integration-manager/core/v1/service"
+	"github.com/klovercloud-ci-cd/integration-manager/enums"
 	"github.com/labstack/echo/v4"
 	"log"
 )

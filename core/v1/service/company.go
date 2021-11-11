@@ -1,8 +1,8 @@
 package service
 
 import (
-	v1 "github.com/klovercloud-ci/core/v1"
-	"github.com/klovercloud-ci/enums"
+	v1 "github.com/klovercloud-ci-cd/integration-manager/core/v1"
+	"github.com/klovercloud-ci-cd/integration-manager/enums"
 )
 
 // Company Company related operations.

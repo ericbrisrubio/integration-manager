@@ -2,8 +2,8 @@ package mongo
 
 import (
 	"github.com/joho/godotenv"
-	v1 "github.com/klovercloud-ci/core/v1"
-	"github.com/klovercloud-ci/enums"
+	v1 "github.com/klovercloud-ci-cd/integration-manager/core/v1"
+	"github.com/klovercloud-ci-cd/integration-manager/enums"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"os"
@@ -94,7 +94,7 @@ func TestCompanyRepository_AppendRepositories(t *testing.T) {
 							Name:             "test78",
 							IsWebhookEnabled: false,
 						},
-						Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+						Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 					},
 				},
 			},
@@ -110,7 +110,7 @@ func TestCompanyRepository_AppendRepositories(t *testing.T) {
 							Name:             "test79",
 							IsWebhookEnabled: false,
 						},
-						Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+						Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 					},
 				},
 			},
@@ -170,7 +170,7 @@ func TestCompanyRepository_DeleteRepositories(t *testing.T) {
 							Name:             "test7",
 							IsWebhookEnabled: false,
 						},
-						Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+						Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 					},
 				},
 			},
@@ -227,7 +227,7 @@ func TestCompanyRepository_AppendApplications(t *testing.T) {
 					Name:             "test71",
 					IsWebhookEnabled: false,
 				},
-				Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+				Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 			},
 			{
 				MetaData: v1.ApplicationMetadata{
@@ -236,7 +236,7 @@ func TestCompanyRepository_AppendApplications(t *testing.T) {
 					Name:             "test72",
 					IsWebhookEnabled: false,
 				},
-				Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+				Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 			},
 		},
 		expected: 3,
@@ -291,7 +291,7 @@ func TestCompanyRepository_DeleteApplications(t *testing.T) {
 					Name:             "test71",
 					IsWebhookEnabled: false,
 				},
-				Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+				Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 			},
 			{
 				MetaData: v1.ApplicationMetadata{
@@ -300,7 +300,7 @@ func TestCompanyRepository_DeleteApplications(t *testing.T) {
 					Name:             "test72",
 					IsWebhookEnabled: false,
 				},
-				Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+				Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 			},
 		},
 		expected: 1,
@@ -338,7 +338,7 @@ func TestCompanyRepository_GetCompanyByApplicationUrl(t *testing.T) {
 		actual   v1.Company
 	}
 	testCase := TestData{
-		url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+		url: "https://github.com/klovercloud-ci-cd/integration-manager",
 		expected: v1.Company{
 			MetaData: v1.CompanyMetadata(struct {
 				Labels                    map[string]string
@@ -360,7 +360,7 @@ func TestCompanyRepository_GetCompanyByApplicationUrl(t *testing.T) {
 								Name:             "test7",
 								IsWebhookEnabled: false,
 							},
-							Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+							Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 						},
 					},
 				},
@@ -409,7 +409,7 @@ func TestCompanyRepository_GetRepositoryByRepositoryId(t *testing.T) {
 						Name:             "test7",
 						IsWebhookEnabled: false,
 					},
-					Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+					Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 				},
 			},
 		},
@@ -452,7 +452,7 @@ func TestCompanyRepository_GetApplicationsByCompanyIdAndRepositoryType(t *testin
 					Name:             "test7",
 					IsWebhookEnabled: false,
 				},
-				Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+				Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 			},
 		},
 	}
@@ -491,7 +491,7 @@ func TestCompanyRepository_GetRepositoryByCompanyIdAndApplicationUrl(t *testing.
 	}
 	testCase := TestData{
 		companyId: "07",
-		url:       "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+		url:       "https://github.com/klovercloud-ci-cd/integration-manager",
 		expected: v1.Repository{
 			Id:    "07",
 			Type:  enums.GITHUB,
@@ -504,7 +504,7 @@ func TestCompanyRepository_GetRepositoryByCompanyIdAndApplicationUrl(t *testing.
 						Name:             "test7",
 						IsWebhookEnabled: false,
 					},
-					Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+					Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 				},
 			},
 		},
@@ -542,7 +542,7 @@ func TestCompanyRepository_GetApplicationByCompanyIdAndRepositoryIdAndApplicatio
 	testCase := TestData{
 		companyId: "07",
 		repoId:    "07",
-		url:       "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+		url:       "https://github.com/klovercloud-ci-cd/integration-manager",
 		expected: v1.Application{
 			MetaData: v1.ApplicationMetadata{
 				Labels:           map[string]string{"compId": "123", "teamId": "123"},
@@ -550,7 +550,7 @@ func TestCompanyRepository_GetApplicationByCompanyIdAndRepositoryIdAndApplicatio
 				Name:             "test7",
 				IsWebhookEnabled: false,
 			},
-			Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+			Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 		},
 	}
 	err := loadEnv(t)
@@ -599,7 +599,7 @@ func TestCompanyRepository_DeleteApplicationsSoftDelete(t *testing.T) {
 					Name:             "test7",
 					IsWebhookEnabled: false,
 				},
-				Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+				Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 			},
 		},
 		expected: enums.INACTIVE,
@@ -663,7 +663,7 @@ func TestCompanyRepository_DeleteRepositoriesSoftDelete(t *testing.T) {
 							Name:             "test7",
 							IsWebhookEnabled: false,
 						},
-						Url: "https://github.com/klovercloud-ci-cd/klovercloud-ci-integration-manager",
+						Url: "https://github.com/klovercloud-ci-cd/integration-manager",
 					},
 				},
 			},
