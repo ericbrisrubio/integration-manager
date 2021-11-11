@@ -51,7 +51,7 @@ func (githubService githubService) CreateRepositoryWebhook(username, repositoryN
 		log.Println(err.Error())
 		return v1.GithubWebhook{}, err
 	}
-	err, data := githubService.client.Post(url, header, b)
+	data, err := githubService.client.Post(url, header, b)
 	if err != nil {
 		log.Println(err.Error())
 		return v1.GithubWebhook{}, err
@@ -83,7 +83,7 @@ func (githubService githubService) GetPipeline(repositoryName, username, revisio
 	header["Authorization"] = "token " + token
 	header["Accept"] = "application/vnd.github.v3.raw"
 	header["X-Requested-With"] = "Curl"
-	err, data := githubService.client.Get(url, header)
+	data, err := githubService.client.Get(url, header)
 	if err != nil {
 		// send to observer
 		return nil, err
@@ -126,7 +126,7 @@ func (githubService githubService) GetDescriptors(repositoryName, username, revi
 		header["Authorization"] = "token " + token
 		header["Accept"] = "application/vnd.github.v3.raw"
 		header["X-Requested-With"] = "Curl"
-		err, data := githubService.client.Get(url, header)
+		data, err := githubService.client.Get(url, header)
 		if err != nil {
 			// send to observer
 			return nil, err
@@ -159,7 +159,7 @@ func (githubService githubService) GetDirectoryContents(repositoryName, username
 	header := make(map[string]string)
 	header["Authorization"] = "token " + token
 	header["Accept"] = "application/vnd.github.v3+json"
-	err, data := githubService.client.Get(url, header)
+	data, err := githubService.client.Get(url, header)
 	if err != nil {
 		// send to observer
 		return nil, err

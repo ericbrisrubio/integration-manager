@@ -516,11 +516,13 @@ func (c companyRepository) Delete(companyId string) error {
 
 	return err
 }
+
 // RemoveRepository removes repository from a list by index
 func RemoveRepository(s []v1.Repository, i int) []v1.Repository {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
 }
+
 // RemoveApplication removes applications from a list by index
 func RemoveApplication(s []v1.Application, i int) []v1.Application {
 	s[i] = s[len(s)-1]

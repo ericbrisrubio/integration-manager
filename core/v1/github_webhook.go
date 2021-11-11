@@ -181,6 +181,7 @@ type GithubWebHookEvent struct {
 		Modified []string      `json:"modified"`
 	} `json:"head_commit"`
 }
+
 // GithubCreateWebhookRequest contains github web hook creation data
 type GithubCreateWebhookRequest struct {
 	Config struct {
@@ -188,6 +189,7 @@ type GithubCreateWebhookRequest struct {
 	} `json:"config"`
 	Events []enums.GIT_EVENT `json:"events"`
 }
+
 // GithubWebhook contains github web hook data
 type GithubWebhook struct {
 	Type   string   `json:"type"`

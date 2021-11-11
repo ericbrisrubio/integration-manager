@@ -203,9 +203,9 @@ func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOptio
 		if option.LoadApplications {
 			return companies, int64(len(IndexedCompanies))
 		}
-			for j := range companies.Repositories {
-				companies.Repositories[j].Applications = nil
-			}
+		for j := range companies.Repositories {
+			companies.Repositories[j].Applications = nil
+		}
 
 	} else {
 		companies.Repositories = nil
@@ -322,11 +322,13 @@ func paginate(logs []v1.Company, page int64, limit int64) []v1.Company {
 	}
 	return logs[startIndex:endIndex]
 }
+
 // RemoveRepository removes repository from a list by index
 func RemoveRepository(s []v1.Repository, i int) []v1.Repository {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
 }
+
 // RemoveApplication removes application from a list by index
 func RemoveApplication(s []v1.Application, i int) []v1.Application {
 	s[i] = s[len(s)-1]

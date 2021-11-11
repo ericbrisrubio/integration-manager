@@ -34,7 +34,7 @@ func (h httpClientService) Delete(url string, header map[string]string) error {
 	return nil
 }
 
-func (h httpClientService) Get(url string, header map[string]string) (error, []byte) {
+func (h httpClientService) Get(url string, header map[string]string) ([]byte, error) {
 	client := http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	for k, v := range header {
@@ -42,26 +42,26 @@ func (h httpClientService) Get(url string, header map[string]string) (error, []b
 	}
 	if err != nil {
 		log.Println(err.Error())
-		return err, nil
+		return nil, err
 	}
 	res, err := client.Do(req)
 	if err != nil {
 		log.Println(err.Error())
-		return err, nil
+		return nil, err
 	}
 	defer res.Body.Close()
 	if res.StatusCode == http.StatusOK {
 		jsonDataFromHttp, err := ioutil.ReadAll(res.Body)
 		if err != nil {
 			log.Println(err.Error())
-			return err, nil
+			return nil, err
 		}
-		return nil, jsonDataFromHttp
+		return jsonDataFromHttp, nil
 	}
-		return errors.New("Status: " + res.Status + ", code: " + strconv.Itoa(res.StatusCode)), nil
+	return nil, errors.New("Status: " + res.Status + ", code: " + strconv.Itoa(res.StatusCode))
 }
 
-func (h httpClientService) Post(url string, header map[string]string, body []byte) (error, []byte) {
+func (h httpClientService) Post(url string, header map[string]string, body []byte) ([]byte, error) {
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
 	for k, v := range header {
 		req.Header.Set(k, v)
@@ -70,17 +70,17 @@ func (h httpClientService) Post(url string, header map[string]string, body []byt
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("[ERROR] Failed communicate :", err.Error())
-		return err, nil
+		return nil, err
 	}
 	defer resp.Body.Close()
 	body, err = ioutil.ReadAll(resp.Body)
 	if resp.StatusCode != 200 && resp.StatusCode != 201 {
-		return err, nil
+		return nil, err
 	}
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
-	return nil, body
+	return body, nil
 }
 
 // NewHttpClientService returns HttpClient type service

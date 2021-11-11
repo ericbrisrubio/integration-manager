@@ -9,6 +9,7 @@ import (
 
 var data []v1.Company
 
+// InitCompanyData loads mock company data
 func InitCompanyData() []v1.Company {
 	var data []v1.Company
 

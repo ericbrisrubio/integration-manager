@@ -19,7 +19,7 @@ func (p processInventoryEventService) CountTodaysRanProcessByCompanyId(companyId
 	header["token"] = config.Token
 	header["Content-Type"] = "application/json"
 	var count int64
-	err, data := p.httpClient.Get(url, header)
+	data, err := p.httpClient.Get(url, header)
 	if err != nil {
 		log.Println(err.Error())
 		return count
