@@ -198,6 +198,12 @@ var doc = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Loads Applications",
+                        "name": "loadApplications",
+                        "in": "query"
                     }
                 ],
                 "responses": {
