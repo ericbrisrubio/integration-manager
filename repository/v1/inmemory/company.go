@@ -25,16 +25,12 @@ func (c companyRepository) GetRepositoryByRepositoryId(id string) v1.Repository 
 }
 
 func (c companyRepository) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
-	var companies []v1.Company
 	var app v1.Application
 	for _, each := range IndexedCompanies {
-		companies = append(companies, each)
-	}
-	for _, eachCompany := range companies {
-		if companyId == eachCompany.Id {
-			for _, eachrepo := range eachCompany.Repositories {
-				if eachrepo.Id == repositoryId {
-					for _, eachApp := range eachrepo.Applications {
+		if companyId == each.Id {
+			for _, eachRepo := range each.Repositories {
+				if eachRepo.Id == repositoryId {
+					for _, eachApp := range eachRepo.Applications {
 						if applicationUrl == eachApp.Url {
 							app.MetaData = eachApp.MetaData
 							app.Url = eachApp.Url
@@ -47,11 +43,7 @@ func (c companyRepository) GetApplicationByCompanyIdAndRepositoryIdAndApplicatio
 	return app
 }
 func (c companyRepository) AppendRepositories(companyId string, repos []v1.Repository) error {
-	var companies []v1.Company
 	for _, each := range IndexedCompanies {
-		companies = append(companies, each)
-	}
-	for _, each := range companies {
 		if companyId == each.Id {
 			for _, eachRepo := range repos {
 				each.Repositories = append(each.Repositories, eachRepo)
@@ -62,12 +54,8 @@ func (c companyRepository) AppendRepositories(companyId string, repos []v1.Repos
 }
 
 func (c companyRepository) DeleteRepositories(companyId string, repos []v1.Repository, isSoftDelete bool) error {
-	var companies []v1.Company
 	var repositories []v1.Repository
 	for _, each := range IndexedCompanies {
-		companies = append(companies, each)
-	}
-	for _, each := range companies {
 		if companyId == each.Id {
 			if isSoftDelete {
 				each.Status = enums.INACTIVE
@@ -87,11 +75,7 @@ func (c companyRepository) DeleteRepositories(companyId string, repos []v1.Repos
 }
 
 func (c companyRepository) AppendApplications(companyId, repositoryId string, apps []v1.Application) error {
-	var companies []v1.Company
 	for _, each := range IndexedCompanies {
-		companies = append(companies, each)
-	}
-	for _, each := range companies {
 		for _, eachRepo := range each.Repositories {
 			if eachRepo.Id == repositoryId {
 				for _, eachApp := range apps {
@@ -104,12 +88,8 @@ func (c companyRepository) AppendApplications(companyId, repositoryId string, ap
 }
 
 func (c companyRepository) DeleteApplications(companyId, repositoryId string, apps []v1.Application, isSoftDelete bool) error {
-	var companies []v1.Company
 	var applications []v1.Application
 	for _, each := range IndexedCompanies {
-		companies = append(companies, each)
-	}
-	for _, each := range companies {
 		if companyId == each.Id {
 			if isSoftDelete {
 				each.Status = enums.INACTIVE
@@ -151,12 +131,8 @@ func (c companyRepository) GetRepositoryByCompanyIdAndApplicationUrl(id, url str
 }
 
 func (c companyRepository) GetCompanyByApplicationUrl(url string) v1.Company {
-	var companies []v1.Company
 	var result v1.Company
 	for _, each := range IndexedCompanies {
-		companies = append(companies, each)
-	}
-	for _, each := range companies {
 		for _, eachRepo := range each.Repositories {
 			for _, app := range eachRepo.Applications {
 				if app.Url == url {
@@ -194,11 +170,7 @@ func (c companyRepository) GetCompanies(option v1.CompanyQueryOption) ([]v1.Comp
 
 func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64) {
 	var companies v1.Company
-	for _, each := range IndexedCompanies {
-		if each.Id == id {
-			companies = each
-		}
-	}
+	companies = IndexedCompanies[id]
 	if option.LoadRepositories {
 		if option.LoadApplications {
 			return companies, int64(len(IndexedCompanies))
@@ -216,11 +188,7 @@ func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOptio
 func (c companyRepository) GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64) {
 	var repository []v1.Repository
 	var companies v1.Company
-	for _, each := range IndexedCompanies {
-		if each.Id == id {
-			companies = each
-		}
-	}
+	companies = IndexedCompanies[id]
 	if option.LoadRepositories {
 		if option.LoadApplications {
 			for j := range companies.Repositories {
@@ -241,11 +209,7 @@ func (c companyRepository) GetRepositoriesByCompanyId(id string, option v1.Compa
 func (c companyRepository) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Application, int64) {
 	var applications []v1.Application
 	var companies v1.Company
-	for _, each := range IndexedCompanies {
-		if each.Id == id {
-			companies = each
-		}
-	}
+	companies = IndexedCompanies[id]
 	if option.LoadRepositories {
 		for j := range companies.Repositories {
 			if option.LoadApplications {
@@ -266,11 +230,7 @@ func (c companyRepository) GetApplicationsByCompanyId(id string, option v1.Compa
 func (c companyRepository) GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption) []v1.Application {
 	var applications []v1.Application
 	var companies v1.Company
-	for _, each := range IndexedCompanies {
-		if each.Id == id {
-			companies = each
-		}
-	}
+	companies = IndexedCompanies[id]
 	if option.LoadRepositories {
 		for j := range companies.Repositories {
 			if _type == companies.Repositories[j].Type {
@@ -302,25 +262,6 @@ func (c companyRepository) Store(company v1.Company) error {
 func (c companyRepository) Delete(companyId string) error {
 	delete(IndexedCompanies, companyId)
 	return nil
-}
-func paginate(logs []v1.Company, page int64, limit int64) []v1.Company {
-	if page < 0 || limit <= 0 {
-		return nil
-	}
-	var startIndex, endIndex int64
-	if page == 0 {
-		startIndex = 0
-	} else {
-		startIndex = page * limit
-	}
-	endIndex = startIndex + limit
-	if startIndex >= int64(len(logs)) {
-		return nil
-	}
-	if endIndex >= int64(len(logs)) {
-		return logs[startIndex:]
-	}
-	return logs[startIndex:endIndex]
 }
 
 // RemoveRepository removes repository from a list by index
