@@ -11,9 +11,6 @@ import (
 
 // GetV1GithubService returns Git service
 func GetV1GithubService() service.Git {
-	var observers []service.Observer
-	observers = append(observers, logic.NewCiCoreEventService(logic.NewHttpClientService()))
-	observers = append(observers, logic.NewProcessInventoryEventObserverService(logic.NewHttpClientService()))
 	return logic.NewGithubService(GetV1CompanyService(), nil, logic.NewHttpClientService())
 }
 

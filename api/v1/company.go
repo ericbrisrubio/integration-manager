@@ -157,15 +157,13 @@ func (c companyApi) GetRepositoriesById(context echo.Context) error {
 }
 
 func generateRepositoryAndApplicationId(payload v1.Company) v1.Company {
-	comp := v1.Company{}
-	comp = payload
 	for i, each := range payload.Repositories {
-		comp.Repositories[i].Id = guuid.New().String()
+		payload.Repositories[i].Id = guuid.New().String()
 		for j := range each.Applications {
-			comp.Repositories[i].Applications[j].MetaData.Id = guuid.New().String()
+			payload.Repositories[i].Applications[j].MetaData.Id = guuid.New().String()
 		}
 	}
-	return comp
+	return payload
 }
 
 func getQueryOption(context echo.Context) v1.CompanyQueryOption {
