@@ -85,7 +85,6 @@ func (c companyApi) Save(context echo.Context) error {
 		log.Println("Input Error:", err.Error())
 		return common.GenerateErrorResponse(context, nil, "Failed to Bind Input!")
 	}
-
 	var payload = v1.Company{
 		MetaData:     formData.MetaData,
 		Id:           formData.Id,
