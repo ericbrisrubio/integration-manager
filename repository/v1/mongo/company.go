@@ -12,8 +12,9 @@ import (
 	"time"
 )
 
+// CompanyCollection collection name
 var (
-	CompanyCollection = "CompanyCollection"
+	CompanyCollection = "companyCollection"
 )
 
 type companyRepository struct {
@@ -120,14 +121,14 @@ func (c companyRepository) DeleteRepositories(companyId string, repos []v1.Repos
 	if isSoftDelete {
 		for i, each := range company.Repositories {
 			if each.Id == repos[i].Id {
-				for j, _ := range each.Applications {
+				for j := range each.Applications {
 					each.Applications[j].Status = enums.INACTIVE
 				}
 			}
 		}
 	} else {
 		repositories = company.Repositories
-		for i, _ := range repos {
+		for i := range repos {
 			for j, each := range company.Repositories {
 				if repos[i].Id == each.Id {
 					repositories = RemoveRepository(company.Repositories, j)
@@ -172,7 +173,7 @@ func (c companyRepository) AppendApplications(companyId, repositoryId string, ap
 	}
 	company, _ := c.GetByCompanyId(companyId, option)
 
-	for i, _ := range company.Repositories {
+	for i := range company.Repositories {
 		if company.Repositories[i].Id == repositoryId {
 			company.Repositories[i].Applications = append(company.Repositories[i].Applications, apps...)
 		}
@@ -210,7 +211,7 @@ func (c companyRepository) DeleteApplications(companyId, repositoryId string, ap
 	if isSoftDelete {
 		for _, each := range company.Repositories {
 			for j, eachApp := range each.Applications {
-				for k, _ := range apps {
+				for k := range apps {
 					if apps[k].MetaData.Id == eachApp.MetaData.Id {
 						each.Applications[j].Status = enums.INACTIVE
 					}
@@ -222,8 +223,8 @@ func (c companyRepository) DeleteApplications(companyId, repositoryId string, ap
 		for i, each := range company.Repositories {
 			applications = each.Applications
 			if company.Repositories[i].Id == repositoryId {
-				for j, _ := range apps {
-					for k, _ := range applications {
+				for j := range apps {
+					for k := range applications {
 						if each.Applications[k].MetaData.Id == apps[j].MetaData.Id {
 							app := RemoveApplication(applications, k)
 							applications = app
@@ -515,16 +516,18 @@ func (c companyRepository) Delete(companyId string) error {
 
 	return err
 }
-
+// RemoveRepository removes repository from a list by index
 func RemoveRepository(s []v1.Repository, i int) []v1.Repository {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
 }
+// RemoveApplication removes applications from a list by index
 func RemoveApplication(s []v1.Application, i int) []v1.Application {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
 }
 
+// NewCompanyRepository returns CompanyRepository type object
 func NewCompanyRepository(timeout int) repository.CompanyRepository {
 	return &companyRepository{
 		manager: GetDmManager(),

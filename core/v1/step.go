@@ -7,6 +7,7 @@ import (
 	"reflect"
 )
 
+// Step contains pipeline step info
 type Step struct {
 	Name        string                       `json:"name" yaml:"name"`
 	Type        enums.STEP_TYPE              `json:"type" yaml:"type"`
@@ -16,6 +17,7 @@ type Step struct {
 	Descriptors *[]unstructured.Unstructured `json:"descriptors" yaml:"descriptors"`
 }
 
+// Validate validates pipeline step
 func (step Step) Validate() error {
 	if step.Name == "" {
 		return errors.New("step name is required!")

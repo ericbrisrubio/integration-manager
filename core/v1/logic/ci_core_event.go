@@ -13,8 +13,8 @@ type ciCoreEventService struct {
 }
 
 func (a ciCoreEventService) Listen(subject v1.Subject) {
-	if subject.EventData!=nil && len(subject.EventData)>0{
-		if subject.EventData["trigger"]==false{
+	if subject.EventData != nil && len(subject.EventData) > 0 {
+		if subject.EventData["trigger"] == false {
 			return
 		}
 	}
@@ -24,7 +24,7 @@ func (a ciCoreEventService) Listen(subject v1.Subject) {
 	url := config.KlovercloudCiCoreUrl + "/pipelines?url=" + subject.CoreRequestQueryParam["url"] + "&revision=" + subject.CoreRequestQueryParam["revision"] + "&purging=" + subject.CoreRequestQueryParam["purging"]
 
 	header := make(map[string]string)
-	header["token"]=config.Token
+	header["token"] = config.Token
 	header["Content-Type"] = "application/json"
 
 	b, err := json.Marshal(subject.Pipeline)
@@ -35,6 +35,7 @@ func (a ciCoreEventService) Listen(subject v1.Subject) {
 	go a.httpClient.Post(url, header, b)
 }
 
+// NewCiCoreEventService returns Observer type service
 func NewCiCoreEventService(httpPublisher service.HttpClient) service.Observer {
 	return &ciCoreEventService{
 		httpClient: httpPublisher,

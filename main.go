@@ -4,6 +4,7 @@ import (
 	"github.com/klovercloud-ci/api"
 	"github.com/klovercloud-ci/config"
 )
+
 // @title Klovercloud-ci-integration-manager API
 // @description Klovercloud-ci-integration-manager API
 func main() {

@@ -4,14 +4,16 @@ import (
 	"errors"
 )
 
+// Pipeline contains pipeline data
 type Pipeline struct {
-	MetaData PipelineMetadata `json:"_metadata" yaml:"_metadata"`
-	ApiVersion string `json:"api_version" yaml:"api_version"`
-	Name       string `json:"name"  yaml:"name"`
-	ProcessId  string `json:"process_id" yaml:"process_id"`
-	Steps      []Step `json:"steps" yaml:"steps"`
+	MetaData   PipelineMetadata `json:"_metadata" yaml:"_metadata"`
+	ApiVersion string           `json:"api_version" yaml:"api_version"`
+	Name       string           `json:"name"  yaml:"name"`
+	ProcessId  string           `json:"process_id" yaml:"process_id"`
+	Steps      []Step           `json:"steps" yaml:"steps"`
 }
 
+// Validate validates pipeline data
 func (pipeline Pipeline) Validate() error {
 	if pipeline.ApiVersion == "" {
 		return errors.New("Api version is required!")

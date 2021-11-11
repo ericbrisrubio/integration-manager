@@ -5,6 +5,7 @@ import (
 	"github.com/klovercloud-ci/enums"
 )
 
+// CompanyRepository company repository related operations
 type CompanyRepository interface {
 	Store(company v1.Company) error
 	AppendRepositories(companyId string, repos []v1.Repository) error

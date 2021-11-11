@@ -14,9 +14,9 @@ type processInventoryEventService struct {
 }
 
 func (p processInventoryEventService) CountTodaysRanProcessByCompanyId(companyId string) int64 {
-	url := config.EventStoreUrl + "/processes?companyId="+companyId+"&operation=countTodaysProcessByCompanyId"
+	url := config.EventStoreUrl + "/processes?companyId=" + companyId + "&operation=countTodaysProcessByCompanyId"
 	header := make(map[string]string)
-	header["token"]=config.Token
+	header["token"] = config.Token
 	header["Content-Type"] = "application/json"
 	var count int64
 	err, data := p.httpClient.Get(url, header)
@@ -50,10 +50,10 @@ func (p processInventoryEventService) Listen(subject v1.Subject) {
 	url := config.EventStoreUrl + "/processes"
 
 	header := make(map[string]string)
-	header["token"]=config.Token
+	header["token"] = config.Token
 	header["Content-Type"] = "application/json"
 
-	process := v1.ProcessInventoryEvent{
+	process := v1.Process{
 		ProcessId:    subject.Pipeline.ProcessId,
 		CompanyId:    subject.App.CompanyId,
 		AppId:        subject.App.AppId,
@@ -68,16 +68,16 @@ func (p processInventoryEventService) Listen(subject v1.Subject) {
 	go p.httpClient.Post(url, header, b)
 }
 
+// NewProcessInventoryEventObserverService returns Observer type service
 func NewProcessInventoryEventObserverService(httpPublisher service.HttpClient) service.Observer {
 	return &processInventoryEventService{
 		httpClient: httpPublisher,
 	}
 }
 
-
+// NewProcessInventoryEventService returns ProcessInventoryEvent type service
 func NewProcessInventoryEventService(httpPublisher service.HttpClient) service.ProcessInventoryEvent {
 	return &processInventoryEventService{
 		httpClient: httpPublisher,
 	}
 }
-

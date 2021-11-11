@@ -1,4 +1,4 @@
-package in_memory
+package inmemory
 
 import (
 	"fmt"
@@ -23,7 +23,7 @@ func TestCompanyRepository_Store(t *testing.T) {
 	})
 	var repository []v1.Repository
 	repository = append(repository, v1.Repository{
-		Type:         enums.Inmemory,
+		Type:         enums.INMEMORY,
 		Token:        "123456",
 		Applications: applications,
 	})
@@ -75,7 +75,7 @@ func TestCompanyRepository_GetCompanies(t *testing.T) {
 	})
 	var repository []v1.Repository
 	repository = append(repository, v1.Repository{
-		Type:         enums.Inmemory,
+		Type:         enums.INMEMORY,
 		Token:        "123456",
 		Applications: applications,
 	})
@@ -131,7 +131,7 @@ func TestCompanyRepository_GetByCompanyId(t *testing.T) {
 	})
 	var repository []v1.Repository
 	repository = append(repository, v1.Repository{
-		Type:         enums.Inmemory,
+		Type:         enums.INMEMORY,
 		Token:        "123456",
 		Applications: applications,
 	})
@@ -182,7 +182,7 @@ func TestCompanyRepository_GetRepositoriesByCompanyId(t *testing.T) {
 	})
 	var repository []v1.Repository
 	repository = append(repository, v1.Repository{
-		Type:         enums.Inmemory,
+		Type:         enums.INMEMORY,
 		Token:        "123456",
 		Applications: applications,
 	})
@@ -195,7 +195,7 @@ func TestCompanyRepository_GetRepositoriesByCompanyId(t *testing.T) {
 			Status:       "active",
 		}, expected: []v1.Repository{
 			{
-				Type:         enums.Inmemory,
+				Type:         enums.INMEMORY,
 				Token:        "123456",
 				Applications: applications,
 			},
@@ -241,7 +241,7 @@ func TestCompanyRepository_GetApplicationsByCompanyId(t *testing.T) {
 	})
 	var repository []v1.Repository
 	repository = append(repository, v1.Repository{
-		Type:         enums.Inmemory,
+		Type:         enums.INMEMORY,
 		Token:        "123456",
 		Applications: applications,
 	})

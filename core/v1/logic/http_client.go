@@ -57,10 +57,8 @@ func (h httpClientService) Get(url string, header map[string]string) (error, []b
 			return err, nil
 		}
 		return nil, jsonDataFromHttp
-	} else {
-		return errors.New("Status: " + res.Status + ", code: " + strconv.Itoa(res.StatusCode)), nil
 	}
-
+		return errors.New("Status: " + res.Status + ", code: " + strconv.Itoa(res.StatusCode)), nil
 }
 
 func (h httpClientService) Post(url string, header map[string]string, body []byte) (error, []byte) {
@@ -85,6 +83,7 @@ func (h httpClientService) Post(url string, header map[string]string, body []byt
 	return nil, body
 }
 
+// NewHttpClientService returns HttpClient type service
 func NewHttpClientService() service.HttpClient {
 	return &httpClientService{}
 }

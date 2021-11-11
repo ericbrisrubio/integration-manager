@@ -25,13 +25,13 @@ type companyApi struct {
 // @Description updates repositories
 // @Tags Company
 // @Produce json
-// @Param data body v1.ListOfRepositories true "ListOfRepositories data"
+// @Param data body v1.RepositoriesDto true "RepositoriesDto data"
 // @Param id path string true "Company id"
 // @Param companyUpdateOption query string true "Company Update Option"
 // @Success 200 {object} common.ResponseDTO
 // @Router /api/v1/companies/{id}/repositories [PUT]
 func (c companyApi) UpdateRepositories(context echo.Context) error {
-	var formData v1.ListOfRepositories
+	var formData v1.RepositoriesDto
 	if err := context.Bind(&formData); err != nil {
 		log.Println("Input Error:", err.Error())
 		return common.GenerateErrorResponse(context, nil, "Failed to Bind Input!")
@@ -61,11 +61,11 @@ func (c companyApi) UpdateRepositories(context echo.Context) error {
 // @Produce json
 // @Param page query int64 false "Page number"
 // @Param limit query int64 false "Record count"
-// @Param loadRepositories query bool false "Loads Repositories"
-// @Param loadApplications query bool false "Loads Applications"
+// @Param loadRepositories query bool false "Loads RepositoriesDto"
+// @Param loadApplications query bool false "Loads ApplicationsDto"
 // @Success 200 {object} common.ResponseDTO
 // @Router /api/v1/companies [GET]
-func (c companyApi) GetCompanies(context echo.Context) error {
+func (c companyApi) Get(context echo.Context) error {
 	option := getQueryOption(context)
 	data := c.companyService.GetCompanies(option)
 	return common.GenerateSuccessResponse(context, data, nil, "Success!")
@@ -127,13 +127,13 @@ func (c companyApi) GetById(context echo.Context) error {
 	return common.GenerateSuccessResponse(context, data, nil, "Success!")
 }
 
-// Get.. Get Repositories by company id
-// @Summary Get Repositories by company id
-// @Description Gets Repositories by company id
+// Get.. Get RepositoriesDto by company id
+// @Summary Get RepositoriesDto by company id
+// @Description Gets RepositoriesDto by company id
 // @Tags Company
 // @Produce json
 // @Param id path string true "Company id"
-// @Param loadApplications query bool false "Loads Applications"
+// @Param loadApplications query bool false "Loads ApplicationsDto"
 // @Success 200 {object} common.ResponseDTO
 // @Router /api/v1/companies/{id}/repositories [GET]
 func (c companyApi) GetRepositoriesById(context echo.Context) error {
@@ -188,6 +188,7 @@ func getQueryOption(context echo.Context) v1.CompanyQueryOption {
 	return option
 }
 
+// NewCompanyApi returns Company type api
 func NewCompanyApi(companyService service.Company, observerList []service.Observer) api.Company {
 	return &companyApi{
 		companyService: companyService,

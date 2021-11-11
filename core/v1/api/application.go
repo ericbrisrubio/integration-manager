@@ -2,6 +2,7 @@ package api
 
 import "github.com/labstack/echo/v4"
 
+// Application application api operations
 type Application interface {
-	UpdateApplication(context echo.Context) error
+	Update(context echo.Context) error
 }

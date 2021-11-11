@@ -6,6 +6,7 @@ import (
 	"reflect"
 )
 
+// Subject observers listen event with an object of this struct
 type Subject struct {
 	Step, Log             string
 	CoreRequestQueryParam map[string]string
@@ -20,6 +21,7 @@ type Subject struct {
 	}
 }
 
+// Repository contains repository info
 type Repository struct {
 	Id           string                `bson:"id" json:"id"`
 	Type         enums.REPOSITORY_TYPE `bson:"type" json:"type"`
@@ -27,6 +29,7 @@ type Repository struct {
 	Applications []Application         `bson:"applications" json:"applications"`
 }
 
+// Validate validates repository info
 func (repository Repository) Validate() error {
 	if repository.Id == "" {
 		return errors.New("Repository id is required!")
@@ -44,11 +47,12 @@ func (repository Repository) Validate() error {
 		return nil
 	} else if repository.Type == "" {
 		return errors.New("Repository type is required")
-	} else {
-		return errors.New("Repository type is invalid!")
 	}
+	return errors.New("Repository type is invalid!")
+
 }
 
+// Application contains application info
 type Application struct {
 	MetaData ApplicationMetadata  `bson:"_metadata" json:"_metadata"`
 	Url      string               `bson:"url" json:"url"`
@@ -56,6 +60,7 @@ type Application struct {
 	Status   enums.COMPANY_STATUS `bson:"status" json:"status"`
 }
 
+// Validate validates application info
 func (application Application) Validate() error {
 	if application.Url == "" {
 		return errors.New("Application url is required!")
@@ -67,6 +72,7 @@ func (application Application) Validate() error {
 	return nil
 }
 
+// ApplicationMetadata contains application metadata info
 type ApplicationMetadata struct {
 	Labels           map[string]string `bson:"labels" json:"labels"`
 	Id               string            `bson:"id" json:"id"`
@@ -74,6 +80,7 @@ type ApplicationMetadata struct {
 	IsWebhookEnabled bool              `bson:"is_webhook_enabled" json:"is_webhook_enabled"`
 }
 
+// Validate validates application metadata
 func (metadata ApplicationMetadata) Validate() error {
 	keys := reflect.ValueOf(metadata.Labels).MapKeys()
 	for i := 0; i < len(keys); i++ {
@@ -90,12 +97,14 @@ func (metadata ApplicationMetadata) Validate() error {
 	return nil
 }
 
+// CompanyMetadata contains company metadata info
 type CompanyMetadata struct {
 	Labels                    map[string]string `bson:"labels" json:"labels" yaml:"labels"`
 	NumberOfConcurrentProcess int64             `bson:"number_of_concurrent_process" json:"number_of_concurrent_process" yaml:"number_of_concurrent_process"`
 	TotalProcessPerDay        int64             `bson:"total_process_per_day" json:"total_process_per_day" yaml:"total_process_per_day"`
 }
 
+// Validate validates company metadata
 func (metadata CompanyMetadata) Validate() error {
 	keys := reflect.ValueOf(metadata.Labels).MapKeys()
 	for i := 0; i < len(keys); i++ {
@@ -106,29 +115,115 @@ func (metadata CompanyMetadata) Validate() error {
 	return nil
 }
 
+// CompanyUpdateOption contains company update options
 type CompanyUpdateOption struct {
 	Option enums.COMPANY_UPDATE_OPTION `json:"option"`
 }
 
+// CompanyQueryOption contains company query options
 type CompanyQueryOption struct {
 	Pagination       Pagination
 	LoadRepositories bool
 	LoadApplications bool
 }
 
+// Pagination contains pagination options
 type Pagination struct {
 	Page  int64
 	Limit int64
 }
 
-type ProcessInventoryEvent struct {
+// Process contains process inventory event options
+type Process struct {
 	ProcessId    string                 `bson:"process_id" json:"process_id"`
 	CompanyId    string                 `bson:"company_id" json:"company_id"`
 	AppId        string                 `bson:"app_id" json:"app_id"`
 	RepositoryId string                 `bson:"repository_id" json:"repository_id"`
 	Data         map[string]interface{} `bson:"data" json:"data"`
 }
+
+// PipelineMetadata contains pipeline metadata event options
 type PipelineMetadata struct {
 	CompanyId       string          `json:"company_id" yaml:"company_id"`
 	CompanyMetadata CompanyMetadata `json:"company_metadata" yaml:"company_metadata"`
+}
+
+// OnlyCompanyDto contains only company info
+type OnlyCompanyDto struct {
+	MetaData CompanyMetadata      `bson:"_metadata" json:"_metadata"`
+	Id       string               `bson:"id" json:"id"`
+	Name     string               `bson:"name" json:"name"`
+	Status   enums.COMPANY_STATUS `bson:"status" json:"status"`
+}
+
+// GetCompanyWithoutRepository returns company without repositories
+func (dto Company) GetCompanyWithoutRepository() Company {
+	company := Company{
+		MetaData:     dto.MetaData,
+		Id:           dto.Id,
+		Name:         dto.Name,
+		Repositories: nil,
+		Status:       dto.Status,
+	}
+	return company
+}
+
+// CompanyWiseRepositoriesDto contains company wise repositories
+type CompanyWiseRepositoriesDto struct {
+	MetaData     CompanyMetadata      `bson:"_metadata" json:"_metadata"`
+	Id           string               `bson:"id" json:"id"`
+	Name         string               `bson:"name" json:"name"`
+	Status       enums.COMPANY_STATUS `bson:"status" json:"status"`
+	Repositories []struct {
+		Id    string                `bson:"_Id" json:"_Id"`
+		Type  enums.REPOSITORY_TYPE `bson:"type" json:"type"`
+		Token string                `bson:"token" json:"token"`
+	} `bson:"repositories" json:"repositories"`
+}
+
+// ApplicationsDto contains application list
+type ApplicationsDto struct {
+	Applications []Application `bson:"applications" json:"applications"`
+}
+
+// RepositoriesDto contains repository list
+type RepositoriesDto struct {
+	Repositories []Repository `bson:"repositories" json:"repositories"`
+}
+
+// GetCompanyWithRepository returns company with repositories
+func (dto Company) GetCompanyWithRepository() Company {
+	company := Company{
+		MetaData: dto.MetaData,
+		Id:       dto.Id,
+		Name:     dto.Name,
+		Status:   dto.Status,
+	}
+	for _, each := range dto.Repositories {
+		company.Repositories = append(company.Repositories, Repository{
+			Id:           each.Id,
+			Type:         each.Type,
+			Token:        each.Token,
+			Applications: nil,
+		})
+	}
+	return company
+}
+
+// OnlyRepository contains only repository info
+type OnlyRepository struct {
+	Id    string                `bson:"_Id" json:"_Id"`
+	Type  enums.REPOSITORY_TYPE `bson:"type" json:"type"`
+	Token string                `bson:"token" json:"token"`
+}
+
+// GetRepositoryWithoutApplication returns repository without applications
+func (dto OnlyRepository) GetRepositoryWithoutApplication() Repository {
+	repository := Repository{
+		Id:           dto.Id,
+		Type:         dto.Type,
+		Token:        dto.Token,
+		Applications: nil,
+	}
+	return repository
 }

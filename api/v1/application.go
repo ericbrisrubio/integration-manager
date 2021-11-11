@@ -21,14 +21,14 @@ type applicationApi struct {
 // @Tags Application
 // @Accept json
 // @Produce json
-// @Param data body v1.ListOfApplications true "ListOfApplications Data"
+// @Param data body v1.ApplicationsDto true "ApplicationsDto Data"
 // @Param company_id query string true "company id"
 // @Param repository_Id query string true "repository id"
 // @Success 200 {object} common.ResponseDTO
 // @Failure 404 {object} common.ResponseDTO
 // @Router /api/v1/applications [POST]
-func (a applicationApi) UpdateApplication(context echo.Context) error {
-	var formData v1.ListOfApplications
+func (a applicationApi) Update(context echo.Context) error {
+	var formData v1.ApplicationsDto
 	id := context.QueryParam("company_id")
 	repoId := context.QueryParam("repository_Id")
 	updateOption := context.QueryParam("companyUpdateOption")
@@ -48,6 +48,7 @@ func (a applicationApi) UpdateApplication(context echo.Context) error {
 		nil, "saved Successfully")
 }
 
+// NewApplicationApi returns Application type api
 func NewApplicationApi(companyService service.Company, observerList []service.Observer) api.Application {
 	return &applicationApi{
 		companyService: companyService,

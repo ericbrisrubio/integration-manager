@@ -1,5 +1,6 @@
 package v1
 
+// GithubDirectoryContent contains github directory data
 type GithubDirectoryContent struct {
 	Name        string      `json:"name"`
 	Path        string      `json:"path"`

@@ -13,10 +13,10 @@ import (
 )
 
 type v1GithubApi struct {
-	gitService     service.Git
-	companyService service.Company
+	gitService                   service.Git
+	companyService               service.Company
 	processInventoryEventService service.ProcessInventoryEvent
-	observerList   []service.Observer
+	observerList                 []service.Observer
 }
 
 // Listen ... Listen Github Web hook event
@@ -46,18 +46,18 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 	}
 	repository := g.companyService.GetRepositoryByCompanyIdAndApplicationUrl(companyId, resource.Repository.URL)
 	application := g.companyService.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repository.Id, resource.Repository.URL)
-	if !application.MetaData.IsWebhookEnabled{
+	if !application.MetaData.IsWebhookEnabled {
 		return common.GenerateForbiddenResponse(context, "[Forbidden]: Web hook is disabled!", "Operation Failed!")
 	}
 	data, err := g.gitService.GetPipeline(repoName, owner, revision, repository.Token)
 	if err != nil {
-		log.Println("[ERROR]:Failed to trigger pipeline process! ",err.Error())
+		log.Println("[ERROR]:Failed to trigger pipeline process! ", err.Error())
 		return common.GenerateErrorResponse(context, err.Error(), "Failed to trigger pipeline process!")
 	}
-	for _,step:=range data.Steps{
-		if step.Type==enums.BUILD && step.Params[enums.REVISION]!="" {
-			branch:=strings.Split(resource.Ref,"/")[2]
-			if step.Params[enums.REVISION]!=branch{
+	for _, step := range data.Steps {
+		if step.Type == enums.BUILD && step.Params[enums.REVISION] != "" {
+			branch := strings.Split(resource.Ref, "/")[2]
+			if step.Params[enums.REVISION] != branch {
 				return common.GenerateForbiddenResponse(context, "[Forbidden]: Branch wasn't matched!", "Operation Failed!")
 			}
 		}
@@ -66,7 +66,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		for i := range data.Steps {
 			if data.Steps[i].Type == enums.DEPLOY {
 				if val, ok := data.Steps[i].Params["env"]; ok {
-					contentsData, err := g.gitService.GetDescriptors(repoName, owner, revision, repository.Token, enums.PIPELINE_DESCRIPTORS_BASE_DIRECTORY+"/",val)
+					contentsData, err := g.gitService.GetDescriptors(repoName, owner, revision, repository.Token, enums.PIPELINE_DESCRIPTORS_BASE_DIRECTORY+"/", val)
 					if err != nil {
 						return common.GenerateErrorResponse(context, err.Error(), "Failed to trigger pipeline process!")
 					}
@@ -79,9 +79,9 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 	}
 	data.ProcessId = uuid.NewV4().String()
 
-	company,_:=g.companyService.GetByCompanyId(companyId,v1.CompanyQueryOption{v1.Pagination{},  false,false})
-	todaysRanProcess:=g.processInventoryEventService.CountTodaysRanProcessByCompanyId(companyId)
-	data.MetaData=v1.PipelineMetadata{
+	company, _ := g.companyService.GetByCompanyId(companyId, v1.CompanyQueryOption{v1.Pagination{}, false, false})
+	todaysRanProcess := g.processInventoryEventService.CountTodaysRanProcessByCompanyId(companyId)
+	data.MetaData = v1.PipelineMetadata{
 		CompanyId:       companyId,
 		CompanyMetadata: company.MetaData,
 	}
@@ -100,13 +100,13 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 			RepositoryId: repository.Id,
 		},
 	}
-	if todaysRanProcess>=company.MetaData.TotalProcessPerDay {
-		subject.Log="No More process today, you've touched today's limit!"
-		if subject.EventData==nil{
-			subject.EventData= make(map[string]interface{})
+	if todaysRanProcess >= company.MetaData.TotalProcessPerDay {
+		subject.Log = "No More process today, you've touched today's limit!"
+		if subject.EventData == nil {
+			subject.EventData = make(map[string]interface{})
 		}
-		subject.EventData["trigger"]=false
-		subject.EventData["log"]=subject.Log
+		subject.EventData["trigger"] = false
+		subject.EventData["log"] = subject.Log
 	}
 
 	go g.notifyAll(subject)
@@ -117,11 +117,13 @@ func (g v1GithubApi) notifyAll(listener v1.Subject) {
 		go observer.Listen(listener)
 	}
 }
-func NewV1GithubApi(gitService service.Git, companyService service.Company,	processInventoryEventService service.ProcessInventoryEvent, observerList []service.Observer) api.Git {
+
+// NewGithubApi returns Git type api
+func NewGithubApi(gitService service.Git, companyService service.Company, processInventoryEventService service.ProcessInventoryEvent, observerList []service.Observer) api.Git {
 	return &v1GithubApi{
-		gitService:     gitService,
-		companyService: companyService,
-		observerList:   observerList,
+		gitService:                   gitService,
+		companyService:               companyService,
+		observerList:                 observerList,
 		processInventoryEventService: processInventoryEventService,
 	}
 }

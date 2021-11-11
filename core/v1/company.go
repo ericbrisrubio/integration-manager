@@ -5,6 +5,7 @@ import (
 	"github.com/klovercloud-ci/enums"
 )
 
+// Company contains company data
 type Company struct {
 	MetaData     CompanyMetadata      `bson:"_metadata" json:"_metadata"`
 	Id           string               `bson:"id" json:"id"`
@@ -13,6 +14,7 @@ type Company struct {
 	Status       enums.COMPANY_STATUS `bson:"status" json:"status"`
 }
 
+// Validate validates company data
 func (dto Company) Validate() error {
 	err := dto.MetaData.Validate()
 	if err != nil {
@@ -34,7 +36,6 @@ func (dto Company) Validate() error {
 		return nil
 	} else if dto.Status == "" {
 		return errors.New("Company status is required!")
-	} else {
-		return errors.New("Company status invalid!")
 	}
+	return errors.New("Company status invalid!")
 }

@@ -9,21 +9,55 @@ import (
 	"strings"
 )
 
+// ServerPort refers to server port.
 var ServerPort string
+
+// DbServer refers to database server ip.
 var DbServer string
+
+// DbPort refers to database server port.
 var DbPort string
+
+// DbUsername refers to database name.
 var DbUsername string
+
+// DbPassword refers to database password.
 var DbPassword string
+
+// DatabaseConnectionString refers to database connection string.
 var DatabaseConnectionString string
+
+// DatabaseName refers to database name.
 var DatabaseName string
+
+// Database refers to database options.
 var Database string
+
+// KlovercloudCiCoreUrl refers to ci core url.
 var KlovercloudCiCoreUrl string
+
+// EventStoreUrl refers to event-store url.
 var EventStoreUrl string
-var Publickey string
+
+// PublicKey refers to public key of EventStoreToken.
+var PublicKey string
+
+// EnableAuthentication refers if service to service authentication is enabled.
 var EnableAuthentication bool
+
+// Token refers to jwt token for service to service communication.
 var Token string
-var DefaultPerDayTotalProcess, DefaultNumberOfConcurrentProcess int64
+
+// DefaultNumberOfConcurrentProcess refers to default number of concurrent process
+var DefaultNumberOfConcurrentProcess int64
+
+// DefaultPerDayTotalProcess refers to default number of build per day
+var DefaultPerDayTotalProcess int64
+
+// GithubWebhookConsumingUrl refers to github web hook consuming url.
 var GithubWebhookConsumingUrl string
+
+// InitEnvironmentVariables initializes environment variables
 func InitEnvironmentVariables() {
 	err := godotenv.Load()
 	if err != nil {
@@ -38,7 +72,7 @@ func InitEnvironmentVariables() {
 	DatabaseName = os.Getenv("DATABASE_NAME")
 	EventStoreUrl = os.Getenv("EVENT_STORE_URL")
 	Database = os.Getenv("DATABASE")
-	if Database == enums.Mongo {
+	if Database == enums.MONGO {
 		DatabaseConnectionString = "mongodb://" + DbUsername + ":" + DbPassword + "@" + DbServer + ":" + DbPort
 	}
 	KlovercloudCiCoreUrl = os.Getenv("KLOVERCLOUD_CI_CORE_URL")
@@ -54,12 +88,12 @@ func InitEnvironmentVariables() {
 	Token = os.Getenv("TOKEN")
 
 	DefaultPerDayTotalProcess, err = strconv.ParseInt(os.Getenv("DEFAULT_PER_DAY_TOTAL_PROCESS"), 10, 64)
-	if err!=nil{
-		DefaultPerDayTotalProcess =10
+	if err != nil {
+		DefaultPerDayTotalProcess = 10
 	}
 	DefaultNumberOfConcurrentProcess, err = strconv.ParseInt(os.Getenv("DEFAULT_NUMBER_OF_CONCURRENT_PROCESS"), 10, 64)
-	if err!=nil{
-		DefaultNumberOfConcurrentProcess =10
+	if err != nil {
+		DefaultNumberOfConcurrentProcess = 10
 	}
-	GithubWebhookConsumingUrl=os.Getenv("GITHUB_WEBHOOK_CONSUMING_URL")
+	GithubWebhookConsumingUrl = os.Getenv("GITHUB_WEBHOOK_CONSUMING_URL")
 }

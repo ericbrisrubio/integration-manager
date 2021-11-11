@@ -19,8 +19,8 @@ type githubService struct {
 	client         service.HttpClient
 }
 
-func (githubService githubService) DeleteRepositoryWebhookById(username, repogitory_name, webhookId, token string) error {
-	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repogitory_name + "/hooks/" + webhookId
+func (githubService githubService) DeleteRepositoryWebhookById(username, repositoryName, webhookId, token string) error {
+	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repositoryName + "/hooks/" + webhookId
 	header := make(map[string]string)
 	header["Authorization"] = "token " + token
 	header["Accept"] = "application/vnd.github.v3+json"
@@ -32,8 +32,8 @@ func (githubService githubService) DeleteRepositoryWebhookById(username, repogit
 	return nil
 }
 
-func (githubService githubService) CreateRepositoryWebhook(username, repogitory_name, token string) (v1.GithubWebhook, error) {
-	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repogitory_name + "/hooks"
+func (githubService githubService) CreateRepositoryWebhook(username, repositoryName, token string) (v1.GithubWebhook, error) {
+	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repositoryName + "/hooks"
 	header := make(map[string]string)
 	header["Authorization"] = "token " + token
 	header["Content-Type"] = "application/json"
@@ -65,8 +65,8 @@ func (githubService githubService) CreateRepositoryWebhook(username, repogitory_
 	return webhook, nil
 }
 
-func (githubService githubService) GetPipeline(repogitory_name, username, revision, token string) (*v1.Pipeline, error) {
-	contents, err := githubService.GetDirectoryContents(repogitory_name, username, revision, token, enums.PIPELINE_FILE_BASE_DIRECTORY)
+func (githubService githubService) GetPipeline(repositoryName, username, revision, token string) (*v1.Pipeline, error) {
+	contents, err := githubService.GetDirectoryContents(repositoryName, username, revision, token, enums.PIPELINE_FILE_BASE_DIRECTORY)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (githubService githubService) GetPipeline(repogitory_name, username, revisi
 			break
 		}
 	}
-	url := enums.GITHUB_RAW_CONTENT_BASE_URL + username + "/" + repogitory_name + "/" + revision + "/klovercloud/pipeline/" + pipelneFile
+	url := enums.GITHUB_RAW_CONTENT_BASE_URL + username + "/" + repositoryName + "/" + revision + "/klovercloud/pipeline/" + pipelneFile
 	header := make(map[string]string)
 	header["Authorization"] = "token " + token
 	header["Accept"] = "application/vnd.github.v3.raw"
@@ -107,8 +107,8 @@ func (githubService githubService) GetPipeline(repogitory_name, username, revisi
 	return &pipeline, nil
 }
 
-func (githubService githubService) GetDescriptors(repogitory_name, username, revision, token, path, env string) ([]unstructured.Unstructured, error) {
-	contents, err := githubService.GetDirectoryContents(repogitory_name, username, revision, token, path)
+func (githubService githubService) GetDescriptors(repositoryName, username, revision, token, path, env string) ([]unstructured.Unstructured, error) {
+	contents, err := githubService.GetDirectoryContents(repositoryName, username, revision, token, path)
 	if err != nil {
 		return nil, err
 	}
@@ -151,11 +151,11 @@ func (githubService githubService) GetDescriptors(repogitory_name, username, rev
 	return files, nil
 }
 
-func (githubService githubService) GetDirectoryContents(repogitory_name, username, revision, token, path string) ([]v1.GithubDirectoryContent, error) {
+func (githubService githubService) GetDirectoryContents(repositoryName, username, revision, token, path string) ([]v1.GithubDirectoryContent, error) {
 	if strings.HasPrefix(path, "/") {
 		path = strings.TrimPrefix(path, "/")
 	}
-	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repogitory_name + "/contents/" + path + "?ref=" + revision
+	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repositoryName + "/contents/" + path + "?ref=" + revision
 	header := make(map[string]string)
 	header["Authorization"] = "token " + token
 	header["Accept"] = "application/vnd.github.v3+json"
@@ -171,7 +171,6 @@ func (githubService githubService) GetDirectoryContents(repogitory_name, usernam
 		// send to observer
 		return nil, err
 	}
-
 	return contents, nil
 }
 
@@ -180,6 +179,8 @@ func (githubService githubService) notifyAll(listener v1.Subject) {
 		go observer.Listen(listener)
 	}
 }
+
+// NewGithubService returns Git type service
 func NewGithubService(companyService service.Company, observerList []service.Observer, client service.HttpClient) service.Git {
 	return &githubService{
 		companyService: companyService,

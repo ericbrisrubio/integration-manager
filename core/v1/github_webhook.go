@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-
+// GithubWebHookEvent contains github web hook event data
 type GithubWebHookEvent struct {
 	Ref        string `json:"ref"`
 	Before     string `json:"before"`
@@ -181,14 +181,14 @@ type GithubWebHookEvent struct {
 		Modified []string      `json:"modified"`
 	} `json:"head_commit"`
 }
-
+// GithubCreateWebhookRequest contains github web hook creation data
 type GithubCreateWebhookRequest struct {
 	Config struct {
 		URL string `json:"url"`
 	} `json:"config"`
 	Events []enums.GIT_EVENT `json:"events"`
 }
-
+// GithubWebhook contains github web hook data
 type GithubWebhook struct {
 	Type   string   `json:"type"`
 	ID     int      `json:"id"`

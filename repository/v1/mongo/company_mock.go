@@ -212,6 +212,8 @@ func InitCompanyData() []v1.Company {
 	}
 	return data
 }
+
+// NewMockCompanyRepository returns CompanyRepository type object
 func NewMockCompanyRepository() repository.CompanyRepository {
 	manager := GetMockDmManager()
 	err := manager.Db.Drop(context.Background())

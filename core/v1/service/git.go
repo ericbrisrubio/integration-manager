@@ -5,10 +5,11 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
+// Git Git related operations.
 type Git interface {
-	GetPipeline(repogitory_name, username, revision, token string) (*v1.Pipeline, error)
-	GetDescriptors(repogitory_name, username, revision, token, path,env string) ([]unstructured.Unstructured, error)
-	GetDirectoryContents(repogitory_name, username, revision, token, path string) ([]v1.GithubDirectoryContent, error)
-	CreateRepositoryWebhook(username,repogitory_name,token string)(v1.GithubWebhook,error)
-	DeleteRepositoryWebhookById(username,repogitory_name,webhookId,token string) error
+	GetPipeline(repositoryName, username, revision, token string) (*v1.Pipeline, error)
+	GetDescriptors(repositoryName, username, revision, token, path, env string) ([]unstructured.Unstructured, error)
+	GetDirectoryContents(repositoryName, username, revision, token, path string) ([]v1.GithubDirectoryContent, error)
+	CreateRepositoryWebhook(username, repositoryName, token string) (v1.GithubWebhook, error)
+	DeleteRepositoryWebhookById(username, repositoryName, webhookId, token string) error
 }

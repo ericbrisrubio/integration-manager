@@ -60,6 +60,7 @@ func (r repositoryApi) GetApplicationsById(context echo.Context) error {
 	return common.GenerateSuccessResponse(context, data, &metadata, "")
 }
 
+// NewRepositoryApi returns Repository type api
 func NewRepositoryApi(companyService service.Company, observerList []service.Observer) api.Repository {
 	return &repositoryApi{
 		companyService: companyService,

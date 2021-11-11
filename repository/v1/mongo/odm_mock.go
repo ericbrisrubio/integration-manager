@@ -8,6 +8,7 @@ import (
 	"os"
 )
 
+// GetMockDmManager returns mock dmManager
 func GetMockDmManager() *dmManager {
 	onceDmManager.Do(func() {
 		log.Println("[INFO] Starting Initializing Singleton DB Manager")

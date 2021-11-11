@@ -26,7 +26,7 @@ func (c companyService) UpdateRepositories(companyId string, repositories []v1.R
 	if companyUpdateOption.Option == enums.APPEND_REPOSITORY {
 		for i, each := range repositories {
 			repositories[i].Id = uuid.New().String()
-			for j, _ := range each.Applications {
+			for j := range each.Applications {
 				each.Applications[j].MetaData.Id = uuid.New().String()
 			}
 		}
@@ -66,12 +66,12 @@ func getUsernameAndRepoNameFromGithubRepositoryUrl(url string) (username string,
 
 func (c companyService) UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.CompanyUpdateOption) error {
 	if companyUpdateOption.Option == enums.APPEND_APPLICATION {
-		for i, _ := range apps {
+		for i := range apps {
 			apps[i].MetaData.Id = uuid.New().String()
 		}
 		repo := c.GetRepositoryByRepositoryId(repositoryId)
 		if repo.Type == enums.GITHUB {
-			for i, _ := range apps {
+			for i := range apps {
 				usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
 				gitWebhook, err := NewGithubService(c, nil, c.client).CreateRepositoryWebhook(usernameOrorgName, repoName, repo.Token)
 				if err != nil {
@@ -97,14 +97,13 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 	if companyUpdateOption.Option == enums.DELETE_APPLICATION {
 		repo := c.GetRepositoryByRepositoryId(repositoryId)
 		if repo.Type == enums.GITHUB {
-			for i, _ := range apps {
+			for i := range apps {
 				usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
 				err := NewGithubService(c, nil, c.client).DeleteRepositoryWebhookById(usernameOrorgName, repoName, string(rune(apps[i].Webhook.ID)), repo.Token)
 				if err != nil {
 					return err
-				} else {
-					apps[i].MetaData.IsWebhookEnabled = false
 				}
+				apps[i].MetaData.IsWebhookEnabled = false
 			}
 		}
 		err := c.repo.DeleteApplications(companyId, repositoryId, apps, false)
@@ -156,6 +155,7 @@ func (c companyService) GetApplicationsByCompanyIdAndRepositoryType(id string, _
 	return c.repo.GetApplicationsByCompanyIdAndRepositoryType(id, _type, option)
 }
 
+// NewCompanyService returns Company type service
 func NewCompanyService(repo repository.CompanyRepository, client service.HttpClient) service.Company {
 	return &companyService{
 		repo:   repo,

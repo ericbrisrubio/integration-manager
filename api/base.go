@@ -3,18 +3,18 @@ package api
 import (
 	v1 "github.com/klovercloud-ci/api/v1"
 	"github.com/labstack/echo/v4"
-	_ "github.com/klovercloud-ci/docs"
 	"github.com/swaggo/echo-swagger"
 	"net/http"
 )
 
+// Routes base router
 func Routes(e *echo.Echo) {
 	// Index Page
 	e.GET("/", index)
 
 	// Health Page
 	e.GET("/health", health)
-	e.GET("/swagger/*",echoSwagger.WrapHandler)
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 	v1.Router(e.Group("/api/v1"))
 }
 

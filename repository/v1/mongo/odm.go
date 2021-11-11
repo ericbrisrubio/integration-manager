@@ -9,13 +9,6 @@ import (
 	"sync"
 )
 
-type SortParam struct {
-	SortBy string
-	Type   int
-}
-
-type Data interface{}
-
 type dmManager struct {
 	Ctx context.Context
 	Db  *mongo.Database
@@ -24,6 +17,7 @@ type dmManager struct {
 var singletonDmManager *dmManager
 var onceDmManager sync.Once
 
+// GetDmManager returns dmManager
 func GetDmManager() *dmManager {
 	onceDmManager.Do(func() {
 		log.Println("[INFO] Starting Initializing Singleton DB Manager")

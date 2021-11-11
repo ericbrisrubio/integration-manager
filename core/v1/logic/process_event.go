@@ -13,21 +13,22 @@ type processEventService struct {
 }
 
 func (e processEventService) Listen(subject v1.Subject) {
-		event:=v1.ProcessEvent{
-			ProcessId: subject.Pipeline.ProcessId,
-			Data:      subject.EventData,
-		}
-		header:=make(map[string]string)
-		header["Content-Type"]="application/json"
-		header["token"]=config.Token
-		b, err := json.Marshal(event)
-		if err!=nil{
-			log.Println(err.Error())
-			return
-		}
-		e.httpPublisher.Post(config.EventStoreUrl+"/processes_events",header,b)
+	event := v1.ProcessEvent{
+		ProcessId: subject.Pipeline.ProcessId,
+		Data:      subject.EventData,
+	}
+	header := make(map[string]string)
+	header["Content-Type"] = "application/json"
+	header["token"] = config.Token
+	b, err := json.Marshal(event)
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+	e.httpPublisher.Post(config.EventStoreUrl+"/processes_events", header, b)
 }
 
+// NewProcessEventService returns Observer type service
 func NewProcessEventService(httpPublisher service.HttpClient) service.Observer {
 	return &processEventService{
 		httpPublisher: httpPublisher,

@@ -1,4 +1,4 @@
-package in_memory
+package inmemory
 
 import (
 	v1 "github.com/klovercloud-ci/core/v1"
@@ -6,20 +6,12 @@ import (
 	"github.com/klovercloud-ci/enums"
 )
 
-var (
-	CompanyCollection = "CompanyCollection"
-)
-
 type companyRepository struct {
 }
 
 func (c companyRepository) GetRepositoryByRepositoryId(id string) v1.Repository {
-	var companies []v1.Company
 	var repo v1.Repository
 	for _, each := range IndexedCompanies {
-		companies = append(companies, each)
-	}
-	for _, each := range companies {
 		for _, eachrepo := range each.Repositories {
 			if id == eachrepo.Id {
 				repo.Type = eachrepo.Type
@@ -210,11 +202,11 @@ func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOptio
 	if option.LoadRepositories {
 		if option.LoadApplications {
 			return companies, int64(len(IndexedCompanies))
-		} else {
+		}
 			for j := range companies.Repositories {
 				companies.Repositories[j].Applications = nil
 			}
-		}
+
 	} else {
 		companies.Repositories = nil
 	}
@@ -330,15 +322,18 @@ func paginate(logs []v1.Company, page int64, limit int64) []v1.Company {
 	}
 	return logs[startIndex:endIndex]
 }
+// RemoveRepository removes repository from a list by index
 func RemoveRepository(s []v1.Repository, i int) []v1.Repository {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
 }
+// RemoveApplication removes application from a list by index
 func RemoveApplication(s []v1.Application, i int) []v1.Application {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
 }
 
+// NewCompanyRepository returns CompanyRepository type object
 func NewCompanyRepository(timeout int) repository.CompanyRepository {
 	return &companyRepository{}
 
