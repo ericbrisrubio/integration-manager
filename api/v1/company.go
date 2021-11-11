@@ -133,6 +133,7 @@ func (c companyApi) GetById(context echo.Context) error {
 // @Tags Company
 // @Produce json
 // @Param id path string true "Company id"
+// @Param loadApplications query bool false "Loads Applications"
 // @Success 200 {object} common.ResponseDTO
 // @Router /api/v1/companies/{id}/repositories [GET]
 func (c companyApi) GetRepositoriesById(context echo.Context) error {

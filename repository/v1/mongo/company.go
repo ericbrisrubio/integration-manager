@@ -409,21 +409,18 @@ func (c companyRepository) GetRepositoriesByCompanyId(id string, option v1.Compa
 			log.Println("[ERROR]", err)
 			break
 		}
-		if option.LoadRepositories == true {
-			if option.LoadApplications == true {
-				results = elemValue.Repositories
-			} else {
-				var rep v1.Repository
-				for _, each := range elemValue.Repositories {
-					rep.Type = each.Type
-					rep.Id = each.Id
-					rep.Token = each.Token
-					rep.Applications = nil
+		if option.LoadApplications == true {
+			results = elemValue.Repositories
+		} else {
+			var rep v1.Repository
+			for _, each := range elemValue.Repositories {
+				rep.Type = each.Type
+				rep.Id = each.Id
+				rep.Token = each.Token
+				rep.Applications = nil
 
-					results = append(results, rep)
-				}
+				results = append(results, rep)
 			}
-			return results, int64(len(results))
 		}
 	}
 	return results, int64(len(results))

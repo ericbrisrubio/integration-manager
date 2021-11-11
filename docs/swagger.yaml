@@ -599,6 +599,10 @@ paths:
         name: id
         required: true
         type: string
+      - description: Loads Applications
+        in: query
+        name: loadApplications
+        type: boolean
       produces:
       - application/json
       responses:
