@@ -29,7 +29,7 @@ type applicationApi struct {
 // @Router /api/v1/applications [POST]
 func (a applicationApi) UpdateApplication(context echo.Context) error {
 	var formData v1.ListOfApplications
-	id := context.QueryParam("company_id")
+	id := context.QueryParam("company_Id")
 	repoId := context.QueryParam("repository_Id")
 	updateOption := context.QueryParam("companyUpdateOption")
 	if err := context.Bind(&formData); err != nil {
