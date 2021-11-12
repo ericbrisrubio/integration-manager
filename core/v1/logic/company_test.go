@@ -1,7 +1,6 @@
 package logic
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
@@ -20,13 +19,11 @@ func Test_trimUrl(t *testing.T) {
 	}
 	testdata.actual, _ = getUsernameAndRepoNameFromGithubRepositoryUrl(testdata.url)
 	if !reflect.DeepEqual(testdata.expected, testdata.actual) {
-		fmt.Println(testdata.actual)
 		assert.ElementsMatch(t, testdata.expected, testdata.actual)
 	}
 	_, testdata.actual = getUsernameAndRepoNameFromGithubRepositoryUrl(testdata.url)
 	testdata.expected = "integration-manager"
 	if !reflect.DeepEqual(testdata.expected, testdata.actual) {
-		fmt.Println(testdata.actual)
 		assert.ElementsMatch(t, testdata.expected, testdata.actual)
 	}
 }
