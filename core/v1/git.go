@@ -2,7 +2,7 @@ package v1
 
 import "time"
 
-// GithWebhook contains github web hook data
+// GitWebhook contains github web hook data
 type GitWebhook struct {
 	Type   string   `json:"type"`
 	ID     int      `json:"id"`
