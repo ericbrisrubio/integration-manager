@@ -32,7 +32,7 @@ func (githubService githubService) DeleteRepositoryWebhookById(username, reposit
 	return nil
 }
 
-func (githubService githubService) CreateRepositoryWebhook(username, repositoryName, token string) (v1.GithubWebhook, error) {
+func (githubService githubService) CreateRepositoryWebhook(username, repositoryName, token string) (v1.GitWebhook, error) {
 	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repositoryName + "/hooks"
 	header := make(map[string]string)
 	header["Authorization"] = "token " + token
@@ -49,20 +49,20 @@ func (githubService githubService) CreateRepositoryWebhook(username, repositoryN
 	b, err := json.Marshal(body)
 	if err != nil {
 		log.Println(err.Error())
-		return v1.GithubWebhook{}, err
+		return v1.GitWebhook{}, err
 	}
 	data, err := githubService.client.Post(url, header, b)
 	if err != nil {
 		log.Println(err.Error())
-		return v1.GithubWebhook{}, err
+		return v1.GitWebhook{}, err
 	}
 	webhook := v1.GithubWebhook{}
 	err = json.Unmarshal(data, &webhook)
 	if err != nil {
 		log.Println(err.Error())
-		return v1.GithubWebhook{}, err
+		return v1.GitWebhook{}, err
 	}
-	return webhook, nil
+	return webhook.GetGitWebhook(), nil
 }
 
 func (githubService githubService) GetPipeline(repositoryName, username, revision, token string) (*v1.Pipeline, error) {
@@ -151,7 +151,7 @@ func (githubService githubService) GetDescriptors(repositoryName, username, revi
 	return files, nil
 }
 
-func (githubService githubService) GetDirectoryContents(repositoryName, username, revision, token, path string) ([]v1.GithubDirectoryContent, error) {
+func (githubService githubService) GetDirectoryContents(repositoryName, username, revision, token, path string) ([]v1.GitDirectoryContent, error) {
 	if strings.HasPrefix(path, "/") {
 		path = strings.TrimPrefix(path, "/")
 	}
@@ -164,14 +164,18 @@ func (githubService githubService) GetDirectoryContents(repositoryName, username
 		// send to observer
 		return nil, err
 	}
-	contents := []v1.GithubDirectoryContent{}
-	err = json.Unmarshal(data, &contents)
+	githubDirectorycontents := []v1.GithubDirectoryContent{}
+	err = json.Unmarshal(data, &githubDirectorycontents)
 	if err != nil {
 		log.Println(err.Error())
 		// send to observer
 		return nil, err
 	}
-	return contents, nil
+	var gitDirectorycontents []v1.GitDirectoryContent
+	for _, each := range githubDirectorycontents {
+		gitDirectorycontents = append(gitDirectorycontents, each.GetGitDirectoryContent())
+	}
+	return gitDirectorycontents, nil
 }
 
 func (githubService githubService) notifyAll(listener v1.Subject) {

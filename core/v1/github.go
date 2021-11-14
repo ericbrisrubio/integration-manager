@@ -5,6 +5,48 @@ import (
 	"time"
 )
 
+// GithubDirectoryContent contains github directory data
+type GithubDirectoryContent struct {
+	Name        string      `json:"name"`
+	Path        string      `json:"path"`
+	Sha         string      `json:"sha"`
+	Size        int         `json:"size"`
+	URL         string      `json:"url"`
+	HTMLURL     string      `json:"html_url"`
+	GitURL      string      `json:"git_url"`
+	DownloadURL interface{} `json:"download_url"`
+	Type        string      `json:"type"`
+	Links       struct {
+		Self string `json:"self"`
+		Git  string `json:"git"`
+		HTML string `json:"html"`
+	} `json:"_links"`
+}
+
+// GetGitDirectoryContent converts GithubDirectoryContent object to GitDirectoryContent object
+func (directoryContent GithubDirectoryContent) GetGitDirectoryContent() GitDirectoryContent {
+	return GitDirectoryContent{
+		Name:        directoryContent.Name,
+		Path:        directoryContent.Path,
+		Sha:         directoryContent.Sha,
+		Size:        directoryContent.Size,
+		URL:         directoryContent.URL,
+		HTMLURL:     directoryContent.HTMLURL,
+		GitURL:      directoryContent.GitURL,
+		DownloadURL: directoryContent.DownloadURL,
+		Type:        directoryContent.Type,
+		Links: struct {
+			Self string `json:"self"`
+			Git  string `json:"git"`
+			HTML string `json:"html"`
+		}{
+			Self: directoryContent.Links.Self,
+			Git:  directoryContent.Links.Git,
+			HTML: directoryContent.Links.HTML,
+		},
+	}
+}
+
 // GithubWebHookEvent contains github web hook event data
 type GithubWebHookEvent struct {
 	Ref        string `json:"ref"`
@@ -207,4 +249,29 @@ type GithubWebhook struct {
 	TestURL       string    `json:"test_url"`
 	PingURL       string    `json:"ping_url"`
 	DeliveriesURL string    `json:"deliveries_url"`
+}
+
+// GetGitWebhook converts GithubWebhook object to GitWebhook object
+func (webhook GithubWebhook) GetGitWebhook() GitWebhook {
+	return GitWebhook{
+		Type:   webhook.Type,
+		ID:     webhook.ID,
+		Active: webhook.Active,
+		Events: webhook.Events,
+		Config: struct {
+			URL         string `json:"url"`
+			InsecureSsl string `json:"insecure_ssl"`
+			ContentType string `json:"content_type"`
+		}{
+			URL:         webhook.Config.URL,
+			InsecureSsl: webhook.Config.InsecureSsl,
+			ContentType: webhook.Config.ContentType,
+		},
+		UpdatedAt:     webhook.UpdatedAt,
+		CreatedAt:     webhook.CreatedAt,
+		URL:           webhook.URL,
+		TestURL:       webhook.TestURL,
+		PingURL:       webhook.PingURL,
+		DeliveriesURL: webhook.DeliveriesURL,
+	}
 }

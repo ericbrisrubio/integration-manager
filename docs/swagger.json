@@ -1,1075 +1,1075 @@
 {
-    "swagger": "2.0",
-    "info": {
-        "description": "integration-manager API",
-        "title": "integration-manager API",
-        "contact": {}
-    },
-    "paths": {
-        "/api/v1/applications": {
-            "post": {
-                "description": "Update Application by company id and  repository id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Application"
-                ],
-                "summary": "Update Application",
-                "parameters": [
-                    {
-                        "description": "ApplicationsDto Data",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.ApplicationsDto"
-                        }
-                    },
-                    {
-                        "type": "string",
-                        "description": "company id",
-                        "name": "company_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "repository id",
-                        "name": "repository_Id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
-                        }
-                    }
-                }
+  "swagger": "2.0",
+  "info": {
+    "description": "integration-manager API",
+    "title": "integration-manager API",
+    "contact": {}
+  },
+  "paths": {
+    "/api/v1/applications": {
+      "post": {
+        "description": "Update Application by company id and  repository id",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Application"
+        ],
+        "summary": "Update Application",
+        "parameters": [
+          {
+            "description": "ApplicationsDto Data",
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1.ApplicationsDto"
             }
-        },
-        "/api/v1/companies": {
-            "get": {
-                "description": "Gets companies",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Company"
-                ],
-                "summary": "Get companies",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Record count",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Loads RepositoriesDto",
-                        "name": "loadRepositories",
-                        "in": "query"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Loads ApplicationsDto",
-                        "name": "loadApplications",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Saves company",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Company"
-                ],
-                "summary": "Save company",
-                "parameters": [
-                    {
-                        "description": "Company data",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.Company"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
-                        }
-                    }
-                }
+          },
+          {
+            "type": "string",
+            "description": "company id",
+            "name": "company_id",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "repository id",
+            "name": "repository_Id",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/common.ResponseDTO"
             }
-        },
-        "/api/v1/companies/{id}": {
-            "get": {
-                "description": "Gets company by id",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Company"
-                ],
-                "summary": "Get company by id",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Company id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
-                        }
-                    }
-                }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/common.ResponseDTO"
             }
-        },
-        "/api/v1/companies/{id}/repositories": {
-            "get": {
-                "description": "Gets RepositoriesDto by company id",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Company"
-                ],
-                "summary": "Get RepositoriesDto by company id",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Company id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Loads ApplicationsDto",
-                        "name": "loadApplications",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "updates repositories",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Company"
-                ],
-                "summary": "Update repositories by company id",
-                "parameters": [
-                    {
-                        "description": "RepositoriesDto data",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.RepositoriesDto"
-                        }
-                    },
-                    {
-                        "type": "string",
-                        "description": "Company id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Company Update Option",
-                        "name": "companyUpdateOption",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/githubs": {
-            "post": {
-                "description": "Listens Github Web hook events. Register this endpoint as github web hook endpoint",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Github"
-                ],
-                "summary": "Listen Github Web hook event",
-                "parameters": [
-                    {
-                        "description": "GithubWebHookEvent Data",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.GithubWebHookEvent"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/repositories/{id}": {
-            "get": {
-                "description": "Gets Repository by id",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Repository"
-                ],
-                "summary": "Get Repository by id",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Repository id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/repositories/{id}/applications": {
-            "get": {
-                "description": "Gets Applications by repository id",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Repository"
-                ],
-                "summary": "Get Applications by repository id",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Repository id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
-                        }
-                    }
-                }
-            }
+          }
         }
+      }
     },
-    "definitions": {
-        "common.MetaData": {
-            "type": "object",
-            "properties": {
-                "links": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "page_count": {
-                    "type": "integer"
-                },
-                "per_page": {
-                    "type": "integer"
-                },
-                "total_count": {
-                    "type": "integer"
-                }
+    "/api/v1/companies": {
+      "get": {
+        "description": "Gets companies",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Company"
+        ],
+        "summary": "Get companies",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Page number",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Record count",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Loads RepositoriesDto",
+            "name": "loadRepositories",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Loads ApplicationsDto",
+            "name": "loadApplications",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/common.ResponseDTO"
             }
-        },
-        "common.ResponseDTO": {
-            "type": "object",
-            "properties": {
-                "_metadata": {
-                    "$ref": "#/definitions/common.MetaData"
-                },
-                "data": {},
-                "message": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                }
-            }
-        },
-        "v1.Application": {
-            "type": "object",
-            "properties": {
-                "_metadata": {
-                    "$ref": "#/definitions/v1.ApplicationMetadata"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "url": {
-                    "type": "string"
-                },
-                "webhook": {
-                    "$ref": "#/definitions/v1.GithubWebhook"
-                }
-            }
-        },
-        "v1.ApplicationMetadata": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "is_webhook_enabled": {
-                    "type": "boolean"
-                },
-                "labels": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "v1.ApplicationsDto": {
-            "type": "object",
-            "properties": {
-                "applications": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/v1.Application"
-                    }
-                }
-            }
-        },
-        "v1.Company": {
-            "type": "object",
-            "properties": {
-                "_metadata": {
-                    "$ref": "#/definitions/v1.CompanyMetadata"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "repositories": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/v1.Repository"
-                    }
-                },
-                "status": {
-                    "type": "string"
-                }
-            }
-        },
-        "v1.CompanyMetadata": {
-            "type": "object",
-            "properties": {
-                "labels": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "number_of_concurrent_process": {
-                    "type": "integer"
-                },
-                "total_process_per_day": {
-                    "type": "integer"
-                }
-            }
-        },
-        "v1.GithubWebHookEvent": {
-            "type": "object",
-            "properties": {
-                "after": {
-                    "type": "string"
-                },
-                "base_ref": {},
-                "before": {
-                    "type": "string"
-                },
-                "commits": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "added": {
-                                "type": "array",
-                                "items": {}
-                            },
-                            "author": {
-                                "type": "object",
-                                "properties": {
-                                    "email": {
-                                        "type": "string"
-                                    },
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "username": {
-                                        "type": "string"
-                                    }
-                                }
-                            },
-                            "committer": {
-                                "type": "object",
-                                "properties": {
-                                    "email": {
-                                        "type": "string"
-                                    },
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "username": {
-                                        "type": "string"
-                                    }
-                                }
-                            },
-                            "distinct": {
-                                "type": "boolean"
-                            },
-                            "id": {
-                                "type": "string"
-                            },
-                            "message": {
-                                "type": "string"
-                            },
-                            "modified": {
-                                "type": "array",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            "removed": {
-                                "type": "array",
-                                "items": {}
-                            },
-                            "timestamp": {
-                                "type": "string"
-                            },
-                            "tree_id": {
-                                "type": "string"
-                            },
-                            "url": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                },
-                "compare": {
-                    "type": "string"
-                },
-                "created": {
-                    "type": "boolean"
-                },
-                "deleted": {
-                    "type": "boolean"
-                },
-                "forced": {
-                    "type": "boolean"
-                },
-                "head_commit": {
-                    "type": "object",
-                    "properties": {
-                        "added": {
-                            "type": "array",
-                            "items": {}
-                        },
-                        "author": {
-                            "type": "object",
-                            "properties": {
-                                "email": {
-                                    "type": "string"
-                                },
-                                "name": {
-                                    "type": "string"
-                                },
-                                "username": {
-                                    "type": "string"
-                                }
-                            }
-                        },
-                        "committer": {
-                            "type": "object",
-                            "properties": {
-                                "email": {
-                                    "type": "string"
-                                },
-                                "name": {
-                                    "type": "string"
-                                },
-                                "username": {
-                                    "type": "string"
-                                }
-                            }
-                        },
-                        "distinct": {
-                            "type": "boolean"
-                        },
-                        "id": {
-                            "type": "string"
-                        },
-                        "message": {
-                            "type": "string"
-                        },
-                        "modified": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        },
-                        "removed": {
-                            "type": "array",
-                            "items": {}
-                        },
-                        "timestamp": {
-                            "type": "string"
-                        },
-                        "tree_id": {
-                            "type": "string"
-                        },
-                        "url": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "pusher": {
-                    "type": "object",
-                    "properties": {
-                        "email": {
-                            "type": "string"
-                        },
-                        "name": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "ref": {
-                    "type": "string"
-                },
-                "repository": {
-                    "type": "object",
-                    "properties": {
-                        "allow_forking": {
-                            "type": "boolean"
-                        },
-                        "archive_url": {
-                            "type": "string"
-                        },
-                        "archived": {
-                            "type": "boolean"
-                        },
-                        "assignees_url": {
-                            "type": "string"
-                        },
-                        "blobs_url": {
-                            "type": "string"
-                        },
-                        "branches_url": {
-                            "type": "string"
-                        },
-                        "clone_url": {
-                            "type": "string"
-                        },
-                        "collaborators_url": {
-                            "type": "string"
-                        },
-                        "comments_url": {
-                            "type": "string"
-                        },
-                        "commits_url": {
-                            "type": "string"
-                        },
-                        "compare_url": {
-                            "type": "string"
-                        },
-                        "contents_url": {
-                            "type": "string"
-                        },
-                        "contributors_url": {
-                            "type": "string"
-                        },
-                        "created_at": {
-                            "type": "integer"
-                        },
-                        "default_branch": {
-                            "type": "string"
-                        },
-                        "deployments_url": {
-                            "type": "string"
-                        },
-                        "description": {},
-                        "disabled": {
-                            "type": "boolean"
-                        },
-                        "downloads_url": {
-                            "type": "string"
-                        },
-                        "events_url": {
-                            "type": "string"
-                        },
-                        "fork": {
-                            "type": "boolean"
-                        },
-                        "forks": {
-                            "type": "integer"
-                        },
-                        "forks_count": {
-                            "type": "integer"
-                        },
-                        "forks_url": {
-                            "type": "string"
-                        },
-                        "full_name": {
-                            "type": "string"
-                        },
-                        "git_commits_url": {
-                            "type": "string"
-                        },
-                        "git_refs_url": {
-                            "type": "string"
-                        },
-                        "git_tags_url": {
-                            "type": "string"
-                        },
-                        "git_url": {
-                            "type": "string"
-                        },
-                        "has_downloads": {
-                            "type": "boolean"
-                        },
-                        "has_issues": {
-                            "type": "boolean"
-                        },
-                        "has_pages": {
-                            "type": "boolean"
-                        },
-                        "has_projects": {
-                            "type": "boolean"
-                        },
-                        "has_wiki": {
-                            "type": "boolean"
-                        },
-                        "homepage": {},
-                        "hooks_url": {
-                            "type": "string"
-                        },
-                        "html_url": {
-                            "type": "string"
-                        },
-                        "id": {
-                            "type": "integer"
-                        },
-                        "issue_comment_url": {
-                            "type": "string"
-                        },
-                        "issue_events_url": {
-                            "type": "string"
-                        },
-                        "issues_url": {
-                            "type": "string"
-                        },
-                        "keys_url": {
-                            "type": "string"
-                        },
-                        "labels_url": {
-                            "type": "string"
-                        },
-                        "language": {
-                            "type": "string"
-                        },
-                        "languages_url": {
-                            "type": "string"
-                        },
-                        "license": {},
-                        "master_branch": {
-                            "type": "string"
-                        },
-                        "merges_url": {
-                            "type": "string"
-                        },
-                        "milestones_url": {
-                            "type": "string"
-                        },
-                        "mirror_url": {},
-                        "name": {
-                            "type": "string"
-                        },
-                        "node_id": {
-                            "type": "string"
-                        },
-                        "notifications_url": {
-                            "type": "string"
-                        },
-                        "open_issues": {
-                            "type": "integer"
-                        },
-                        "open_issues_count": {
-                            "type": "integer"
-                        },
-                        "owner": {
-                            "type": "object",
-                            "properties": {
-                                "avatar_url": {
-                                    "type": "string"
-                                },
-                                "email": {
-                                    "type": "string"
-                                },
-                                "events_url": {
-                                    "type": "string"
-                                },
-                                "followers_url": {
-                                    "type": "string"
-                                },
-                                "following_url": {
-                                    "type": "string"
-                                },
-                                "gists_url": {
-                                    "type": "string"
-                                },
-                                "gravatar_id": {
-                                    "type": "string"
-                                },
-                                "html_url": {
-                                    "type": "string"
-                                },
-                                "id": {
-                                    "type": "integer"
-                                },
-                                "login": {
-                                    "type": "string"
-                                },
-                                "name": {
-                                    "type": "string"
-                                },
-                                "node_id": {
-                                    "type": "string"
-                                },
-                                "organizations_url": {
-                                    "type": "string"
-                                },
-                                "received_events_url": {
-                                    "type": "string"
-                                },
-                                "repos_url": {
-                                    "type": "string"
-                                },
-                                "site_admin": {
-                                    "type": "boolean"
-                                },
-                                "starred_url": {
-                                    "type": "string"
-                                },
-                                "subscriptions_url": {
-                                    "type": "string"
-                                },
-                                "type": {
-                                    "type": "string"
-                                },
-                                "url": {
-                                    "type": "string"
-                                }
-                            }
-                        },
-                        "private": {
-                            "type": "boolean"
-                        },
-                        "pulls_url": {
-                            "type": "string"
-                        },
-                        "pushed_at": {
-                            "type": "integer"
-                        },
-                        "releases_url": {
-                            "type": "string"
-                        },
-                        "size": {
-                            "type": "integer"
-                        },
-                        "ssh_url": {
-                            "type": "string"
-                        },
-                        "stargazers": {
-                            "type": "integer"
-                        },
-                        "stargazers_count": {
-                            "type": "integer"
-                        },
-                        "stargazers_url": {
-                            "type": "string"
-                        },
-                        "statuses_url": {
-                            "type": "string"
-                        },
-                        "subscribers_url": {
-                            "type": "string"
-                        },
-                        "subscription_url": {
-                            "type": "string"
-                        },
-                        "svn_url": {
-                            "type": "string"
-                        },
-                        "tags_url": {
-                            "type": "string"
-                        },
-                        "teams_url": {
-                            "type": "string"
-                        },
-                        "trees_url": {
-                            "type": "string"
-                        },
-                        "updated_at": {
-                            "type": "string"
-                        },
-                        "url": {
-                            "type": "string"
-                        },
-                        "watchers": {
-                            "type": "integer"
-                        },
-                        "watchers_count": {
-                            "type": "integer"
-                        }
-                    }
-                },
-                "sender": {
-                    "type": "object",
-                    "properties": {
-                        "avatar_url": {
-                            "type": "string"
-                        },
-                        "events_url": {
-                            "type": "string"
-                        },
-                        "followers_url": {
-                            "type": "string"
-                        },
-                        "following_url": {
-                            "type": "string"
-                        },
-                        "gists_url": {
-                            "type": "string"
-                        },
-                        "gravatar_id": {
-                            "type": "string"
-                        },
-                        "html_url": {
-                            "type": "string"
-                        },
-                        "id": {
-                            "type": "integer"
-                        },
-                        "login": {
-                            "type": "string"
-                        },
-                        "node_id": {
-                            "type": "string"
-                        },
-                        "organizations_url": {
-                            "type": "string"
-                        },
-                        "received_events_url": {
-                            "type": "string"
-                        },
-                        "repos_url": {
-                            "type": "string"
-                        },
-                        "site_admin": {
-                            "type": "boolean"
-                        },
-                        "starred_url": {
-                            "type": "string"
-                        },
-                        "subscriptions_url": {
-                            "type": "string"
-                        },
-                        "type": {
-                            "type": "string"
-                        },
-                        "url": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "v1.GithubWebhook": {
-            "type": "object",
-            "properties": {
-                "active": {
-                    "type": "boolean"
-                },
-                "config": {
-                    "type": "object",
-                    "properties": {
-                        "content_type": {
-                            "type": "string"
-                        },
-                        "insecure_ssl": {
-                            "type": "string"
-                        },
-                        "url": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "deliveries_url": {
-                    "type": "string"
-                },
-                "events": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "ping_url": {
-                    "type": "string"
-                },
-                "test_url": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "url": {
-                    "type": "string"
-                }
-            }
-        },
-        "v1.RepositoriesDto": {
-            "type": "object",
-            "properties": {
-                "repositories": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/v1.Repository"
-                    }
-                }
-            }
-        },
-        "v1.Repository": {
-            "type": "object",
-            "properties": {
-                "applications": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/v1.Application"
-                    }
-                },
-                "id": {
-                    "type": "string"
-                },
-                "token": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                }
-            }
+          }
         }
+      },
+      "post": {
+        "description": "Saves company",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Company"
+        ],
+        "summary": "Save company",
+        "parameters": [
+          {
+            "description": "Company data",
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1.Company"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/common.ResponseDTO"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/companies/{id}": {
+      "get": {
+        "description": "Gets company by id",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Company"
+        ],
+        "summary": "Get company by id",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Company id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/common.ResponseDTO"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/companies/{id}/repositories": {
+      "get": {
+        "description": "Gets RepositoriesDto by company id",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Company"
+        ],
+        "summary": "Get RepositoriesDto by company id",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Company id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "boolean",
+            "description": "Loads ApplicationsDto",
+            "name": "loadApplications",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/common.ResponseDTO"
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "updates repositories",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Company"
+        ],
+        "summary": "Update repositories by company id",
+        "parameters": [
+          {
+            "description": "RepositoriesDto data",
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1.RepositoriesDto"
+            }
+          },
+          {
+            "type": "string",
+            "description": "Company id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Company Update Option",
+            "name": "companyUpdateOption",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/common.ResponseDTO"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/githubs": {
+      "post": {
+        "description": "Listens Github Web hook events. Register this endpoint as github web hook endpoint",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Github"
+        ],
+        "summary": "Listen Github Web hook event",
+        "parameters": [
+          {
+            "description": "GithubWebHookEvent Data",
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1.GithubWebHookEvent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/common.ResponseDTO"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/common.ResponseDTO"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/repositories/{id}": {
+      "get": {
+        "description": "Gets Repository by id",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Repository"
+        ],
+        "summary": "Get Repository by id",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Repository id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/common.ResponseDTO"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/repositories/{id}/applications": {
+      "get": {
+        "description": "Gets Applications by repository id",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Repository"
+        ],
+        "summary": "Get Applications by repository id",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Repository id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/common.ResponseDTO"
+            }
+          }
+        }
+      }
     }
+  },
+  "definitions": {
+    "common.MetaData": {
+      "type": "object",
+      "properties": {
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "page": {
+          "type": "integer"
+        },
+        "page_count": {
+          "type": "integer"
+        },
+        "per_page": {
+          "type": "integer"
+        },
+        "total_count": {
+          "type": "integer"
+        }
+      }
+    },
+    "common.ResponseDTO": {
+      "type": "object",
+      "properties": {
+        "_metadata": {
+          "$ref": "#/definitions/common.MetaData"
+        },
+        "data": {},
+        "message": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "v1.Application": {
+      "type": "object",
+      "properties": {
+        "_metadata": {
+          "$ref": "#/definitions/v1.ApplicationMetadata"
+        },
+        "status": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "webhook": {
+          "$ref": "#/definitions/v1.GithubWebhook"
+        }
+      }
+    },
+    "v1.ApplicationMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "is_webhook_enabled": {
+          "type": "boolean"
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1.ApplicationsDto": {
+      "type": "object",
+      "properties": {
+        "applications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1.Application"
+          }
+        }
+      }
+    },
+    "v1.Company": {
+      "type": "object",
+      "properties": {
+        "_metadata": {
+          "$ref": "#/definitions/v1.CompanyMetadata"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "repositories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1.Repository"
+          }
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "v1.CompanyMetadata": {
+      "type": "object",
+      "properties": {
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "number_of_concurrent_process": {
+          "type": "integer"
+        },
+        "total_process_per_day": {
+          "type": "integer"
+        }
+      }
+    },
+    "v1.GithubWebHookEvent": {
+      "type": "object",
+      "properties": {
+        "after": {
+          "type": "string"
+        },
+        "base_ref": {},
+        "before": {
+          "type": "string"
+        },
+        "commits": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "added": {
+                "type": "array",
+                "items": {}
+              },
+              "author": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "username": {
+                    "type": "string"
+                  }
+                }
+              },
+              "committer": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "username": {
+                    "type": "string"
+                  }
+                }
+              },
+              "distinct": {
+                "type": "boolean"
+              },
+              "id": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "modified": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "removed": {
+                "type": "array",
+                "items": {}
+              },
+              "timestamp": {
+                "type": "string"
+              },
+              "tree_id": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "compare": {
+          "type": "string"
+        },
+        "created": {
+          "type": "boolean"
+        },
+        "deleted": {
+          "type": "boolean"
+        },
+        "forced": {
+          "type": "boolean"
+        },
+        "head_commit": {
+          "type": "object",
+          "properties": {
+            "added": {
+              "type": "array",
+              "items": {}
+            },
+            "author": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "username": {
+                  "type": "string"
+                }
+              }
+            },
+            "committer": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "username": {
+                  "type": "string"
+                }
+              }
+            },
+            "distinct": {
+              "type": "boolean"
+            },
+            "id": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "modified": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "removed": {
+              "type": "array",
+              "items": {}
+            },
+            "timestamp": {
+              "type": "string"
+            },
+            "tree_id": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          }
+        },
+        "pusher": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        "ref": {
+          "type": "string"
+        },
+        "repository": {
+          "type": "object",
+          "properties": {
+            "allow_forking": {
+              "type": "boolean"
+            },
+            "archive_url": {
+              "type": "string"
+            },
+            "archived": {
+              "type": "boolean"
+            },
+            "assignees_url": {
+              "type": "string"
+            },
+            "blobs_url": {
+              "type": "string"
+            },
+            "branches_url": {
+              "type": "string"
+            },
+            "clone_url": {
+              "type": "string"
+            },
+            "collaborators_url": {
+              "type": "string"
+            },
+            "comments_url": {
+              "type": "string"
+            },
+            "commits_url": {
+              "type": "string"
+            },
+            "compare_url": {
+              "type": "string"
+            },
+            "contents_url": {
+              "type": "string"
+            },
+            "contributors_url": {
+              "type": "string"
+            },
+            "created_at": {
+              "type": "integer"
+            },
+            "default_branch": {
+              "type": "string"
+            },
+            "deployments_url": {
+              "type": "string"
+            },
+            "description": {},
+            "disabled": {
+              "type": "boolean"
+            },
+            "downloads_url": {
+              "type": "string"
+            },
+            "events_url": {
+              "type": "string"
+            },
+            "fork": {
+              "type": "boolean"
+            },
+            "forks": {
+              "type": "integer"
+            },
+            "forks_count": {
+              "type": "integer"
+            },
+            "forks_url": {
+              "type": "string"
+            },
+            "full_name": {
+              "type": "string"
+            },
+            "git_commits_url": {
+              "type": "string"
+            },
+            "git_refs_url": {
+              "type": "string"
+            },
+            "git_tags_url": {
+              "type": "string"
+            },
+            "git_url": {
+              "type": "string"
+            },
+            "has_downloads": {
+              "type": "boolean"
+            },
+            "has_issues": {
+              "type": "boolean"
+            },
+            "has_pages": {
+              "type": "boolean"
+            },
+            "has_projects": {
+              "type": "boolean"
+            },
+            "has_wiki": {
+              "type": "boolean"
+            },
+            "homepage": {},
+            "hooks_url": {
+              "type": "string"
+            },
+            "html_url": {
+              "type": "string"
+            },
+            "id": {
+              "type": "integer"
+            },
+            "issue_comment_url": {
+              "type": "string"
+            },
+            "issue_events_url": {
+              "type": "string"
+            },
+            "issues_url": {
+              "type": "string"
+            },
+            "keys_url": {
+              "type": "string"
+            },
+            "labels_url": {
+              "type": "string"
+            },
+            "language": {
+              "type": "string"
+            },
+            "languages_url": {
+              "type": "string"
+            },
+            "license": {},
+            "master_branch": {
+              "type": "string"
+            },
+            "merges_url": {
+              "type": "string"
+            },
+            "milestones_url": {
+              "type": "string"
+            },
+            "mirror_url": {},
+            "name": {
+              "type": "string"
+            },
+            "node_id": {
+              "type": "string"
+            },
+            "notifications_url": {
+              "type": "string"
+            },
+            "open_issues": {
+              "type": "integer"
+            },
+            "open_issues_count": {
+              "type": "integer"
+            },
+            "owner": {
+              "type": "object",
+              "properties": {
+                "avatar_url": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "events_url": {
+                  "type": "string"
+                },
+                "followers_url": {
+                  "type": "string"
+                },
+                "following_url": {
+                  "type": "string"
+                },
+                "gists_url": {
+                  "type": "string"
+                },
+                "gravatar_id": {
+                  "type": "string"
+                },
+                "html_url": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "integer"
+                },
+                "login": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "node_id": {
+                  "type": "string"
+                },
+                "organizations_url": {
+                  "type": "string"
+                },
+                "received_events_url": {
+                  "type": "string"
+                },
+                "repos_url": {
+                  "type": "string"
+                },
+                "site_admin": {
+                  "type": "boolean"
+                },
+                "starred_url": {
+                  "type": "string"
+                },
+                "subscriptions_url": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              }
+            },
+            "private": {
+              "type": "boolean"
+            },
+            "pulls_url": {
+              "type": "string"
+            },
+            "pushed_at": {
+              "type": "integer"
+            },
+            "releases_url": {
+              "type": "string"
+            },
+            "size": {
+              "type": "integer"
+            },
+            "ssh_url": {
+              "type": "string"
+            },
+            "stargazers": {
+              "type": "integer"
+            },
+            "stargazers_count": {
+              "type": "integer"
+            },
+            "stargazers_url": {
+              "type": "string"
+            },
+            "statuses_url": {
+              "type": "string"
+            },
+            "subscribers_url": {
+              "type": "string"
+            },
+            "subscription_url": {
+              "type": "string"
+            },
+            "svn_url": {
+              "type": "string"
+            },
+            "tags_url": {
+              "type": "string"
+            },
+            "teams_url": {
+              "type": "string"
+            },
+            "trees_url": {
+              "type": "string"
+            },
+            "updated_at": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            },
+            "watchers": {
+              "type": "integer"
+            },
+            "watchers_count": {
+              "type": "integer"
+            }
+          }
+        },
+        "sender": {
+          "type": "object",
+          "properties": {
+            "avatar_url": {
+              "type": "string"
+            },
+            "events_url": {
+              "type": "string"
+            },
+            "followers_url": {
+              "type": "string"
+            },
+            "following_url": {
+              "type": "string"
+            },
+            "gists_url": {
+              "type": "string"
+            },
+            "gravatar_id": {
+              "type": "string"
+            },
+            "html_url": {
+              "type": "string"
+            },
+            "id": {
+              "type": "integer"
+            },
+            "login": {
+              "type": "string"
+            },
+            "node_id": {
+              "type": "string"
+            },
+            "organizations_url": {
+              "type": "string"
+            },
+            "received_events_url": {
+              "type": "string"
+            },
+            "repos_url": {
+              "type": "string"
+            },
+            "site_admin": {
+              "type": "boolean"
+            },
+            "starred_url": {
+              "type": "string"
+            },
+            "subscriptions_url": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "v1.GithubWebhook": {
+      "type": "object",
+      "properties": {
+        "active": {
+          "type": "boolean"
+        },
+        "config": {
+          "type": "object",
+          "properties": {
+            "content_type": {
+              "type": "string"
+            },
+            "insecure_ssl": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          }
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "deliveries_url": {
+          "type": "string"
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "integer"
+        },
+        "ping_url": {
+          "type": "string"
+        },
+        "test_url": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "v1.RepositoriesDto": {
+      "type": "object",
+      "properties": {
+        "repositories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1.Repository"
+          }
+        }
+      }
+    },
+    "v1.Repository": {
+      "type": "object",
+      "properties": {
+        "applications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1.Application"
+          }
+        },
+        "id": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    }
+  }
 }

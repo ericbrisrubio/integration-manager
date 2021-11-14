@@ -20,7 +20,7 @@ definitions:
     properties:
       _metadata:
         $ref: '#/definitions/common.MetaData'
-      data: {}
+      data: { }
       message:
         type: string
       status:
@@ -87,14 +87,14 @@ definitions:
     properties:
       after:
         type: string
-      base_ref: {}
+      base_ref: { }
       before:
         type: string
       commits:
         items:
           properties:
             added:
-              items: {}
+              items: { }
               type: array
             author:
               properties:
@@ -125,7 +125,7 @@ definitions:
                 type: string
               type: array
             removed:
-              items: {}
+              items: { }
               type: array
             timestamp:
               type: string
@@ -146,7 +146,7 @@ definitions:
       head_commit:
         properties:
           added:
-            items: {}
+            items: { }
             type: array
           author:
             properties:
@@ -177,7 +177,7 @@ definitions:
               type: string
             type: array
           removed:
-            items: {}
+            items: { }
             type: array
           timestamp:
             type: string
@@ -229,7 +229,7 @@ definitions:
             type: string
           deployments_url:
             type: string
-          description: {}
+          description: { }
           disabled:
             type: boolean
           downloads_url:
@@ -264,7 +264,7 @@ definitions:
             type: boolean
           has_wiki:
             type: boolean
-          homepage: {}
+          homepage: { }
           hooks_url:
             type: string
           html_url:
@@ -285,14 +285,14 @@ definitions:
             type: string
           languages_url:
             type: string
-          license: {}
+          license: { }
           master_branch:
             type: string
           merges_url:
             type: string
           milestones_url:
             type: string
-          mirror_url: {}
+          mirror_url: { }
           name:
             type: string
           node_id:
@@ -482,34 +482,34 @@ definitions:
         type: string
     type: object
 info:
-  contact: {}
+  contact: { }
   description: integration-manager API
   title: integration-manager API
 paths:
   /api/v1/applications:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Update Application by company id and  repository id
       parameters:
-      - description: ApplicationsDto Data
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/v1.ApplicationsDto'
-      - description: company id
-        in: query
-        name: company_id
-        required: true
-        type: string
-      - description: repository id
-        in: query
-        name: repository_Id
-        required: true
-        type: string
+        - description: ApplicationsDto Data
+          in: body
+          name: data
+          required: true
+          schema:
+            $ref: '#/definitions/v1.ApplicationsDto'
+        - description: company id
+          in: query
+          name: company_id
+          required: true
+          type: string
+        - description: repository id
+          in: query
+          name: repository_Id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -521,29 +521,29 @@ paths:
             $ref: '#/definitions/common.ResponseDTO'
       summary: Update Application
       tags:
-      - Application
+        - Application
   /api/v1/companies:
     get:
       description: Gets companies
       parameters:
-      - description: Page number
-        in: query
-        name: page
-        type: integer
-      - description: Record count
-        in: query
-        name: limit
-        type: integer
-      - description: Loads RepositoriesDto
-        in: query
-        name: loadRepositories
-        type: boolean
-      - description: Loads ApplicationsDto
-        in: query
-        name: loadApplications
-        type: boolean
+        - description: Page number
+          in: query
+          name: page
+          type: integer
+        - description: Record count
+          in: query
+          name: limit
+          type: integer
+        - description: Loads RepositoriesDto
+          in: query
+          name: loadRepositories
+          type: boolean
+        - description: Loads ApplicationsDto
+          in: query
+          name: loadApplications
+          type: boolean
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -551,18 +551,18 @@ paths:
             $ref: '#/definitions/common.ResponseDTO'
       summary: Get companies
       tags:
-      - Company
+        - Company
     post:
       description: Saves company
       parameters:
-      - description: Company data
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/v1.Company'
+        - description: Company data
+          in: body
+          name: data
+          required: true
+          schema:
+            $ref: '#/definitions/v1.Company'
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -570,18 +570,18 @@ paths:
             $ref: '#/definitions/common.ResponseDTO'
       summary: Save company
       tags:
-      - Company
+        - Company
   /api/v1/companies/{id}:
     get:
       description: Gets company by id
       parameters:
-      - description: Company id
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: Company id
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -589,22 +589,22 @@ paths:
             $ref: '#/definitions/common.ResponseDTO'
       summary: Get company by id
       tags:
-      - Company
+        - Company
   /api/v1/companies/{id}/repositories:
     get:
       description: Gets RepositoriesDto by company id
       parameters:
-      - description: Company id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Loads ApplicationsDto
-        in: query
-        name: loadApplications
-        type: boolean
+        - description: Company id
+          in: path
+          name: id
+          required: true
+          type: string
+        - description: Loads ApplicationsDto
+          in: query
+          name: loadApplications
+          type: boolean
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -612,28 +612,28 @@ paths:
             $ref: '#/definitions/common.ResponseDTO'
       summary: Get RepositoriesDto by company id
       tags:
-      - Company
+        - Company
     put:
       description: updates repositories
       parameters:
-      - description: RepositoriesDto data
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/v1.RepositoriesDto'
-      - description: Company id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Company Update Option
-        in: query
-        name: companyUpdateOption
-        required: true
-        type: string
+        - description: RepositoriesDto data
+          in: body
+          name: data
+          required: true
+          schema:
+            $ref: '#/definitions/v1.RepositoriesDto'
+        - description: Company id
+          in: path
+          name: id
+          required: true
+          type: string
+        - description: Company Update Option
+          in: query
+          name: companyUpdateOption
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -641,22 +641,22 @@ paths:
             $ref: '#/definitions/common.ResponseDTO'
       summary: Update repositories by company id
       tags:
-      - Company
+        - Company
   /api/v1/githubs:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Listens Github Web hook events. Register this endpoint as github
         web hook endpoint
       parameters:
-      - description: GithubWebHookEvent Data
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/v1.GithubWebHookEvent'
+        - description: GithubWebHookEvent Data
+          in: body
+          name: data
+          required: true
+          schema:
+            $ref: '#/definitions/v1.GithubWebHookEvent'
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -668,18 +668,18 @@ paths:
             $ref: '#/definitions/common.ResponseDTO'
       summary: Listen Github Web hook event
       tags:
-      - Github
+        - Github
   /api/v1/repositories/{id}:
     get:
       description: Gets Repository by id
       parameters:
-      - description: Repository id
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: Repository id
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -687,18 +687,18 @@ paths:
             $ref: '#/definitions/common.ResponseDTO'
       summary: Get Repository by id
       tags:
-      - Repository
+        - Repository
   /api/v1/repositories/{id}/applications:
     get:
       description: Gets Applications by repository id
       parameters:
-      - description: Repository id
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: Repository id
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -706,5 +706,5 @@ paths:
             $ref: '#/definitions/common.ResponseDTO'
       summary: Get Applications by repository id
       tags:
-      - Repository
+        - Repository
 swagger: "2.0"
