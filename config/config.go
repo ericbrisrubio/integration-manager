@@ -36,7 +36,7 @@ var Database string
 // KlovercloudCiCoreUrl refers to ci core url.
 var KlovercloudCiCoreUrl string
 
-// EventStoreUrl refers to event-store url.
+// EventStoreUrl refers to event-bank url.
 var EventStoreUrl string
 
 // PublicKey refers to public key of EventStoreToken.
