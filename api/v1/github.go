@@ -26,7 +26,7 @@ type v1GithubApi struct {
 // @Accept json
 // @Produce json
 // @Param data body v1.GithubWebHookEvent true "GithubWebHookEvent Data"
-// @Success 200 {object} common.ResponseDTO
+// @Success 200 {object} common.ResponseDTO{data=string}
 // @Failure 404 {object} common.ResponseDTO
 // @Router /api/v1/githubs [POST]
 func (g v1GithubApi) ListenEvent(context echo.Context) error {
