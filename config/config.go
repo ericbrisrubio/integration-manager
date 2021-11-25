@@ -57,6 +57,9 @@ var DefaultPerDayTotalProcess int64
 // GithubWebhookConsumingUrl refers to github web hook consuming url.
 var GithubWebhookConsumingUrl string
 
+// BitbucketWebhookConsumingUrl refers to github web hook consuming url.
+var BitbucketWebhookConsumingUrl string
+
 // InitEnvironmentVariables initializes environment variables
 func InitEnvironmentVariables() {
 	err := godotenv.Load()
@@ -96,4 +99,5 @@ func InitEnvironmentVariables() {
 		DefaultNumberOfConcurrentProcess = 10
 	}
 	GithubWebhookConsumingUrl = os.Getenv("GITHUB_WEBHOOK_CONSUMING_URL")
+	BitbucketWebhookConsumingUrl = os.Getenv("BITBUCKET_WEBHOOK_CONSUMING_URL")
 }

@@ -64,6 +64,15 @@ func getUsernameAndRepoNameFromGithubRepositoryUrl(url string) (username string,
 	return usernameOrorgName, repositoryName
 }
 
+func getUsernameAndRepoNameFromBitbucketRepositoryUrl(url string) (username string, repoName string) {
+	urlArray := strings.Split(url, "/")
+	if len(urlArray) < 3 {
+		return "", ""
+	}
+	repositoryName := urlArray[len(urlArray)-4]
+	usernameOrOrgName := urlArray[len(urlArray)-5]
+	return usernameOrOrgName, repositoryName
+}
 func (c companyService) UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.CompanyUpdateOption) error {
 	if companyUpdateOption.Option == enums.APPEND_APPLICATION {
 		for i := range apps {
@@ -79,6 +88,18 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 					apps[i].MetaData.IsWebhookEnabled = false
 				} else {
 					apps[i].Webhook = gitWebhook
+					apps[i].MetaData.IsWebhookEnabled = true
+				}
+			}
+		} else if repo.Type == enums.BIT_BUCKET {
+			for i := range apps {
+				usernameOrOrgName, repoName := getUsernameAndRepoNameFromBitbucketRepositoryUrl(apps[i].Url)
+				bitbucketWebhook, err := NewBitBucketService(c, nil, c.client).CreateRepositoryWebhook(usernameOrOrgName, repoName, repo.Token)
+				if err != nil {
+					apps[i].Webhook = bitbucketWebhook
+					apps[i].MetaData.IsWebhookEnabled = false
+				} else {
+					apps[i].Webhook = bitbucketWebhook
 					apps[i].MetaData.IsWebhookEnabled = true
 				}
 			}
@@ -99,7 +120,16 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 		if repo.Type == enums.GITHUB {
 			for i := range apps {
 				usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
-				err := NewGithubService(c, nil, c.client).DeleteRepositoryWebhookById(usernameOrorgName, repoName, string(rune(apps[i].Webhook.ID)), repo.Token)
+				err := NewGithubService(c, nil, c.client).DeleteRepositoryWebhookById(usernameOrorgName, repoName, apps[i].Webhook.ID, repo.Token)
+				if err != nil {
+					return err
+				}
+				apps[i].MetaData.IsWebhookEnabled = false
+			}
+		} else if repo.Type == enums.BIT_BUCKET {
+			for i := range apps {
+				usernameOrOrgName, repoName := getUsernameAndRepoNameFromBitbucketRepositoryUrl(apps[i].Url)
+				err := NewBitBucketService(c, nil, c.client).DeleteRepositoryWebhookById(usernameOrOrgName, repoName, apps[i].Webhook.ID, repo.Token)
 				if err != nil {
 					return err
 				}
