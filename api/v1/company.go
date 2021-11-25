@@ -63,7 +63,7 @@ func (c companyApi) UpdateRepositories(context echo.Context) error {
 // @Param limit query int64 false "Record count"
 // @Param loadRepositories query bool false "Loads RepositoriesDto"
 // @Param loadApplications query bool false "Loads ApplicationsDto"
-// @Success 200 {object} common.ResponseDTO
+// @Success 200 {object} common.ResponseDTO{data=[]v1.Company}
 // @Router /api/v1/companies [GET]
 func (c companyApi) Get(context echo.Context) error {
 	option := getQueryOption(context)
@@ -114,7 +114,7 @@ func (c companyApi) Save(context echo.Context) error {
 // @Tags Company
 // @Produce json
 // @Param id path string true "Company id"
-// @Success 200 {object} common.ResponseDTO
+// @Success 200 {object} common.ResponseDTO{data=v1.Company}
 // @Router /api/v1/companies/{id} [GET]
 func (c companyApi) GetById(context echo.Context) error {
 	id := context.Param("id")
@@ -134,7 +134,7 @@ func (c companyApi) GetById(context echo.Context) error {
 // @Produce json
 // @Param id path string true "Company id"
 // @Param loadApplications query bool false "Loads ApplicationsDto"
-// @Success 200 {object} common.ResponseDTO
+// @Success 200 {object} common.ResponseDTO{data=[]v1.Repository}
 // @Router /api/v1/companies/{id}/repositories [GET]
 func (c companyApi) GetRepositoriesById(context echo.Context) error {
 	id := context.Param("id")

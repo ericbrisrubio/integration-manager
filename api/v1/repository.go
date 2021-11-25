@@ -21,7 +21,7 @@ type repositoryApi struct {
 // @Tags Repository
 // @Produce json
 // @Param id path string true "Repository id"
-// @Success 200 {object} common.ResponseDTO
+// @Success 200 {object} common.ResponseDTO{data=v1.Repository}
 // @Router /api/v1/repositories/{id} [GET]
 func (r repositoryApi) GetById(context echo.Context) error {
 	id := context.Param("id")
@@ -38,7 +38,7 @@ func (r repositoryApi) GetById(context echo.Context) error {
 // @Tags Repository
 // @Produce json
 // @Param id path string true "Repository id"
-// @Success 200 {object} common.ResponseDTO
+// @Success 200 {object} common.ResponseDTO{data=[]v1.Application}
 // @Router /api/v1/repositories/{id}/applications [GET]
 func (r repositoryApi) GetApplicationsById(context echo.Context) error {
 	id := context.Param("id")

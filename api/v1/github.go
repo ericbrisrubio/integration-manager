@@ -26,7 +26,7 @@ type v1GithubApi struct {
 // @Accept json
 // @Produce json
 // @Param data body v1.GithubWebHookEvent true "GithubWebHookEvent Data"
-// @Success 200 {object} common.ResponseDTO
+// @Success 200 {object} common.ResponseDTO{data=string}
 // @Failure 404 {object} common.ResponseDTO
 // @Router /api/v1/githubs [POST]
 func (g v1GithubApi) ListenEvent(context echo.Context) error {
@@ -64,7 +64,29 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 	}
 	if data != nil {
 		for i := range data.Steps {
-			if data.Steps[i].Type == enums.DEPLOY {
+			if data.Steps[i].Type == enums.BUILD {
+				if images, ok := data.Steps[i].Params["images"]; ok {
+					images := strings.Split(images, ",")
+					for i, image := range images {
+						strs := strings.Split(image, ":")
+						if len(strs) == 1 {
+							images[i] = images[i] + ":" + revision
+						}
+					}
+					data.Steps[i].Params["images"] = strings.Join(images, ",")
+				}
+
+			} else if data.Steps[i].Type == enums.DEPLOY {
+				if images, ok := data.Steps[i].Params["images"]; ok {
+					images := strings.Split(images, ",")
+					for i, image := range images {
+						strs := strings.Split(image, ":")
+						if len(strs) == 1 {
+							images[i] = images[i] + ":" + revision
+						}
+					}
+					data.Steps[i].Params["images"] = strings.Join(images, ",")
+				}
 				if val, ok := data.Steps[i].Params["env"]; ok {
 					contentsData, err := g.gitService.GetDescriptors(repoName, owner, revision, repository.Token, enums.PIPELINE_DESCRIPTORS_BASE_DIRECTORY+"/", val)
 					if err != nil {
