@@ -1,6 +1,7 @@
 package v1
 
 import (
+	_ "encoding/json"
 	"github.com/klovercloud-ci-cd/integration-manager/api/common"
 	v1 "github.com/klovercloud-ci-cd/integration-manager/core/v1"
 	"github.com/klovercloud-ci-cd/integration-manager/core/v1/api"
@@ -9,7 +10,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/twinj/uuid"
 	"log"
-	"strings"
 )
 
 type v1BitbucketApi struct {
@@ -19,28 +19,28 @@ type v1BitbucketApi struct {
 	observerList                 []service.Observer
 }
 
+// Listen ... Listen Bitbucket Web hook event
+// @Summary  Listen Bitbucket Web hook event
+// @Description Listens Bitbucket Web hook events. Register this endpoint as Bitbucket web hook endpoint
+// @Tags Bitbucket
+// @Accept json
+// @Produce json
+// @Param data body v1.BitbucketWebHookEvent true "GithubWebHookEvent Data"
+// @Success 200 {object} common.ResponseDTO{data=string}
+// @Failure 404 {object} common.ResponseDTO
+// @Router /api/v1/bitbuckets [POST]
 func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
-	test := new(v1.BitbucketWebHookEvent)
-	if err := context.Bind(test); err != nil {
-		log.Println(err.Error())
-		return common.GenerateErrorResponse(context, err.Error(), "Operation Failed!")
-	}
-	resource := new(v1.GithubWebHookEvent)
+	resource := new(v1.BitbucketWebHookEvent)
 	if err := context.Bind(resource); err != nil {
 		log.Println(err.Error())
 		return common.GenerateErrorResponse(context, err.Error(), "Operation Failed!")
 	}
 	repoName := resource.Repository.Name
-	owner := resource.Repository.Owner.Login
-	revision := resource.After
-	companyId := ""
-	if resource.Repository.Owner.Type == "Organization" {
-		companyId = resource.Repository.Name
-	} else {
-		companyId = resource.Repository.Owner.Email
-	}
-	repository := b.companyService.GetRepositoryByCompanyIdAndApplicationUrl(companyId, resource.Repository.URL)
-	application := b.companyService.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repository.Id, resource.Repository.URL)
+	owner := resource.Actor.DisplayName
+	revision := resource.Push.Changes[len(resource.Push.Changes)-1].New.Target.Hash
+	companyId := resource.Repository.Owner.DisplayName
+	repository := b.companyService.GetRepositoryByCompanyIdAndApplicationUrl(companyId, resource.Repository.Links.HTML.Href)
+	application := b.companyService.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, resource.Repository.UUID, resource.Repository.Links.HTML.Href)
 	if !application.MetaData.IsWebhookEnabled {
 		return common.GenerateForbiddenResponse(context, "[Forbidden]: Web hook is disabled!", "Operation Failed!")
 	}
@@ -51,7 +51,7 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 	}
 	for _, step := range data.Steps {
 		if step.Type == enums.BUILD && step.Params[enums.REVISION] != "" {
-			branch := strings.Split(resource.Ref, "/")[2]
+			branch := resource.Push.Changes[len(resource.Push.Changes)-1].New.Name
 			if step.Params[enums.REVISION] != branch {
 				return common.GenerateForbiddenResponse(context, "[Forbidden]: Branch wasn't matched!", "Operation Failed!")
 			}
@@ -82,7 +82,7 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 	}
 	subject := v1.Subject{
 		Log:                   "Pipeline triggered",
-		CoreRequestQueryParam: map[string]string{"url": resource.Repository.URL, "revision": revision, "purging": "ENABLE"},
+		CoreRequestQueryParam: map[string]string{"url": resource.Repository.Links.HTML.Href, "revision": revision, "purging": "ENABLE"},
 		EventData:             map[string]interface{}{},
 		Pipeline:              *data,
 		App: struct {

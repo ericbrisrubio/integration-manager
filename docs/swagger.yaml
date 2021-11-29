@@ -20,7 +20,7 @@ definitions:
     properties:
       _metadata:
         $ref: '#/definitions/common.MetaData'
-      data: {}
+      data: { }
       message:
         type: string
       status:
@@ -56,6 +56,583 @@ definitions:
         items:
           $ref: '#/definitions/v1.Application'
         type: array
+    type: object
+  v1.BitbucketWebHookEvent:
+    properties:
+      actor:
+        properties:
+          account_id:
+            type: string
+          display_name:
+            type: string
+          links:
+            properties:
+              avatar:
+                properties:
+                  href:
+                    type: string
+                type: object
+              html:
+                properties:
+                  href:
+                    type: string
+                type: object
+              self:
+                properties:
+                  href:
+                    type: string
+                type: object
+            type: object
+          nickname:
+            type: string
+          type:
+            type: string
+          uuid:
+            type: string
+        type: object
+      push:
+        properties:
+          changes:
+            items:
+              properties:
+                closed:
+                  type: boolean
+                commits:
+                  items:
+                    properties:
+                      author:
+                        properties:
+                          raw:
+                            type: string
+                          type:
+                            type: string
+                          user:
+                            properties:
+                              account_id:
+                                type: string
+                              display_name:
+                                type: string
+                              links:
+                                properties:
+                                  avatar:
+                                    properties:
+                                      href:
+                                        type: string
+                                    type: object
+                                  html:
+                                    properties:
+                                      href:
+                                        type: string
+                                    type: object
+                                  self:
+                                    properties:
+                                      href:
+                                        type: string
+                                    type: object
+                                type: object
+                              nickname:
+                                type: string
+                              type:
+                                type: string
+                              uuid:
+                                type: string
+                            type: object
+                        type: object
+                      date:
+                        type: string
+                      hash:
+                        type: string
+                      links:
+                        properties:
+                          approve:
+                            properties:
+                              href:
+                                type: string
+                            type: object
+                          comments:
+                            properties:
+                              href:
+                                type: string
+                            type: object
+                          diff:
+                            properties:
+                              href:
+                                type: string
+                            type: object
+                          html:
+                            properties:
+                              href:
+                                type: string
+                            type: object
+                          patch:
+                            properties:
+                              href:
+                                type: string
+                            type: object
+                          self:
+                            properties:
+                              href:
+                                type: string
+                            type: object
+                          statuses:
+                            properties:
+                              href:
+                                type: string
+                            type: object
+                        type: object
+                      message:
+                        type: string
+                      parents:
+                        items:
+                          properties:
+                            hash:
+                              type: string
+                            links:
+                              properties:
+                                html:
+                                  properties:
+                                    href:
+                                      type: string
+                                  type: object
+                                self:
+                                  properties:
+                                    href:
+                                      type: string
+                                  type: object
+                              type: object
+                            type:
+                              type: string
+                          type: object
+                        type: array
+                      properties:
+                        type: object
+                      rendered:
+                        type: object
+                      summary:
+                        properties:
+                          html:
+                            type: string
+                          markup:
+                            type: string
+                          raw:
+                            type: string
+                          type:
+                            type: string
+                        type: object
+                      type:
+                        type: string
+                    type: object
+                  type: array
+                created:
+                  type: boolean
+                forced:
+                  type: boolean
+                links:
+                  properties:
+                    commits:
+                      properties:
+                        href:
+                          type: string
+                      type: object
+                    diff:
+                      properties:
+                        href:
+                          type: string
+                      type: object
+                    html:
+                      properties:
+                        href:
+                          type: string
+                      type: object
+                  type: object
+                new:
+                  properties:
+                    default_merge_strategy:
+                      type: string
+                    links:
+                      properties:
+                        commits:
+                          properties:
+                            href:
+                              type: string
+                          type: object
+                        html:
+                          properties:
+                            href:
+                              type: string
+                          type: object
+                        self:
+                          properties:
+                            href:
+                              type: string
+                          type: object
+                      type: object
+                    merge_strategies:
+                      items:
+                        type: string
+                      type: array
+                    name:
+                      type: string
+                    target:
+                      properties:
+                        author:
+                          properties:
+                            raw:
+                              type: string
+                            type:
+                              type: string
+                            user:
+                              properties:
+                                account_id:
+                                  type: string
+                                display_name:
+                                  type: string
+                                links:
+                                  properties:
+                                    avatar:
+                                      properties:
+                                        href:
+                                          type: string
+                                      type: object
+                                    html:
+                                      properties:
+                                        href:
+                                          type: string
+                                      type: object
+                                    self:
+                                      properties:
+                                        href:
+                                          type: string
+                                      type: object
+                                  type: object
+                                nickname:
+                                  type: string
+                                type:
+                                  type: string
+                                uuid:
+                                  type: string
+                              type: object
+                          type: object
+                        date:
+                          type: string
+                        hash:
+                          type: string
+                        links:
+                          properties:
+                            html:
+                              properties:
+                                href:
+                                  type: string
+                              type: object
+                            self:
+                              properties:
+                                href:
+                                  type: string
+                              type: object
+                          type: object
+                        message:
+                          type: string
+                        parents:
+                          items:
+                            properties:
+                              hash:
+                                type: string
+                              links:
+                                properties:
+                                  html:
+                                    properties:
+                                      href:
+                                        type: string
+                                    type: object
+                                  self:
+                                    properties:
+                                      href:
+                                        type: string
+                                    type: object
+                                type: object
+                              type:
+                                type: string
+                            type: object
+                          type: array
+                        properties:
+                          type: object
+                        rendered:
+                          type: object
+                        summary:
+                          properties:
+                            html:
+                              type: string
+                            markup:
+                              type: string
+                            raw:
+                              type: string
+                            type:
+                              type: string
+                          type: object
+                        type:
+                          type: string
+                      type: object
+                    type:
+                      type: string
+                  type: object
+                old:
+                  properties:
+                    default_merge_strategy:
+                      type: string
+                    links:
+                      properties:
+                        commits:
+                          properties:
+                            href:
+                              type: string
+                          type: object
+                        html:
+                          properties:
+                            href:
+                              type: string
+                          type: object
+                        self:
+                          properties:
+                            href:
+                              type: string
+                          type: object
+                      type: object
+                    merge_strategies:
+                      items:
+                        type: string
+                      type: array
+                    name:
+                      type: string
+                    target:
+                      properties:
+                        author:
+                          properties:
+                            raw:
+                              type: string
+                            type:
+                              type: string
+                            user:
+                              properties:
+                                account_id:
+                                  type: string
+                                display_name:
+                                  type: string
+                                links:
+                                  properties:
+                                    avatar:
+                                      properties:
+                                        href:
+                                          type: string
+                                      type: object
+                                    html:
+                                      properties:
+                                        href:
+                                          type: string
+                                      type: object
+                                    self:
+                                      properties:
+                                        href:
+                                          type: string
+                                      type: object
+                                  type: object
+                                nickname:
+                                  type: string
+                                type:
+                                  type: string
+                                uuid:
+                                  type: string
+                              type: object
+                          type: object
+                        date:
+                          type: string
+                        hash:
+                          type: string
+                        links:
+                          properties:
+                            html:
+                              properties:
+                                href:
+                                  type: string
+                              type: object
+                            self:
+                              properties:
+                                href:
+                                  type: string
+                              type: object
+                          type: object
+                        message:
+                          type: string
+                        parents:
+                          items:
+                            properties:
+                              hash:
+                                type: string
+                              links:
+                                properties:
+                                  html:
+                                    properties:
+                                      href:
+                                        type: string
+                                    type: object
+                                  self:
+                                    properties:
+                                      href:
+                                        type: string
+                                    type: object
+                                type: object
+                              type:
+                                type: string
+                            type: object
+                          type: array
+                        properties:
+                          type: object
+                        rendered:
+                          type: object
+                        summary:
+                          properties:
+                            html:
+                              type: string
+                            markup:
+                              type: string
+                            raw:
+                              type: string
+                            type:
+                              type: string
+                          type: object
+                        type:
+                          type: string
+                      type: object
+                    type:
+                      type: string
+                  type: object
+                truncated:
+                  type: boolean
+              type: object
+            type: array
+        type: object
+      repository:
+        properties:
+          full_name:
+            type: string
+          is_private:
+            type: boolean
+          links:
+            properties:
+              avatar:
+                properties:
+                  href:
+                    type: string
+                type: object
+              html:
+                properties:
+                  href:
+                    type: string
+                type: object
+              self:
+                properties:
+                  href:
+                    type: string
+                type: object
+            type: object
+          name:
+            type: string
+          owner:
+            properties:
+              account_id:
+                type: string
+              display_name:
+                type: string
+              links:
+                properties:
+                  avatar:
+                    properties:
+                      href:
+                        type: string
+                    type: object
+                  html:
+                    properties:
+                      href:
+                        type: string
+                    type: object
+                  self:
+                    properties:
+                      href:
+                        type: string
+                    type: object
+                type: object
+              nickname:
+                type: string
+              type:
+                type: string
+              uuid:
+                type: string
+            type: object
+          project:
+            properties:
+              key:
+                type: string
+              links:
+                properties:
+                  avatar:
+                    properties:
+                      href:
+                        type: string
+                    type: object
+                  html:
+                    properties:
+                      href:
+                        type: string
+                    type: object
+                  self:
+                    properties:
+                      href:
+                        type: string
+                    type: object
+                type: object
+              name:
+                type: string
+              type:
+                type: string
+              uuid:
+                type: string
+            type: object
+          scm:
+            type: string
+          type:
+            type: string
+          uuid:
+            type: string
+          website: { }
+          workspace:
+            properties:
+              links:
+                properties:
+                  avatar:
+                    properties:
+                      href:
+                        type: string
+                    type: object
+                  html:
+                    properties:
+                      href:
+                        type: string
+                    type: object
+                  self:
+                    properties:
+                      href:
+                        type: string
+                    type: object
+                type: object
+              name:
+                type: string
+              slug:
+                type: string
+              type:
+                type: string
+              uuid:
+                type: string
+            type: object
+        type: object
     type: object
   v1.Company:
     properties:
@@ -105,7 +682,7 @@ definitions:
           type: string
         type: array
       id:
-        type: integer
+        type: string
       ping_url:
         type: string
       test_url:
@@ -121,14 +698,14 @@ definitions:
     properties:
       after:
         type: string
-      base_ref: {}
+      base_ref: { }
       before:
         type: string
       commits:
         items:
           properties:
             added:
-              items: {}
+              items: { }
               type: array
             author:
               properties:
@@ -159,7 +736,7 @@ definitions:
                 type: string
               type: array
             removed:
-              items: {}
+              items: { }
               type: array
             timestamp:
               type: string
@@ -180,7 +757,7 @@ definitions:
       head_commit:
         properties:
           added:
-            items: {}
+            items: { }
             type: array
           author:
             properties:
@@ -211,7 +788,7 @@ definitions:
               type: string
             type: array
           removed:
-            items: {}
+            items: { }
             type: array
           timestamp:
             type: string
@@ -263,7 +840,7 @@ definitions:
             type: string
           deployments_url:
             type: string
-          description: {}
+          description: { }
           disabled:
             type: boolean
           downloads_url:
@@ -298,7 +875,7 @@ definitions:
             type: boolean
           has_wiki:
             type: boolean
-          homepage: {}
+          homepage: { }
           hooks_url:
             type: string
           html_url:
@@ -319,14 +896,14 @@ definitions:
             type: string
           languages_url:
             type: string
-          license: {}
+          license: { }
           master_branch:
             type: string
           merges_url:
             type: string
           milestones_url:
             type: string
-          mirror_url: {}
+          mirror_url: { }
           name:
             type: string
           node_id:
@@ -482,34 +1059,34 @@ definitions:
         type: string
     type: object
 info:
-  contact: {}
+  contact: { }
   description: integration-manager API
   title: integration-manager API
 paths:
   /api/v1/applications:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Update Application by company id and  repository id
       parameters:
-      - description: ApplicationsDto Data
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/v1.ApplicationsDto'
-      - description: company id
-        in: query
-        name: company_id
-        required: true
-        type: string
-      - description: repository id
-        in: query
-        name: repository_Id
-        required: true
-        type: string
+        - description: ApplicationsDto Data
+          in: body
+          name: data
+          required: true
+          schema:
+            $ref: '#/definitions/v1.ApplicationsDto'
+        - description: company id
+          in: query
+          name: company_id
+          required: true
+          type: string
+        - description: repository id
+          in: query
+          name: repository_Id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -521,55 +1098,87 @@ paths:
             $ref: '#/definitions/common.ResponseDTO'
       summary: Update Application
       tags:
-      - Application
-  /api/v1/companies:
-    get:
-      description: Gets companies
+        - Application
+  /api/v1/bitbuckets:
+    post:
+      consumes:
+        - application/json
+      description: Listens Bitbucket Web hook events. Register this endpoint as Bitbucket
+        web hook endpoint
       parameters:
-      - description: Page number
-        in: query
-        name: page
-        type: integer
-      - description: Record count
-        in: query
-        name: limit
-        type: integer
-      - description: Loads RepositoriesDto
-        in: query
-        name: loadRepositories
-        type: boolean
-      - description: Loads ApplicationsDto
-        in: query
-        name: loadApplications
-        type: boolean
+        - description: GithubWebHookEvent Data
+          in: body
+          name: data
+          required: true
+          schema:
+            $ref: '#/definitions/v1.BitbucketWebHookEvent'
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/common.ResponseDTO'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/v1.Company'
-                  type: array
-              type: object
+              - $ref: '#/definitions/common.ResponseDTO'
+              - properties:
+                  data:
+                    type: string
+                type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Listen Bitbucket Web hook event
+      tags:
+        - Bitbucket
+  /api/v1/companies:
+    get:
+      description: Gets companies
+      parameters:
+        - description: Page number
+          in: query
+          name: page
+          type: integer
+        - description: Record count
+          in: query
+          name: limit
+          type: integer
+        - description: Loads RepositoriesDto
+          in: query
+          name: loadRepositories
+          type: boolean
+        - description: Loads ApplicationsDto
+          in: query
+          name: loadApplications
+          type: boolean
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+              - $ref: '#/definitions/common.ResponseDTO'
+              - properties:
+                  data:
+                    items:
+                      $ref: '#/definitions/v1.Company'
+                    type: array
+                type: object
       summary: Get companies
       tags:
-      - Company
+        - Company
     post:
       description: Saves company
       parameters:
-      - description: Company data
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/v1.Company'
+        - description: Company data
+          in: body
+          name: data
+          required: true
+          schema:
+            $ref: '#/definitions/v1.Company'
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -577,82 +1186,82 @@ paths:
             $ref: '#/definitions/common.ResponseDTO'
       summary: Save company
       tags:
-      - Company
+        - Company
   /api/v1/companies/{id}:
     get:
       description: Gets company by id
       parameters:
-      - description: Company id
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: Company id
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/common.ResponseDTO'
-            - properties:
-                data:
-                  $ref: '#/definitions/v1.Company'
-              type: object
+              - $ref: '#/definitions/common.ResponseDTO'
+              - properties:
+                  data:
+                    $ref: '#/definitions/v1.Company'
+                type: object
       summary: Get company by id
       tags:
-      - Company
+        - Company
   /api/v1/companies/{id}/repositories:
     get:
       description: Gets RepositoriesDto by company id
       parameters:
-      - description: Company id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Loads ApplicationsDto
-        in: query
-        name: loadApplications
-        type: boolean
+        - description: Company id
+          in: path
+          name: id
+          required: true
+          type: string
+        - description: Loads ApplicationsDto
+          in: query
+          name: loadApplications
+          type: boolean
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/common.ResponseDTO'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/v1.Repository'
-                  type: array
-              type: object
+              - $ref: '#/definitions/common.ResponseDTO'
+              - properties:
+                  data:
+                    items:
+                      $ref: '#/definitions/v1.Repository'
+                    type: array
+                type: object
       summary: Get RepositoriesDto by company id
       tags:
-      - Company
+        - Company
     put:
       description: updates repositories
       parameters:
-      - description: RepositoriesDto data
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/v1.RepositoriesDto'
-      - description: Company id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Company Update Option
-        in: query
-        name: companyUpdateOption
-        required: true
-        type: string
+        - description: RepositoriesDto data
+          in: body
+          name: data
+          required: true
+          schema:
+            $ref: '#/definitions/v1.RepositoriesDto'
+        - description: Company id
+          in: path
+          name: id
+          required: true
+          type: string
+        - description: Company Update Option
+          in: query
+          name: companyUpdateOption
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -660,87 +1269,87 @@ paths:
             $ref: '#/definitions/common.ResponseDTO'
       summary: Update repositories by company id
       tags:
-      - Company
+        - Company
   /api/v1/githubs:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Listens Github Web hook events. Register this endpoint as github
         web hook endpoint
       parameters:
-      - description: GithubWebHookEvent Data
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/v1.GithubWebHookEvent'
+        - description: GithubWebHookEvent Data
+          in: body
+          name: data
+          required: true
+          schema:
+            $ref: '#/definitions/v1.GithubWebHookEvent'
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/common.ResponseDTO'
-            - properties:
-                data:
-                  type: string
-              type: object
+              - $ref: '#/definitions/common.ResponseDTO'
+              - properties:
+                  data:
+                    type: string
+                type: object
         "404":
           description: Not Found
           schema:
             $ref: '#/definitions/common.ResponseDTO'
       summary: Listen Github Web hook event
       tags:
-      - Github
+        - Github
   /api/v1/repositories/{id}:
     get:
       description: Gets Repository by id
       parameters:
-      - description: Repository id
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: Repository id
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/common.ResponseDTO'
-            - properties:
-                data:
-                  $ref: '#/definitions/v1.Repository'
-              type: object
+              - $ref: '#/definitions/common.ResponseDTO'
+              - properties:
+                  data:
+                    $ref: '#/definitions/v1.Repository'
+                type: object
       summary: Get Repository by id
       tags:
-      - Repository
+        - Repository
   /api/v1/repositories/{id}/applications:
     get:
       description: Gets Applications by repository id
       parameters:
-      - description: Repository id
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: Repository id
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/common.ResponseDTO'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/v1.Application'
-                  type: array
-              type: object
+              - $ref: '#/definitions/common.ResponseDTO'
+              - properties:
+                  data:
+                    items:
+                      $ref: '#/definitions/v1.Application'
+                    type: array
+                type: object
       summary: Get Applications by repository id
       tags:
-      - Repository
+        - Repository
 swagger: "2.0"
