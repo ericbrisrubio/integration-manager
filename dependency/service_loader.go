@@ -14,6 +14,11 @@ func GetV1GithubService() service.Git {
 	return logic.NewGithubService(GetV1CompanyService(), nil, logic.NewHttpClientService())
 }
 
+// GetV1BitbucketService returns Git service
+func GetV1BitbucketService() service.Git {
+	return logic.NewBitBucketService(GetV1CompanyService(), nil, logic.NewHttpClientService())
+}
+
 // GetV1Observers returns Observer services
 func GetV1Observers() []service.Observer {
 	var observers []service.Observer

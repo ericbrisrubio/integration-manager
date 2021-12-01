@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/klovercloud-ci-cd/integration-manager/enums"
+	"strconv"
 	"time"
 )
 
@@ -229,7 +230,7 @@ type GithubCreateWebhookRequest struct {
 	Config struct {
 		URL string `json:"url"`
 	} `json:"config"`
-	Events []enums.GIT_EVENT `json:"events"`
+	Events []enums.GITHUB_EVENT `json:"events"`
 }
 
 // GithubWebhook contains github web hook data
@@ -255,7 +256,7 @@ type GithubWebhook struct {
 func (webhook GithubWebhook) GetGitWebhook() GitWebhook {
 	return GitWebhook{
 		Type:   webhook.Type,
-		ID:     webhook.ID,
+		ID:     strconv.Itoa(webhook.ID),
 		Active: webhook.Active,
 		Events: webhook.Events,
 		Config: struct {
