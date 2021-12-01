@@ -49,14 +49,14 @@ var doc = `{
                     {
                         "type": "string",
                         "description": "company id",
-                        "name": "company_id",
+                        "name": "companyId",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "repository id",
-                        "name": "repository_Id",
+                        "name": "repositoryId",
                         "in": "query",
                         "required": true
                     }
@@ -66,6 +66,58 @@ var doc = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/bitbuckets": {
+            "post": {
+                "description": "Listens Bitbucket Web hook events. Register this endpoint as Bitbucket web hook endpoint",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bitbucket"
+                ],
+                "summary": "Listen Bitbucket Web hook event",
+                "parameters": [
+                    {
+                        "description": "GithubWebHookEvent Data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.BitbucketWebHookEvent"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common.ResponseDTO"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "404": {
@@ -529,6 +581,917 @@ var doc = `{
                 }
             }
         },
+        "v1.BitbucketWebHookEvent": {
+            "type": "object",
+            "properties": {
+                "actor": {
+                    "type": "object",
+                    "properties": {
+                        "account_id": {
+                            "type": "string"
+                        },
+                        "display_name": {
+                            "type": "string"
+                        },
+                        "links": {
+                            "type": "object",
+                            "properties": {
+                                "avatar": {
+                                    "type": "object",
+                                    "properties": {
+                                        "href": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "html": {
+                                    "type": "object",
+                                    "properties": {
+                                        "href": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "self": {
+                                    "type": "object",
+                                    "properties": {
+                                        "href": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "nickname": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "uuid": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "push": {
+                    "type": "object",
+                    "properties": {
+                        "changes": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "closed": {
+                                        "type": "boolean"
+                                    },
+                                    "commits": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "author": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "raw": {
+                                                            "type": "string"
+                                                        },
+                                                        "type": {
+                                                            "type": "string"
+                                                        },
+                                                        "user": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "account_id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "display_name": {
+                                                                    "type": "string"
+                                                                },
+                                                                "links": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "avatar": {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "href": {
+                                                                                    "type": "string"
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        "html": {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "href": {
+                                                                                    "type": "string"
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        "self": {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "href": {
+                                                                                    "type": "string"
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "nickname": {
+                                                                    "type": "string"
+                                                                },
+                                                                "type": {
+                                                                    "type": "string"
+                                                                },
+                                                                "uuid": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "date": {
+                                                    "type": "string"
+                                                },
+                                                "hash": {
+                                                    "type": "string"
+                                                },
+                                                "links": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "approve": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "href": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        },
+                                                        "comments": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "href": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        },
+                                                        "diff": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "href": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        },
+                                                        "html": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "href": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        },
+                                                        "patch": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "href": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        },
+                                                        "self": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "href": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        },
+                                                        "statuses": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "href": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "message": {
+                                                    "type": "string"
+                                                },
+                                                "parents": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "hash": {
+                                                                "type": "string"
+                                                            },
+                                                            "links": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "html": {
+                                                                        "type": "object",
+                                                                        "properties": {
+                                                                            "href": {
+                                                                                "type": "string"
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "self": {
+                                                                        "type": "object",
+                                                                        "properties": {
+                                                                            "href": {
+                                                                                "type": "string"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "properties": {
+                                                    "type": "object"
+                                                },
+                                                "rendered": {
+                                                    "type": "object"
+                                                },
+                                                "summary": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "html": {
+                                                            "type": "string"
+                                                        },
+                                                        "markup": {
+                                                            "type": "string"
+                                                        },
+                                                        "raw": {
+                                                            "type": "string"
+                                                        },
+                                                        "type": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "type": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "created": {
+                                        "type": "boolean"
+                                    },
+                                    "forced": {
+                                        "type": "boolean"
+                                    },
+                                    "links": {
+                                        "type": "object",
+                                        "properties": {
+                                            "commits": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "href": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "diff": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "href": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "html": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "href": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "new": {
+                                        "type": "object",
+                                        "properties": {
+                                            "default_merge_strategy": {
+                                                "type": "string"
+                                            },
+                                            "links": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "commits": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "href": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    },
+                                                    "html": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "href": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    },
+                                                    "self": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "href": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "merge_strategies": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "target": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "author": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "raw": {
+                                                                "type": "string"
+                                                            },
+                                                            "type": {
+                                                                "type": "string"
+                                                            },
+                                                            "user": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "account_id": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "display_name": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "links": {
+                                                                        "type": "object",
+                                                                        "properties": {
+                                                                            "avatar": {
+                                                                                "type": "object",
+                                                                                "properties": {
+                                                                                    "href": {
+                                                                                        "type": "string"
+                                                                                    }
+                                                                                }
+                                                                            },
+                                                                            "html": {
+                                                                                "type": "object",
+                                                                                "properties": {
+                                                                                    "href": {
+                                                                                        "type": "string"
+                                                                                    }
+                                                                                }
+                                                                            },
+                                                                            "self": {
+                                                                                "type": "object",
+                                                                                "properties": {
+                                                                                    "href": {
+                                                                                        "type": "string"
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "nickname": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "type": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "uuid": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "date": {
+                                                        "type": "string"
+                                                    },
+                                                    "hash": {
+                                                        "type": "string"
+                                                    },
+                                                    "links": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "html": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "href": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "self": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "href": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "message": {
+                                                        "type": "string"
+                                                    },
+                                                    "parents": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "hash": {
+                                                                    "type": "string"
+                                                                },
+                                                                "links": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "html": {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "href": {
+                                                                                    "type": "string"
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        "self": {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "href": {
+                                                                                    "type": "string"
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "type": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "properties": {
+                                                        "type": "object"
+                                                    },
+                                                    "rendered": {
+                                                        "type": "object"
+                                                    },
+                                                    "summary": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "html": {
+                                                                "type": "string"
+                                                            },
+                                                            "markup": {
+                                                                "type": "string"
+                                                            },
+                                                            "raw": {
+                                                                "type": "string"
+                                                            },
+                                                            "type": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "type": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "old": {
+                                        "type": "object",
+                                        "properties": {
+                                            "default_merge_strategy": {
+                                                "type": "string"
+                                            },
+                                            "links": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "commits": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "href": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    },
+                                                    "html": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "href": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    },
+                                                    "self": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "href": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "merge_strategies": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "target": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "author": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "raw": {
+                                                                "type": "string"
+                                                            },
+                                                            "type": {
+                                                                "type": "string"
+                                                            },
+                                                            "user": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "account_id": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "display_name": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "links": {
+                                                                        "type": "object",
+                                                                        "properties": {
+                                                                            "avatar": {
+                                                                                "type": "object",
+                                                                                "properties": {
+                                                                                    "href": {
+                                                                                        "type": "string"
+                                                                                    }
+                                                                                }
+                                                                            },
+                                                                            "html": {
+                                                                                "type": "object",
+                                                                                "properties": {
+                                                                                    "href": {
+                                                                                        "type": "string"
+                                                                                    }
+                                                                                }
+                                                                            },
+                                                                            "self": {
+                                                                                "type": "object",
+                                                                                "properties": {
+                                                                                    "href": {
+                                                                                        "type": "string"
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "nickname": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "type": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "uuid": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "date": {
+                                                        "type": "string"
+                                                    },
+                                                    "hash": {
+                                                        "type": "string"
+                                                    },
+                                                    "links": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "html": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "href": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "self": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "href": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "message": {
+                                                        "type": "string"
+                                                    },
+                                                    "parents": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "hash": {
+                                                                    "type": "string"
+                                                                },
+                                                                "links": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "html": {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "href": {
+                                                                                    "type": "string"
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        "self": {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "href": {
+                                                                                    "type": "string"
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "type": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "properties": {
+                                                        "type": "object"
+                                                    },
+                                                    "rendered": {
+                                                        "type": "object"
+                                                    },
+                                                    "summary": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "html": {
+                                                                "type": "string"
+                                                            },
+                                                            "markup": {
+                                                                "type": "string"
+                                                            },
+                                                            "raw": {
+                                                                "type": "string"
+                                                            },
+                                                            "type": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "type": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "truncated": {
+                                        "type": "boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "repository": {
+                    "type": "object",
+                    "properties": {
+                        "full_name": {
+                            "type": "string"
+                        },
+                        "is_private": {
+                            "type": "boolean"
+                        },
+                        "links": {
+                            "type": "object",
+                            "properties": {
+                                "avatar": {
+                                    "type": "object",
+                                    "properties": {
+                                        "href": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "html": {
+                                    "type": "object",
+                                    "properties": {
+                                        "href": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "self": {
+                                    "type": "object",
+                                    "properties": {
+                                        "href": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "owner": {
+                            "type": "object",
+                            "properties": {
+                                "account_id": {
+                                    "type": "string"
+                                },
+                                "display_name": {
+                                    "type": "string"
+                                },
+                                "links": {
+                                    "type": "object",
+                                    "properties": {
+                                        "avatar": {
+                                            "type": "object",
+                                            "properties": {
+                                                "href": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "html": {
+                                            "type": "object",
+                                            "properties": {
+                                                "href": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "self": {
+                                            "type": "object",
+                                            "properties": {
+                                                "href": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "nickname": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string"
+                                },
+                                "uuid": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "project": {
+                            "type": "object",
+                            "properties": {
+                                "key": {
+                                    "type": "string"
+                                },
+                                "links": {
+                                    "type": "object",
+                                    "properties": {
+                                        "avatar": {
+                                            "type": "object",
+                                            "properties": {
+                                                "href": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "html": {
+                                            "type": "object",
+                                            "properties": {
+                                                "href": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "self": {
+                                            "type": "object",
+                                            "properties": {
+                                                "href": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string"
+                                },
+                                "uuid": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "scm": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "uuid": {
+                            "type": "string"
+                        },
+                        "website": {},
+                        "workspace": {
+                            "type": "object",
+                            "properties": {
+                                "links": {
+                                    "type": "object",
+                                    "properties": {
+                                        "avatar": {
+                                            "type": "object",
+                                            "properties": {
+                                                "href": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "html": {
+                                            "type": "object",
+                                            "properties": {
+                                                "href": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "self": {
+                                            "type": "object",
+                                            "properties": {
+                                                "href": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "slug": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string"
+                                },
+                                "uuid": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "v1.Company": {
             "type": "object",
             "properties": {
@@ -602,7 +1565,7 @@ var doc = `{
                     }
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "ping_url": {
                     "type": "string"

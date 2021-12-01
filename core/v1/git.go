@@ -5,7 +5,7 @@ import "time"
 // GitWebhook contains github web hook data
 type GitWebhook struct {
 	Type   string   `json:"type"`
-	ID     int      `json:"id"`
+	ID     string   `json:"id"`
 	Active bool     `json:"active"`
 	Events []string `json:"events"`
 	Config struct {

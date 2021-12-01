@@ -44,7 +44,7 @@ func (githubService githubService) CreateRepositoryWebhook(username, repositoryN
 		}{
 			URL: config.GithubWebhookConsumingUrl,
 		},
-		Events: []enums.GIT_EVENT{enums.PUSH, enums.DELETE, enums.RELEASE},
+		Events: []enums.GITHUB_EVENT{enums.GITHUB_PUSH_EVENT, enums.GITHUB_DELETE_EVENT, enums.GITHUB_RELEASE_EVENT},
 	}
 	b, err := json.Marshal(body)
 	if err != nil {
@@ -133,8 +133,8 @@ func (githubService githubService) GetDescriptors(repositoryName, username, revi
 		}
 
 		fileAsString := string(data)[:]
-		sepfiles := strings.Split(fileAsString, "---")
-		for _, each := range sepfiles {
+		sepFiles := strings.Split(fileAsString, "---")
+		for _, each := range sepFiles {
 			obj := &unstructured.Unstructured{
 				Object: map[string]interface{}{},
 			}
@@ -164,18 +164,18 @@ func (githubService githubService) GetDirectoryContents(repositoryName, username
 		// send to observer
 		return nil, err
 	}
-	githubDirectorycontents := []v1.GithubDirectoryContent{}
-	err = json.Unmarshal(data, &githubDirectorycontents)
+	var githubDirectoryContents []v1.GithubDirectoryContent
+	err = json.Unmarshal(data, &githubDirectoryContents)
 	if err != nil {
 		log.Println(err.Error())
 		// send to observer
 		return nil, err
 	}
-	var gitDirectorycontents []v1.GitDirectoryContent
-	for _, each := range githubDirectorycontents {
-		gitDirectorycontents = append(gitDirectorycontents, each.GetGitDirectoryContent())
+	var gitDirectoryContents []v1.GitDirectoryContent
+	for _, each := range githubDirectoryContents {
+		gitDirectoryContents = append(gitDirectoryContents, each.GetGitDirectoryContent())
 	}
-	return gitDirectorycontents, nil
+	return gitDirectoryContents, nil
 }
 
 func (githubService githubService) notifyAll(listener v1.Subject) {

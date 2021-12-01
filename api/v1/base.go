@@ -11,6 +11,13 @@ func Router(g *echo.Group) {
 	CompanyRouter(g.Group("/companies"))
 	RepositoryRouter(g.Group("/repositories"))
 	ApplicationRouter(g.Group("/applications"))
+	BitbucketEventRouter(g.Group("/bitbuckets"))
+}
+
+// BitbucketEventRouter api/v1/bitbuckets event router
+func BitbucketEventRouter(g *echo.Group) {
+	bitbucketApi := NewBitbucketApi(dependency.GetV1BitbucketService(), dependency.GetV1CompanyService(), dependency.GetV1ProcessInventoryEventService(), dependency.GetV1Observers())
+	g.POST("", bitbucketApi.ListenEvent)
 }
 
 // GithubEventRouter api/v1/githubs/* router

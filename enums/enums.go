@@ -67,6 +67,18 @@ const (
 	GITHUB_API_BASE_URL = "https://api.github.com/"
 )
 
+// BITBUCKET_URL bitbucket url for different operations
+type BITBUCKET_URL string
+
+const (
+	// BITBUCKET_RAW_CONTENT_BASE_URL bitbucket url for raw content
+	BITBUCKET_RAW_CONTENT_BASE_URL = "https://bitbucket.org/api/2.0/repositories/"
+	// BITBUCKET_BASE_URL bitbucket base url
+	BITBUCKET_BASE_URL = "https://bitbucket.org/"
+	// BITBUCKET_API_BASE_URL bitbucket base url for api access
+	BITBUCKET_API_BASE_URL = "https://api.bitbucket.org/2.0/"
+)
+
 const (
 	// PIPELINE_FILE_NAME pipeline containing file name
 	PIPELINE_FILE_NAME = "pipeline"
@@ -96,14 +108,22 @@ const PIPELINE_FILE_BASE_DIRECTORY = "klovercloud/pipeline"
 // PIPELINE_DESCRIPTORS_BASE_DIRECTORY pipeline descriptors base directory
 const PIPELINE_DESCRIPTORS_BASE_DIRECTORY = "klovercloud/pipeline/configs"
 
-// GIT_EVENT git web hook event options
-type GIT_EVENT string
+// GITHUB_EVENT git web hook event options
+type GITHUB_EVENT string
 
 const (
-	// PUSH git web hook push event option
-	PUSH = GIT_EVENT("push")
-	// RELEASE git web hook release event option
-	RELEASE = GIT_EVENT("release")
-	// DELETE git web hook delete event option
-	DELETE = GIT_EVENT("delete")
+	// GITHUB_PUSH_EVENT git web hook push event option
+	GITHUB_PUSH_EVENT = GITHUB_EVENT("push")
+	// GITHUB_RELEASE_EVENT git web hook release event option
+	GITHUB_RELEASE_EVENT = GITHUB_EVENT("release")
+	// GITHUB_DELETE_EVENT git web hook delete event option
+	GITHUB_DELETE_EVENT = GITHUB_EVENT("delete")
+)
+
+// BITBUCKET_EVENT git web hook event options
+type BITBUCKET_EVENT string
+
+const (
+	// BITBUCKET_PUSH_EVENT git web hook push event option
+	BITBUCKET_PUSH_EVENT = GITHUB_EVENT("push")
 )
