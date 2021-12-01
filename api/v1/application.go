@@ -22,15 +22,15 @@ type applicationApi struct {
 // @Accept json
 // @Produce json
 // @Param data body v1.ApplicationsDto true "ApplicationsDto Data"
-// @Param company_id query string true "company id"
-// @Param repository_Id query string true "repository id"
+// @Param companyId query string true "company id"
+// @Param repositoryId query string true "repository id"
 // @Success 200 {object} common.ResponseDTO
 // @Failure 404 {object} common.ResponseDTO
 // @Router /api/v1/applications [POST]
 func (a applicationApi) Update(context echo.Context) error {
 	var formData v1.ApplicationsDto
-	id := context.QueryParam("company_Id")
-	repoId := context.QueryParam("repository_Id")
+	id := context.QueryParam("companyId")
+	repoId := context.QueryParam("repositoryId")
 	updateOption := context.QueryParam("companyUpdateOption")
 	if err := context.Bind(&formData); err != nil {
 		log.Println("Input Error:", err.Error())

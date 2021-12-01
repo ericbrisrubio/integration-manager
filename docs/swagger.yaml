@@ -1077,12 +1077,12 @@ paths:
             $ref: '#/definitions/v1.ApplicationsDto'
         - description: company id
           in: query
-          name: company_id
+          name: companyId
           required: true
           type: string
         - description: repository id
           in: query
-          name: repository_Id
+          name: repositoryId
           required: true
           type: string
       produces:

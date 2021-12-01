@@ -49,14 +49,14 @@ var doc = `{
                     {
                         "type": "string",
                         "description": "company id",
-                        "name": "company_id",
+                        "name": "companyId",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "repository id",
-                        "name": "repository_Id",
+                        "name": "repositoryId",
                         "in": "query",
                         "required": true
                     }
