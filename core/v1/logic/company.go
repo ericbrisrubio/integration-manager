@@ -6,6 +6,7 @@ import (
 	"github.com/klovercloud-ci-cd/integration-manager/core/v1/repository"
 	"github.com/klovercloud-ci-cd/integration-manager/core/v1/service"
 	"github.com/klovercloud-ci-cd/integration-manager/enums"
+	"k8s.io/apimachinery/pkg/util/yaml"
 	"log"
 	"strings"
 )
@@ -65,7 +66,8 @@ func getUsernameAndRepoNameFromGithubRepositoryUrl(url string) (username string,
 }
 
 func getUsernameAndRepoNameFromBitbucketRepositoryUrl(url string) (username string, repoName string) {
-	urlArray := strings.Split(url, "/")
+	trim := strings.TrimSuffix(url, ".git")
+	urlArray := strings.Split(trim, "/")
 	if len(urlArray) < 3 {
 		return "", ""
 	}
@@ -94,7 +96,14 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 		} else if repo.Type == enums.BIT_BUCKET {
 			for i := range apps {
 				usernameOrOrgName, repoName := getUsernameAndRepoNameFromBitbucketRepositoryUrl(apps[i].Url)
-				bitbucketWebhook, err := NewBitBucketService(c, nil, c.client).CreateRepositoryWebhook(usernameOrOrgName, repoName, repo.Token)
+				b, err := c.client.Get(enums.BITBUCKET_API_BASE_URL+"repositories/"+usernameOrOrgName+"/"+repoName, nil)
+				var repositoryDetails v1.BitbucketRepository
+				err = yaml.Unmarshal(b, &repositoryDetails)
+				if err != nil {
+					log.Println(err.Error())
+					return err
+				}
+				bitbucketWebhook, err := NewBitBucketService(c, nil, c.client).CreateRepositoryWebhook(repositoryDetails.Workspace.Slug, repositoryDetails.Slug, repo.Token)
 				if err != nil {
 					apps[i].Webhook = bitbucketWebhook
 					apps[i].MetaData.IsWebhookEnabled = false
