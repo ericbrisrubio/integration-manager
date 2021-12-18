@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/klovercloud-ci-cd/integration-manager/api/common"
+	"github.com/klovercloud-ci-cd/integration-manager/config"
 	v1 "github.com/klovercloud-ci-cd/integration-manager/core/v1"
 	"github.com/klovercloud-ci-cd/integration-manager/core/v1/api"
 	"github.com/klovercloud-ci-cd/integration-manager/core/v1/service"
@@ -58,6 +59,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		if step.Type == enums.BUILD && step.Params[enums.REVISION] != "" {
 			branch := strings.Split(resource.Ref, "/")[2]
 			if step.Params[enums.REVISION] != branch {
+				log.Println("[Forbidden]: Branch wasn't matched!")
 				return common.GenerateForbiddenResponse(context, "[Forbidden]: Branch wasn't matched!", "Operation Failed!")
 			}
 		}
@@ -66,11 +68,15 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		for i := range data.Steps {
 			if data.Steps[i].Type == enums.BUILD {
 				if images, ok := data.Steps[i].Params["images"]; ok {
+					imageRevision:=revision
+					if data.Steps[i].Params[enums.REVISION]!="" {
+						imageRevision=data.Steps[i].Params[enums.REVISION]
+					}
 					images := strings.Split(images, ",")
 					for i, image := range images {
 						strs := strings.Split(image, ":")
 						if len(strs) == 1 {
-							images[i] = images[i] + ":" + revision
+							images[i] = images[i] + ":" + imageRevision
 						}
 					}
 					data.Steps[i].Params["images"] = strings.Join(images, ",")
@@ -96,6 +102,21 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 						data.Steps[i].Descriptors = &contentsData
 					}
 				}
+			}else if data.Steps[i].Type == enums.INTERMEDIARY {
+				if images, ok := data.Steps[i].Params["images"]; ok {
+					images := strings.Split(images, ",")
+					imageRevision:=revision
+					if data.Steps[i].Params[enums.REVISION]!="" {
+						imageRevision=data.Steps[i].Params[enums.REVISION]
+					}
+					for i, image := range images {
+						strs := strings.Split(image, ":")
+						if len(strs) == 1 {
+							images[i] = images[i] + ":" + imageRevision
+						}
+					}
+					data.Steps[i].Params["images"] = strings.Join(images, ",")
+				}
 			}
 		}
 	}
@@ -109,7 +130,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 	}
 	subject := v1.Subject{
 		Log:                   "Pipeline triggered",
-		CoreRequestQueryParam: map[string]string{"url": resource.Repository.URL, "revision": revision, "purging": "ENABLE"},
+		CoreRequestQueryParam: map[string]string{"url": resource.Repository.URL, "revision": revision, "purging": config.PipelinePurging},
 		EventData:             map[string]interface{}{},
 		Pipeline:              *data,
 		App: struct {

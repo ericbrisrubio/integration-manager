@@ -49,10 +49,12 @@ const (
 type STEP_TYPE string
 
 const (
-	// BUILD build step
+	// BUILD step that builds image from source code
 	BUILD = STEP_TYPE("BUILD")
-	// DEPLOY deploy step
+	// DEPLOY step that deploys workloads and others to cluster
 	DEPLOY = STEP_TYPE("DEPLOY")
+	// INTERMEDIARY step that runs custom jobs
+	INTERMEDIARY=STEP_TYPE("INTERMEDIARY")
 )
 
 // GITHUB_URL gitbhub url for different operations
