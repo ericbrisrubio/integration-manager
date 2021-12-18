@@ -60,6 +60,9 @@ var GithubWebhookConsumingUrl string
 // BitbucketWebhookConsumingUrl refers to github web hook consuming url.
 var BitbucketWebhookConsumingUrl string
 
+// PipelinePurging refers to k8s resource purging policy.
+var PipelinePurging string
+
 // InitEnvironmentVariables initializes environment variables
 func InitEnvironmentVariables() {
 	err := godotenv.Load()
@@ -100,4 +103,5 @@ func InitEnvironmentVariables() {
 	}
 	GithubWebhookConsumingUrl = os.Getenv("GITHUB_WEBHOOK_CONSUMING_URL")
 	BitbucketWebhookConsumingUrl = os.Getenv("BITBUCKET_WEBHOOK_CONSUMING_URL")
+	PipelinePurging =os.Getenv("PIPELINE_PURGING")
 }
