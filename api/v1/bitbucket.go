@@ -10,6 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/twinj/uuid"
 	"log"
+	"strings"
 )
 
 type v1BitbucketApi struct {
@@ -68,6 +69,37 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 					if contentsData != nil {
 						data.Steps[i].Descriptors = &contentsData
 					}
+				}
+			} else if data.Steps[i].Type == enums.BUILD {
+				if images, ok := data.Steps[i].Params["images"]; ok {
+					imageRevision := revision
+					if data.Steps[i].Params[enums.REVISION] != "" {
+						imageRevision = data.Steps[i].Params[enums.REVISION]
+					}
+					images := strings.Split(images, ",")
+					for i, image := range images {
+						strs := strings.Split(image, ":")
+						if len(strs) == 1 {
+							images[i] = images[i] + ":" + imageRevision
+						}
+					}
+					data.Steps[i].Params["images"] = strings.Join(images, ",")
+				}
+
+			} else if data.Steps[i].Type == enums.INTERMEDIARY {
+				if images, ok := data.Steps[i].Params["images"]; ok {
+					images := strings.Split(images, ",")
+					imageRevision := revision
+					if data.Steps[i].Params[enums.REVISION] != "" {
+						imageRevision = data.Steps[i].Params[enums.REVISION]
+					}
+					for i, image := range images {
+						strs := strings.Split(image, ":")
+						if len(strs) == 1 {
+							images[i] = images[i] + ":" + imageRevision
+						}
+					}
+					data.Steps[i].Params["images"] = strings.Join(images, ",")
 				}
 			}
 		}
