@@ -458,40 +458,53 @@ type BitbucketWebHookEvent struct {
 
 // BitbucketDirectoryContent contains bitbucket directory data
 type BitbucketDirectoryContent struct {
-	Links struct {
-		Self struct {
-			Href string `json:"href"`
-		} `json:"self"`
-		Meta struct {
-			Href string `json:"href"`
-		} `json:"meta"`
-	} `json:"links"`
-	Path   string `json:"path"`
-	Commit struct {
-		Type  string `json:"type"`
-		Hash  string `json:"hash"`
-		Links struct {
+	Pagelen int `json:"pagelen"`
+	Values  []struct {
+		Path   string `json:"path"`
+		Type   string `json:"type"`
+		Commit struct {
+			Type  string `json:"type"`
+			Hash  string `json:"hash"`
+			Links struct {
+				Self struct {
+					Href string `json:"href"`
+				} `json:"self"`
+				HTML struct {
+					Href string `json:"href"`
+				} `json:"html"`
+			} `json:"links"`
+		} `json:"commit"`
+		Mimetype interface{} `json:"mimetype,omitempty"`
+		Links    struct {
 			Self struct {
 				Href string `json:"href"`
 			} `json:"self"`
-			HTML struct {
+			Meta struct {
 				Href string `json:"href"`
-			} `json:"html"`
-		} `json:"links"`
-	} `json:"commit"`
-	Attributes []interface{} `json:"attributes"`
-	Type       string        `json:"type"`
-	Size       int           `json:"size"`
+			} `json:"meta"`
+			History struct {
+				Href string `json:"href"`
+			} `json:"history"`
+		} `json:"links,omitempty"`
+		EscapedPath string        `json:"escaped_path,omitempty"`
+		Attributes  []interface{} `json:"attributes,omitempty"`
+		Size        int           `json:"size,omitempty"`
+	} `json:"values"`
+	Page int `json:"page"`
 }
 
 // GetGitDirectoryContent converts BitbucketDirectoryContent object to GitDirectoryContent object
 func (directoryContent BitbucketDirectoryContent) GetGitDirectoryContent() GitDirectoryContent {
-	return GitDirectoryContent{
-		Path:        directoryContent.Path,
-		Type:        directoryContent.Type,
-		Size:        directoryContent.Size,
-		DownloadURL: directoryContent.Links.Self.Href,
+	gitDirectoryContent := GitDirectoryContent{
+		Path:        directoryContent.Values[0].Links.Self.Href,
+		Size:        directoryContent.Values[0].Size,
+		DownloadURL: directoryContent.Values[0].Links.Self.Href,
 	}
+
+	if directoryContent.Values[0].Type == "commit_file" {
+		gitDirectoryContent.Type = "file"
+	}
+	return gitDirectoryContent
 }
 
 // BitbucketCreateWebhookRequest contains bitbucket web hook creation data

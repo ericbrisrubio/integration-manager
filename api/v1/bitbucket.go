@@ -37,7 +37,7 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 		return common.GenerateErrorResponse(context, err.Error(), "Operation Failed!")
 	}
 	repoName := resource.Repository.Name
-	owner := resource.Actor.DisplayName
+	owner := resource.Repository.Workspace.Slug
 	revision := resource.Push.Changes[len(resource.Push.Changes)-1].New.Target.Hash
 	companyId := resource.Repository.Owner.DisplayName
 	repository := b.companyService.GetRepositoryByCompanyIdAndApplicationUrl(companyId, resource.Repository.Links.HTML.Href)
