@@ -112,7 +112,7 @@ func (b bitbucketService) GetDirectoryContents(repositoryName, username, revisio
 		path = strings.TrimPrefix(path, "/")
 	}
 	base64ConvertedToken := base64.StdEncoding.EncodeToString([]byte(username + ":" + token))
-	url := enums.BITBUCKET_API_BASE_URL + "repositories/" + username + "/" + repositoryName + "/src/" + revision + "/" + path + "?pagelen=100"
+	url := enums.BITBUCKET_API_BASE_URL + "repositories/" + username + "/" + repositoryName + "/src/" + revision + "/" + path + "?pagelen=10"
 	log.Println(url)
 	header := make(map[string]string)
 	header["Authorization"] = "Basic " + base64ConvertedToken

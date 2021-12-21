@@ -14,9 +14,19 @@ func GetV1GithubService() service.Git {
 	return logic.NewGithubService(GetV1CompanyService(), nil, logic.NewHttpClientService())
 }
 
+// GetMockV1GithubService returns Git service
+func GetMockV1GithubService() service.Git {
+	return logic.NewGithubService(GetV1MockCompanyService(), nil, logic.NewHttpClientService())
+}
+
 // GetV1BitbucketService returns Git service
 func GetV1BitbucketService() service.Git {
 	return logic.NewBitBucketService(GetV1CompanyService(), nil, logic.NewHttpClientService())
+}
+
+// GetV1MockBitbucketService returns Git service
+func GetV1MockBitbucketService() service.Git {
+	return logic.NewBitBucketMockService(GetV1MockCompanyService(), nil, logic.NewHttpClientService())
 }
 
 // GetV1Observers returns Observer services
@@ -37,6 +47,13 @@ func GetV1CompanyService() service.Company {
 	} else {
 		company = logic.NewCompanyService(inmemory.NewCompanyRepository(3000), logic.NewHttpClientService())
 	}
+	return company
+}
+
+// GetV1MockCompanyService returns Company service
+func GetV1MockCompanyService() service.Company {
+	var company service.Company
+	company = logic.NewMockCompanyService(inmemory.NewCompanyRepository(3000), logic.NewHttpClientService())
 	return company
 }
 

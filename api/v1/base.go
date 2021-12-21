@@ -1,7 +1,10 @@
 package v1
 
 import (
+	"github.com/klovercloud-ci-cd/integration-manager/config"
+	"github.com/klovercloud-ci-cd/integration-manager/core/v1/api"
 	"github.com/klovercloud-ci-cd/integration-manager/dependency"
+	"github.com/klovercloud-ci-cd/integration-manager/enums"
 	"github.com/labstack/echo/v4"
 )
 
@@ -16,7 +19,13 @@ func Router(g *echo.Group) {
 
 // BitbucketEventRouter api/v1/bitbuckets event router
 func BitbucketEventRouter(g *echo.Group) {
-	bitbucketApi := NewBitbucketApi(dependency.GetV1BitbucketService(), dependency.GetV1CompanyService(), dependency.GetV1ProcessInventoryEventService(), dependency.GetV1Observers())
+	var bitbucketApi api.Git
+
+	if config.Environment == string(enums.PRODUCTION) {
+		bitbucketApi = NewBitbucketApi(dependency.GetV1BitbucketService(), dependency.GetV1CompanyService(), dependency.GetV1ProcessInventoryEventService(), dependency.GetV1Observers())
+	} else {
+		bitbucketApi = NewBitbucketApi(dependency.GetV1MockBitbucketService(), dependency.GetV1MockCompanyService(), dependency.GetV1ProcessInventoryEventService(), dependency.GetV1Observers())
+	}
 	g.POST("", bitbucketApi.ListenEvent)
 }
 
