@@ -1,5 +1,16 @@
 package enums
 
+// ENVIRONMENT run environment
+type ENVIRONMENT string
+
+const (
+	// PRODUCTION mongo as db
+	PRODUCTION = ENVIRONMENT("PRODUCTION")
+	// INMEMORY in memory storage as db
+	DEV  = ENVIRONMENT("DEV")
+	TEST = ENVIRONMENT("TEST")
+)
+
 const (
 	// MONGO mongo as db
 	MONGO = "MONGO"
@@ -54,7 +65,7 @@ const (
 	// DEPLOY step that deploys workloads and others to cluster
 	DEPLOY = STEP_TYPE("DEPLOY")
 	// INTERMEDIARY step that runs custom jobs
-	INTERMEDIARY=STEP_TYPE("INTERMEDIARY")
+	INTERMEDIARY = STEP_TYPE("INTERMEDIARY")
 )
 
 // GITHUB_URL gitbhub url for different operations

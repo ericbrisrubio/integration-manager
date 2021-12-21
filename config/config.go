@@ -62,6 +62,7 @@ var BitbucketWebhookConsumingUrl string
 
 // PipelinePurging refers to k8s resource purging policy.
 var PipelinePurging string
+var Environment string
 
 // InitEnvironmentVariables initializes environment variables
 func InitEnvironmentVariables() {
@@ -77,6 +78,7 @@ func InitEnvironmentVariables() {
 	DbPassword = os.Getenv("MONGO_PASSWORD")
 	DatabaseName = os.Getenv("DATABASE_NAME")
 	EventStoreUrl = os.Getenv("EVENT_STORE_URL")
+	Environment = os.Getenv("ENVIRONMENT")
 	Database = os.Getenv("DATABASE")
 	if Database == enums.MONGO {
 		DatabaseConnectionString = "mongodb://" + DbUsername + ":" + DbPassword + "@" + DbServer + ":" + DbPort
@@ -103,5 +105,5 @@ func InitEnvironmentVariables() {
 	}
 	GithubWebhookConsumingUrl = os.Getenv("GITHUB_WEBHOOK_CONSUMING_URL")
 	BitbucketWebhookConsumingUrl = os.Getenv("BITBUCKET_WEBHOOK_CONSUMING_URL")
-	PipelinePurging =os.Getenv("PIPELINE_PURGING")
+	PipelinePurging = os.Getenv("PIPELINE_PURGING")
 }
