@@ -29,12 +29,12 @@ func (b bitbucketService) GetPipeline(repositoryName, username, revision, token 
 	for _, each := range contents {
 		split := strings.Split(each.Path, "/")
 		if split[len(split)-1] == enums.PIPELINE_FILE_NAME+".yaml" || split[len(split)-1] == enums.PIPELINE_FILE_NAME+".yml" || split[len(split)-1] == enums.PIPELINE_FILE_NAME+".json" {
-			pipelneFile = each.Name
+			pipelneFile = split[len(split)-1]
 			break
 		}
 	}
 	//raw_file_content:-https://api.bitbucket.org/2.0/repositories/shahidul34/abc/src/0e6724ff42018ae42ce0ae3b85f131bf7b10196e/README.md
-	url := enums.BITBUCKET_API_BASE_URL + "/repositories/" + username + "/" + repositoryName + "/src/" + revision + "/" + pipelneFile
+	url := enums.BITBUCKET_API_BASE_URL + "repositories/" + username + "/" + repositoryName + "/src/" + revision + "/" + "klovercloud/pipeline/" + pipelneFile
 	base64ConvertedToken := base64.StdEncoding.EncodeToString([]byte(username + ":" + token))
 	header := make(map[string]string)
 	header["Authorization"] = "Basic " + base64ConvertedToken
@@ -112,7 +112,8 @@ func (b bitbucketService) GetDirectoryContents(repositoryName, username, revisio
 		path = strings.TrimPrefix(path, "/")
 	}
 	base64ConvertedToken := base64.StdEncoding.EncodeToString([]byte(username + ":" + token))
-	url := enums.BITBUCKET_API_BASE_URL + "repositories/" + username + "/" + repositoryName + "/src/" + revision + "/" + path
+	url := enums.BITBUCKET_API_BASE_URL + "repositories/" + username + "/" + repositoryName + "/src/" + revision + "/" + path + "?pagelen=10"
+	log.Println(url)
 	header := make(map[string]string)
 	header["Authorization"] = "Basic " + base64ConvertedToken
 	header["Content-Type"] = "application/json"
@@ -121,7 +122,7 @@ func (b bitbucketService) GetDirectoryContents(repositoryName, username, revisio
 		// send to observer
 		return nil, err
 	}
-	var bitBucketDirectoryContents []v1.BitbucketDirectoryContent
+	var bitBucketDirectoryContents v1.BitbucketDirectoryContent
 	err = json.Unmarshal(data, &bitBucketDirectoryContents)
 	if err != nil {
 		log.Println(err.Error())
@@ -129,8 +130,10 @@ func (b bitbucketService) GetDirectoryContents(repositoryName, username, revisio
 		return nil, err
 	}
 	var gitDirectoryContents []v1.GitDirectoryContent
-	for _, each := range bitBucketDirectoryContents {
-		gitDirectoryContents = append(gitDirectoryContents, each.GetGitDirectoryContent())
+	for _, each := range bitBucketDirectoryContents.Values {
+		gitDirectoryContent := v1.BitbucketDirectoryContent{}
+		gitDirectoryContent.Values = append(gitDirectoryContent.Values, each)
+		gitDirectoryContents = append(gitDirectoryContents, gitDirectoryContent.GetGitDirectoryContent())
 	}
 	return gitDirectoryContents, nil
 }
