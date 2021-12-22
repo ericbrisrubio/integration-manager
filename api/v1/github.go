@@ -41,7 +41,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 	revision := resource.After
 	companyId := ""
 	if resource.Repository.Owner.Type == "Organization" {
-		companyId = resource.Repository.Name
+		companyId = resource.Repository.Owner.Name
 	} else {
 		companyId = resource.Repository.Owner.Email
 	}
@@ -68,9 +68,9 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		for i := range data.Steps {
 			if data.Steps[i].Type == enums.BUILD {
 				if images, ok := data.Steps[i].Params["images"]; ok {
-					imageRevision:=revision
-					if data.Steps[i].Params[enums.REVISION]!="" {
-						imageRevision=data.Steps[i].Params[enums.REVISION]
+					imageRevision := revision
+					if data.Steps[i].Params[enums.REVISION] != "" {
+						imageRevision = data.Steps[i].Params[enums.REVISION]
 					}
 					images := strings.Split(images, ",")
 					for i, image := range images {
@@ -102,12 +102,12 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 						data.Steps[i].Descriptors = &contentsData
 					}
 				}
-			}else if data.Steps[i].Type == enums.INTERMEDIARY {
+			} else if data.Steps[i].Type == enums.INTERMEDIARY {
 				if images, ok := data.Steps[i].Params["images"]; ok {
 					images := strings.Split(images, ",")
-					imageRevision:=revision
-					if data.Steps[i].Params[enums.REVISION]!="" {
-						imageRevision=data.Steps[i].Params[enums.REVISION]
+					imageRevision := revision
+					if data.Steps[i].Params[enums.REVISION] != "" {
+						imageRevision = data.Steps[i].Params[enums.REVISION]
 					}
 					for i, image := range images {
 						strs := strings.Split(image, ":")

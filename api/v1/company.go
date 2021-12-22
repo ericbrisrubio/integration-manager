@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"errors"
 	guuid "github.com/google/uuid"
 	"github.com/klovercloud-ci-cd/integration-manager/api/common"
 	"github.com/klovercloud-ci-cd/integration-manager/config"
@@ -38,7 +37,7 @@ func (c companyApi) UpdateRepositories(context echo.Context) error {
 	}
 	id := context.Param("id")
 	if id == "" {
-		return errors.New("Id required!")
+		return common.GenerateErrorResponse(context, nil, "Company Id is required!")
 	}
 	var payload []v1.Repository
 	payload = formData.Repositories
@@ -119,7 +118,7 @@ func (c companyApi) Save(context echo.Context) error {
 func (c companyApi) GetById(context echo.Context) error {
 	id := context.Param("id")
 	if id == "" {
-		return errors.New("Id required!")
+		return common.GenerateErrorResponse(context, nil, "Company Id is required!")
 	}
 	option := getQueryOption(context)
 
@@ -139,7 +138,7 @@ func (c companyApi) GetById(context echo.Context) error {
 func (c companyApi) GetRepositoriesById(context echo.Context) error {
 	id := context.Param("id")
 	if id == "" {
-		return errors.New("Id required!")
+		return common.GenerateErrorResponse(context, nil, "Company Id is required!")
 	}
 	option := getQueryOption(context)
 	data, total := c.companyService.GetRepositoriesByCompanyId(id, option)

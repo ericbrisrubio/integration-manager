@@ -26,7 +26,7 @@ type repositoryApi struct {
 func (r repositoryApi) GetById(context echo.Context) error {
 	id := context.Param("id")
 	if id == "" {
-		return errors.New("Id required!")
+		return errors.New("repository id is required")
 	}
 	data := r.companyService.GetRepositoryByRepositoryId(id)
 	return common.GenerateSuccessResponse(context, data, nil, "Success!")
@@ -43,7 +43,7 @@ func (r repositoryApi) GetById(context echo.Context) error {
 func (r repositoryApi) GetApplicationsById(context echo.Context) error {
 	id := context.Param("id")
 	if id == "" {
-		return errors.New("Id required!")
+		return errors.New("company id is required")
 	}
 	option := getQueryOption(context)
 	data, total := r.companyService.GetApplicationsByCompanyId(id, option)
