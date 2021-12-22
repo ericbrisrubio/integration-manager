@@ -30,7 +30,17 @@ type applicationApi struct {
 func (a applicationApi) Update(context echo.Context) error {
 	var formData v1.ApplicationsDto
 	id := context.QueryParam("companyId")
+	if id == "" {
+		return context.JSON(404, common.ResponseDTO{
+			Message: "company id is required",
+		})
+	}
 	repoId := context.QueryParam("repositoryId")
+	if repoId == "" {
+		return context.JSON(404, common.ResponseDTO{
+			Message: "repository id is required",
+		})
+	}
 	updateOption := context.QueryParam("companyUpdateOption")
 	if err := context.Bind(&formData); err != nil {
 		log.Println("Input Error:", err.Error())

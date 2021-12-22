@@ -31,7 +31,12 @@ func BitbucketEventRouter(g *echo.Group) {
 
 // GithubEventRouter api/v1/githubs/* router
 func GithubEventRouter(g *echo.Group) {
-	githubApi := NewGithubApi(dependency.GetV1GithubService(), dependency.GetV1CompanyService(), dependency.GetV1ProcessInventoryEventService(), dependency.GetV1Observers())
+	var githubApi api.Git
+	if config.Environment == string(enums.PRODUCTION) {
+		githubApi = NewGithubApi(dependency.GetV1GithubService(), dependency.GetV1CompanyService(), dependency.GetV1ProcessInventoryEventService(), dependency.GetV1Observers())
+	} else {
+		githubApi = NewGithubApi(dependency.GetV1MockGithubService(), dependency.GetV1MockCompanyService(), dependency.GetV1ProcessInventoryEventService(), dependency.GetV1Observers())
+	}
 	g.POST("", githubApi.ListenEvent)
 }
 
