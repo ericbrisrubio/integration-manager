@@ -9,8 +9,8 @@ import (
 	"github.com/klovercloud-ci-cd/integration-manager/enums"
 	"github.com/labstack/echo/v4"
 	"github.com/twinj/uuid"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"log"
-	"strings"
 )
 
 type v1BitbucketApi struct {
@@ -60,46 +60,23 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 	}
 	if data != nil {
 		for i := range data.Steps {
-			if data.Steps[i].Type == enums.DEPLOY {
-				if val, ok := data.Steps[i].Params["env"]; ok {
-					contentsData, err := b.gitService.GetDescriptors(repoName, owner, revision, repository.Token, enums.PIPELINE_DESCRIPTORS_BASE_DIRECTORY+"/", val)
-					if err != nil {
-						return common.GenerateErrorResponse(context, err.Error(), "Failed to trigger pipeline process!")
-					}
-					if contentsData != nil {
-						data.Steps[i].Descriptors = &contentsData
-					}
-				}
-			} else if data.Steps[i].Type == enums.BUILD {
+			if data.Steps[i].Type == enums.BUILD {
 				if images, ok := data.Steps[i].Params["images"]; ok {
-					imageRevision := revision
-					if data.Steps[i].Params[enums.REVISION] != "" {
-						imageRevision = data.Steps[i].Params[enums.REVISION]
-					}
-					images := strings.Split(images, ",")
-					for i, image := range images {
-						strs := strings.Split(image, ":")
-						if len(strs) == 1 {
-							images[i] = images[i] + ":" + imageRevision
-						}
-					}
-					data.Steps[i].Params["images"] = strings.Join(images, ",")
+					data.Steps[i].Params["images"] = setImageVersionForBuild(data.Steps[i], revision, images)
+				}
+
+			} else if data.Steps[i].Type == enums.DEPLOY {
+				data.Steps[i].Params["images"] = setDeploymentVersion(data.Steps[i], revision)
+				descriptor := b.setDescriptors(data.Steps[i], repoName, owner, revision, repository.Token)
+				if descriptor != nil {
+					data.Steps[i].Descriptors = descriptor
+				} else {
+					return common.GenerateErrorResponse(context, err.Error(), "Failed to trigger pipeline process!")
 				}
 
 			} else if data.Steps[i].Type == enums.INTERMEDIARY {
 				if images, ok := data.Steps[i].Params["images"]; ok {
-					images := strings.Split(images, ",")
-					imageRevision := revision
-					if data.Steps[i].Params[enums.REVISION] != "" {
-						imageRevision = data.Steps[i].Params[enums.REVISION]
-					}
-					for i, image := range images {
-						strs := strings.Split(image, ":")
-						if len(strs) == 1 {
-							images[i] = images[i] + ":" + imageRevision
-						}
-					}
-					data.Steps[i].Params["images"] = strings.Join(images, ",")
+					data.Steps[i].Params["images"] = setImageVersionForIntermediary(data.Steps[i], revision, images)
 				}
 			}
 		}
@@ -140,6 +117,20 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 	return common.GenerateSuccessResponse(context, data.ProcessId, nil, "Pipeline triggered!")
 }
 
+// setDescriptors returns descriptors for deployment
+func (b v1BitbucketApi) setDescriptors(step v1.Step, repoName string, owner string, revision string, token string) *[]unstructured.Unstructured {
+	var descriptor *[]unstructured.Unstructured
+	if val, ok := step.Params["env"]; ok {
+		contentsData, err := b.gitService.GetDescriptors(repoName, owner, revision, token, enums.PIPELINE_DESCRIPTORS_BASE_DIRECTORY+"/", val)
+		if err != nil {
+			return nil
+		}
+		if contentsData != nil {
+			descriptor = &contentsData
+		}
+	}
+	return descriptor
+}
 func (b v1BitbucketApi) notifyAll(listener v1.Subject) {
 	for _, observer := range b.observerList {
 		go observer.Listen(listener)

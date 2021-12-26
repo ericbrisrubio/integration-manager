@@ -9,6 +9,7 @@ import (
 	"github.com/klovercloud-ci-cd/integration-manager/enums"
 	"github.com/labstack/echo/v4"
 	"github.com/twinj/uuid"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"log"
 	"strings"
 )
@@ -55,67 +56,29 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		log.Println("[ERROR]:Failed to trigger pipeline process! ", err.Error())
 		return common.GenerateErrorResponse(context, err.Error(), "Failed to trigger pipeline process!")
 	}
-	for _, step := range data.Steps {
-		if step.Type == enums.BUILD && step.Params[enums.REVISION] != "" {
-			branch := strings.Split(resource.Ref, "/")[2]
-			if step.Params[enums.REVISION] != branch {
-				log.Println("[Forbidden]: Branch wasn't matched!")
-				return common.GenerateForbiddenResponse(context, "[Forbidden]: Branch wasn't matched!", "Operation Failed!")
-			}
-		}
+	checkingFlag := branchExists(data.Steps, resource)
+	if !checkingFlag {
+		return common.GenerateErrorResponse(context, "Branch does not exist!", "Operation Failed!")
 	}
 	if data != nil {
 		for i := range data.Steps {
 			if data.Steps[i].Type == enums.BUILD {
 				if images, ok := data.Steps[i].Params["images"]; ok {
-					imageRevision := revision
-					if data.Steps[i].Params[enums.REVISION] != "" {
-						imageRevision = data.Steps[i].Params[enums.REVISION]
-					}
-					images := strings.Split(images, ",")
-					for i, image := range images {
-						strs := strings.Split(image, ":")
-						if len(strs) == 1 {
-							images[i] = images[i] + ":" + imageRevision
-						}
-					}
-					data.Steps[i].Params["images"] = strings.Join(images, ",")
+					data.Steps[i].Params["images"] = setImageVersionForBuild(data.Steps[i], revision, images)
 				}
 
 			} else if data.Steps[i].Type == enums.DEPLOY {
-				if images, ok := data.Steps[i].Params["images"]; ok {
-					images := strings.Split(images, ",")
-					for i, image := range images {
-						strs := strings.Split(image, ":")
-						if len(strs) == 1 {
-							images[i] = images[i] + ":" + revision
-						}
-					}
-					data.Steps[i].Params["images"] = strings.Join(images, ",")
+				data.Steps[i].Params["images"] = setDeploymentVersion(data.Steps[i], revision)
+				descriptor := g.setDescriptors(data.Steps[i], repoName, owner, revision, repository.Token)
+				if descriptor != nil {
+					data.Steps[i].Descriptors = descriptor
+				} else {
+					return common.GenerateErrorResponse(context, err.Error(), "Failed to trigger pipeline process!")
 				}
-				if val, ok := data.Steps[i].Params["env"]; ok {
-					contentsData, err := g.gitService.GetDescriptors(repoName, owner, revision, repository.Token, enums.PIPELINE_DESCRIPTORS_BASE_DIRECTORY+"/", val)
-					if err != nil {
-						return common.GenerateErrorResponse(context, err.Error(), "Failed to trigger pipeline process!")
-					}
-					if contentsData != nil {
-						data.Steps[i].Descriptors = &contentsData
-					}
-				}
+
 			} else if data.Steps[i].Type == enums.INTERMEDIARY {
 				if images, ok := data.Steps[i].Params["images"]; ok {
-					images := strings.Split(images, ",")
-					imageRevision := revision
-					if data.Steps[i].Params[enums.REVISION] != "" {
-						imageRevision = data.Steps[i].Params[enums.REVISION]
-					}
-					for i, image := range images {
-						strs := strings.Split(image, ":")
-						if len(strs) == 1 {
-							images[i] = images[i] + ":" + imageRevision
-						}
-					}
-					data.Steps[i].Params["images"] = strings.Join(images, ",")
+					data.Steps[i].Params["images"] = setImageVersionForIntermediary(data.Steps[i], revision, images)
 				}
 			}
 		}
@@ -154,6 +117,83 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 
 	go g.notifyAll(subject)
 	return common.GenerateSuccessResponse(context, data.ProcessId, nil, "Pipeline triggered!")
+}
+
+// setImageVersionForBuild returns image version for build step
+func setImageVersionForBuild(step v1.Step, revision string, images string) string {
+	imageRevision := revision
+	if step.Params[enums.REVISION] != "" {
+		imageRevision = step.Params[enums.REVISION]
+	}
+	listOfImages := strings.Split(images, ",")
+	for i, image := range listOfImages {
+		strs := strings.Split(image, ":")
+		if len(strs) == 1 {
+			listOfImages[i] = listOfImages[i] + ":" + imageRevision
+		}
+	}
+	return strings.Join(listOfImages, ",")
+}
+
+// setImageVersionForIntermediary returns image version for Intermediary step
+func setImageVersionForIntermediary(step v1.Step, revision string, img string) string {
+	images := strings.Split(img, ",")
+	imageRevision := revision
+	if step.Params[enums.REVISION] != "" {
+		imageRevision = step.Params[enums.REVISION]
+	}
+	for i, image := range images {
+		strs := strings.Split(image, ":")
+		if len(strs) == 1 {
+			images[i] = images[i] + ":" + imageRevision
+		}
+	}
+	return strings.Join(images, ",")
+}
+
+// branchExists returns boolean for branch existence
+func branchExists(steps []v1.Step, resource *v1.GithubWebHookEvent) bool {
+	for _, step := range steps {
+		if step.Type == enums.BUILD && step.Params[enums.REVISION] != "" {
+			branch := strings.Split(resource.Ref, "/")[2]
+			if step.Params[enums.REVISION] != branch {
+				log.Println("[Forbidden]: Branch wasn't matched!")
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// setDeploymentVersion returns image version for deployment
+func setDeploymentVersion(step v1.Step, revision string) string {
+	var deploymentVersion string
+	if images, ok := step.Params["images"]; ok {
+		images := strings.Split(images, ",")
+		for i, image := range images {
+			strs := strings.Split(image, ":")
+			if len(strs) == 1 {
+				images[i] = images[i] + ":" + revision
+			}
+		}
+		deploymentVersion = strings.Join(images, ",")
+	}
+	return deploymentVersion
+}
+
+// setDescriptors returns descriptors for deployment
+func (g v1GithubApi) setDescriptors(step v1.Step, repoName string, owner string, revision string, token string) *[]unstructured.Unstructured {
+	var descriptor *[]unstructured.Unstructured
+	if val, ok := step.Params["env"]; ok {
+		contentsData, err := g.gitService.GetDescriptors(repoName, owner, revision, token, enums.PIPELINE_DESCRIPTORS_BASE_DIRECTORY+"/", val)
+		if err != nil {
+			return nil
+		}
+		if contentsData != nil {
+			descriptor = &contentsData
+		}
+	}
+	return descriptor
 }
 func (g v1GithubApi) notifyAll(listener v1.Subject) {
 	for _, observer := range g.observerList {
