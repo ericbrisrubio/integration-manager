@@ -29,6 +29,11 @@ func GetV1MockBitbucketService() service.Git {
 	return logic.NewBitBucketMockService(GetV1MockCompanyService(), nil, logic.NewHttpClientService())
 }
 
+// GetV1MockGithubService returns Git service
+func GetV1MockGithubService() service.Git {
+	return logic.NewGithubMockService(GetV1MockCompanyService(), nil, logic.NewHttpClientService())
+}
+
 // GetV1Observers returns Observer services
 func GetV1Observers() []service.Observer {
 	var observers []service.Observer
