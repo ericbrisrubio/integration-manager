@@ -84,7 +84,8 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 		if repo.Type == enums.GITHUB {
 			for i := range apps {
 				usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
-				gitWebhook, err := NewGithubService(c, nil, c.client).CreateRepositoryWebhook(usernameOrorgName, repoName, repo.Token)
+				companyId = uuid.New().String()
+				gitWebhook, err := NewGithubService(c, nil, c.client).CreateRepositoryWebhook(usernameOrorgName, repoName, repo.Token, companyId)
 				if err != nil {
 					apps[i].Webhook = gitWebhook
 					apps[i].MetaData.IsWebhookEnabled = false
@@ -103,7 +104,8 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 					log.Println(err.Error())
 					return err
 				}
-				bitbucketWebhook, err := NewBitBucketService(c, nil, c.client).CreateRepositoryWebhook(repositoryDetails.Workspace.Slug, repositoryDetails.Slug, repo.Token)
+				companyId = uuid.New().String()
+				bitbucketWebhook, err := NewBitBucketService(c, nil, c.client).CreateRepositoryWebhook(repositoryDetails.Workspace.Slug, repositoryDetails.Slug, repo.Token, companyId)
 				if err != nil {
 					apps[i].Webhook = bitbucketWebhook
 					apps[i].MetaData.IsWebhookEnabled = false
