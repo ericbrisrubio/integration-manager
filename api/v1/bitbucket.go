@@ -36,10 +36,13 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 		log.Println(err.Error())
 		return common.GenerateErrorResponse(context, err.Error(), "Operation Failed!")
 	}
+	companyId :=context.QueryParam("companyId")
+	if companyId==""{
+		return common.GenerateErrorResponse(context,"[ERROR] no companyId is provided","Please provide companyId")
+	}
 	repoName := resource.Repository.Name
 	owner := resource.Repository.Workspace.Slug
 	revision := resource.Push.Changes[len(resource.Push.Changes)-1].New.Target.Hash
-	companyId := resource.Repository.Owner.DisplayName
 	repository := b.companyService.GetRepositoryByCompanyIdAndApplicationUrl(companyId, resource.Repository.Links.HTML.Href)
 	application := b.companyService.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, resource.Repository.UUID, resource.Repository.Links.HTML.Href)
 	if !application.MetaData.IsWebhookEnabled {

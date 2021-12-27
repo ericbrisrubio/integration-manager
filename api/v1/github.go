@@ -37,15 +37,13 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		log.Println(err.Error())
 		return common.GenerateErrorResponse(context, err.Error(), "Operation Failed!")
 	}
+	companyId :=context.QueryParam("companyId")
+	if companyId==""{
+		return common.GenerateErrorResponse(context,"[ERROR] no companyId is provided","Please provide companyId")
+	}
 	repoName := resource.Repository.Name
 	owner := resource.Repository.Owner.Login
 	revision := resource.After
-	companyId := ""
-	if resource.Repository.Owner.Type == "Organization" {
-		companyId = resource.Repository.Owner.Name
-	} else {
-		companyId = resource.Repository.Owner.Email
-	}
 	repository := g.companyService.GetRepositoryByCompanyIdAndApplicationUrl(companyId, resource.Repository.URL)
 	application := g.companyService.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repository.Id, resource.Repository.URL)
 	if !application.MetaData.IsWebhookEnabled {
