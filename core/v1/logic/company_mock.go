@@ -86,8 +86,8 @@ func (m mockCompanyService) GetApplicationsByCompanyIdAndRepositoryType(id strin
 
 func (m mockCompanyService) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {
 	return v1.Repository{
-		Id:    "1",
-		Token: "RrfyyHNSGwJmYkP46NuA",
+		Id:    "flameOfDimitry",
+		Token: "",
 	}
 }
 
