@@ -22,6 +22,42 @@ type companyRepository struct {
 	timeout time.Duration
 }
 
+func (c companyRepository) GetApplicationByApplicationId(companyId string, applicationId string) v1.Application {
+	var app v1.Application
+	query := bson.M{
+		"$and": []bson.M{},
+	}
+	and := []bson.M{{"id": companyId}}
+	query["$and"] = and
+	coll := c.manager.Db.Collection(CompanyCollection)
+	result, err := coll.Find(c.manager.Ctx, query)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	for result.Next(context.TODO()) {
+		elemValues := new(v1.Company)
+		err := result.Decode(elemValues)
+		if err != nil {
+			log.Println("[ERROR]", err)
+			break
+		}
+		for _, each := range elemValues.Repositories {
+			for _, eachApp := range each.Applications {
+				if eachApp.MetaData.Id == applicationId {
+					app = eachApp
+					break
+				}
+			}
+		}
+	}
+	return app
+}
+
+func (c companyRepository) UpdateApplication(applicationId string, app v1.Application) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (c companyRepository) GetRepositoryByRepositoryId(id string) v1.Repository {
 	var repo v1.Repository
 	query := bson.M{
