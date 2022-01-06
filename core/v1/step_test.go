@@ -9,6 +9,7 @@ import (
 	"testing"
 )
 
+// Test function for testing step data - name, type, trigger, params
 func TestStep_Validate(t *testing.T) {
 	type TestCase struct {
 		data     Step

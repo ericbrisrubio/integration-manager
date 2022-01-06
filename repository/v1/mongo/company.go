@@ -53,9 +53,46 @@ func (c companyRepository) GetApplicationByApplicationId(companyId string, appli
 	return app
 }
 
-func (c companyRepository) UpdateApplication(applicationId string, app v1.Application) error {
-	//TODO implement me
-	panic("implement me")
+func (c companyRepository) UpdateApplication(companyId string, repositoryId string, applicationId string, app v1.Application) error {
+	option := v1.CompanyQueryOption{
+		Pagination:       v1.Pagination{},
+		LoadRepositories: true,
+		LoadApplications: true,
+	}
+	company, _ := c.GetByCompanyId(companyId, option)
+
+	for i, eachRepo := range company.Repositories {
+		if eachRepo.Id == repositoryId {
+			for j, eachApp := range eachRepo.Applications {
+				if eachApp.MetaData.Id == app.MetaData.Id {
+					company.Repositories[i].Applications[j] = app
+					break
+				}
+			}
+			break
+		}
+	}
+
+	filter := bson.M{
+		"$and": []bson.M{
+			{"id": companyId},
+		},
+	}
+	update := bson.M{
+		"$set": company,
+	}
+	upsert := true
+	after := options.After
+	opt := options.FindOneAndUpdateOptions{
+		ReturnDocument: &after,
+		Upsert:         &upsert,
+	}
+	coll := c.manager.Db.Collection(CompanyCollection)
+	err := coll.FindOneAndUpdate(c.manager.Ctx, filter, update, &opt)
+	if err != nil {
+		log.Println("[ERROR]", err.Err())
+	}
+	return nil
 }
 
 func (c companyRepository) GetRepositoryByRepositoryId(id string) v1.Repository {

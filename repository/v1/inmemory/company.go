@@ -14,7 +14,7 @@ func (c companyRepository) GetApplicationByApplicationId(companyId string, appli
 	panic("implement me")
 }
 
-func (c companyRepository) UpdateApplication(applicationId string, app v1.Application) error {
+func (c companyRepository) UpdateApplication(companyId string, repositoryId string, applicationId string, app v1.Application) error {
 	//TODO implement me
 	panic("implement me")
 }
