@@ -9,6 +9,16 @@ import (
 type companyRepository struct {
 }
 
+func (c companyRepository) GetApplicationByApplicationId(companyId string, applicationId string) v1.Application {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (c companyRepository) UpdateApplication(companyId string, repositoryId string, applicationId string, app v1.Application) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (c companyRepository) GetRepositoryByRepositoryId(id string) v1.Repository {
 	var repo v1.Repository
 	for _, each := range IndexedCompanies {
