@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"errors"
 	"github.com/google/uuid"
 	v1 "github.com/klovercloud-ci-cd/integration-manager/core/v1"
 	"github.com/klovercloud-ci-cd/integration-manager/core/v1/repository"
@@ -18,6 +19,50 @@ type companyService struct {
 
 func (c companyService) GetRepositoryByRepositoryId(id string) v1.Repository {
 	return c.repo.GetRepositoryByRepositoryId(id)
+}
+
+func (c companyService) CreateWebHookAndUpdateApplications(companyId string, repoType enums.REPOSITORY_TYPE, repoId string, token string, apps []v1.Application) {
+	if repoType == enums.GITHUB {
+		for _, each := range apps {
+			go c.CreateGithubWebHookAndUpdateApplication(companyId, repoId, token, each)
+		}
+	} else if repoType == enums.BIT_BUCKET {
+		for _, each := range apps {
+			go c.CreateBitbucketWebHookAndUpdateApplication(companyId, repoId, token, each)
+		}
+	}
+}
+
+func (c companyService) CreateGithubWebHookAndUpdateApplication(companyId string, repoId string, token string, app v1.Application) {
+	usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(app.Url)
+	gitWebhook, err := NewGithubService(c, nil, c.client).CreateRepositoryWebhook(usernameOrorgName, repoName, token, companyId)
+	if err != nil {
+		app.Webhook = gitWebhook
+		app.MetaData.IsWebhookEnabled = false
+	} else {
+		app.Webhook = gitWebhook
+		app.MetaData.IsWebhookEnabled = true
+	}
+	err = c.repo.UpdateApplication(companyId, repoId, app.MetaData.Id, app)
+	if err != nil {
+		return
+	}
+}
+
+func (c companyService) CreateBitbucketWebHookAndUpdateApplication(companyId string, repoId string, token string, app v1.Application) {
+	usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(app.Url)
+	gitWebhook, err := NewBitBucketService(c, nil, c.client).CreateRepositoryWebhook(usernameOrorgName, repoName, token, companyId)
+	if err != nil {
+		app.Webhook = gitWebhook
+		app.MetaData.IsWebhookEnabled = false
+	} else {
+		app.Webhook = gitWebhook
+		app.MetaData.IsWebhookEnabled = true
+	}
+	err = c.repo.UpdateApplication(companyId, repoId, app.MetaData.Id, app)
+	if err != nil {
+		return
+	}
 }
 
 func (c companyService) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
@@ -84,7 +129,6 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 		if repo.Type == enums.GITHUB {
 			for i := range apps {
 				usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
-				companyId = uuid.New().String()
 				gitWebhook, err := NewGithubService(c, nil, c.client).CreateRepositoryWebhook(usernameOrorgName, repoName, repo.Token, companyId)
 				if err != nil {
 					apps[i].Webhook = gitWebhook
@@ -104,7 +148,6 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 					log.Println(err.Error())
 					return err
 				}
-				companyId = uuid.New().String()
 				bitbucketWebhook, err := NewBitBucketService(c, nil, c.client).CreateRepositoryWebhook(repositoryDetails.Workspace.Slug, repositoryDetails.Slug, repo.Token, companyId)
 				if err != nil {
 					apps[i].Webhook = bitbucketWebhook
@@ -164,6 +207,13 @@ func (c companyService) GetCompanyByApplicationUrl(url string) v1.Company {
 }
 
 func (c companyService) Store(company v1.Company) error {
+	option := v1.CompanyQueryOption{}
+	if data, _ := c.GetByCompanyId(company.Id, option); data.Id != "" {
+		return errors.New("[ERROR]: Company with id: " + company.Id + " already exists.")
+	}
+	for _, eachRepo := range company.Repositories {
+		go c.CreateWebHookAndUpdateApplications(company.Id, eachRepo.Type, eachRepo.Id, eachRepo.Token, eachRepo.Applications)
+	}
 	return c.repo.Store(company)
 }
 
