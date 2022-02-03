@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"errors"
 	"github.com/google/uuid"
 	v1 "github.com/klovercloud-ci-cd/integration-manager/core/v1"
 	"github.com/klovercloud-ci-cd/integration-manager/core/v1/repository"
@@ -206,6 +207,10 @@ func (c companyService) GetCompanyByApplicationUrl(url string) v1.Company {
 }
 
 func (c companyService) Store(company v1.Company) error {
+	option := v1.CompanyQueryOption{}
+	if data, _ := c.GetByCompanyId(company.Id, option); data.Id != "" {
+		return errors.New("[ERROR]: Company with id: " + company.Id + " already exists.")
+	}
 	for _, eachRepo := range company.Repositories {
 		go c.CreateWebHookAndUpdateApplications(company.Id, eachRepo.Type, eachRepo.Id, eachRepo.Token, eachRepo.Applications)
 	}
