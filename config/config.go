@@ -64,13 +64,25 @@ var BitbucketWebhookConsumingUrl string
 var PipelinePurging string
 var Environment string
 
+// RunMode refers to run mode.
+var RunMode string
+
 // InitEnvironmentVariables initializes environment variables
 func InitEnvironmentVariables() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("ERROR:", err.Error())
-		return
+	RunMode = os.Getenv("RUN_MODE")
+	if RunMode == "" {
+		RunMode = string(enums.DEVELOP)
 	}
+
+	if RunMode != string(enums.PRODUCTION) {
+		//Load .env file
+		err := godotenv.Load()
+		if err != nil {
+			log.Println("ERROR:", err.Error())
+			return
+		}
+	}
+	log.Println("RUN MODE:", RunMode)
 	ServerPort = os.Getenv("SERVER_PORT")
 	DbServer = os.Getenv("MONGO_SERVER")
 	DbPort = os.Getenv("MONGO_PORT")
@@ -95,6 +107,7 @@ func InitEnvironmentVariables() {
 	}
 	Token = os.Getenv("TOKEN")
 
+	err := error(nil)
 	DefaultPerDayTotalProcess, err = strconv.ParseInt(os.Getenv("DEFAULT_PER_DAY_TOTAL_PROCESS"), 10, 64)
 	if err != nil {
 		DefaultPerDayTotalProcess = 10

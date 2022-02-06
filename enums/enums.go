@@ -6,8 +6,9 @@ type ENVIRONMENT string
 const (
 	// PRODUCTION mongo as db
 	PRODUCTION = ENVIRONMENT("PRODUCTION")
-	// INMEMORY in memory storage as db
-	DEV  = ENVIRONMENT("DEV")
+	// DEVELOP development environment
+	DEVELOP = ENVIRONMENT("DEVELOP")
+	// TEST test environment
 	TEST = ENVIRONMENT("TEST")
 )
 
