@@ -208,7 +208,10 @@ func (c companyService) GetCompanyByApplicationUrl(url string) v1.Company {
 
 func (c companyService) Store(company v1.Company) error {
 	option := v1.CompanyQueryOption{}
-	if data, _ := c.GetByCompanyId(company.Id, option); data.Id != "" {
+	if company.Id == "" {
+		return errors.New("[ERROR]: No company id given")
+	}
+	if data, _ := c.GetByCompanyId(company.Id, option); data.Id == company.Id {
 		return errors.New("[ERROR]: Company with id: " + company.Id + " already exists.")
 	}
 	for _, eachRepo := range company.Repositories {
