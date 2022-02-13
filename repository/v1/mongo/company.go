@@ -192,10 +192,13 @@ func (c companyRepository) DeleteRepositories(companyId string, repos []v1.Repos
 	company, _ := c.GetByCompanyId(companyId, option)
 
 	if isSoftDelete {
-		for i, each := range company.Repositories {
-			if each.Id == repos[i].Id {
-				for j := range each.Applications {
-					each.Applications[j].Status = enums.INACTIVE
+		for _, eachRepo := range company.Repositories {
+			for _, eachGivenRepo := range repos {
+				if eachRepo.Id == eachGivenRepo.Id {
+					for j := range eachRepo.Applications {
+						eachRepo.Applications[j].Status = enums.INACTIVE
+					}
+					count++
 				}
 			}
 		}
@@ -213,7 +216,7 @@ func (c companyRepository) DeleteRepositories(companyId string, repos []v1.Repos
 	}
 
 	if count < 1 {
-		return errors.New("Repository Id is not matched!")
+		return errors.New("repository id does not match")
 	}
 
 	filter := bson.M{
