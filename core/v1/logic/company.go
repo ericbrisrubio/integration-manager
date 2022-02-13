@@ -137,6 +137,7 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 					apps[i].Webhook = gitWebhook
 					apps[i].MetaData.IsWebhookEnabled = true
 				}
+				apps[i].Status = enums.ACTIVE
 			}
 		} else if repo.Type == enums.BIT_BUCKET {
 			for i := range apps {
@@ -156,6 +157,7 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 					apps[i].Webhook = bitbucketWebhook
 					apps[i].MetaData.IsWebhookEnabled = true
 				}
+				apps[i].Status = enums.ACTIVE
 			}
 		}
 		err := c.repo.AppendApplications(companyId, repositoryId, apps)
