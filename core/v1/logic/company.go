@@ -75,6 +75,11 @@ func (c companyService) UpdateRepositories(companyId string, repositories []v1.R
 			for j := range each.Applications {
 				each.Applications[j].MetaData.Id = uuid.New().String()
 			}
+			if each.Type == enums.GITHUB {
+				c.webHookForGithub(each.Applications, companyId, each.Token)
+			} else if each.Type == enums.BIT_BUCKET {
+				c.webHookForBitbucket(each.Applications, companyId, each.Token)
+			}
 		}
 		err := c.repo.AppendRepositories(companyId, repositories)
 		if err != nil {
@@ -120,6 +125,44 @@ func getUsernameAndRepoNameFromBitbucketRepositoryUrl(url string) (username stri
 	usernameOrOrgName := urlArray[len(urlArray)-5]
 	return usernameOrOrgName, repositoryName
 }
+func (c companyService) webHookForGithub(apps []v1.Application, companyId string, token string) {
+	for i := range apps {
+		usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
+		gitWebhook, err := NewGithubService(c, nil, c.client).CreateRepositoryWebhook(usernameOrorgName, repoName, token, companyId)
+		if err != nil {
+			apps[i].Webhook = gitWebhook
+			apps[i].MetaData.IsWebhookEnabled = false
+		} else {
+			apps[i].Webhook = gitWebhook
+			apps[i].MetaData.IsWebhookEnabled = true
+			apps[i].Status = enums.ACTIVE
+		}
+
+	}
+}
+
+func (c companyService) webHookForBitbucket(apps []v1.Application, companyId string, token string) {
+	for i := range apps {
+		usernameOrOrgName, repoName := getUsernameAndRepoNameFromBitbucketRepositoryUrl(apps[i].Url)
+		b, err := c.client.Get(enums.BITBUCKET_API_BASE_URL+"repositories/"+usernameOrOrgName+"/"+repoName, nil)
+		var repositoryDetails v1.BitbucketRepository
+		err = yaml.Unmarshal(b, &repositoryDetails)
+		if err != nil {
+			log.Println(err.Error())
+		}
+		bitbucketWebhook, err := NewBitBucketService(c, nil, c.client).CreateRepositoryWebhook(repositoryDetails.Workspace.Slug, repositoryDetails.Slug, token, companyId)
+		if err != nil {
+			apps[i].Webhook = bitbucketWebhook
+			apps[i].MetaData.IsWebhookEnabled = false
+		} else {
+			apps[i].Webhook = bitbucketWebhook
+			apps[i].MetaData.IsWebhookEnabled = true
+			apps[i].Status = enums.ACTIVE
+		}
+
+	}
+}
+
 func (c companyService) UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.CompanyUpdateOption) error {
 	if companyUpdateOption.Option == enums.APPEND_APPLICATION {
 		for i := range apps {
@@ -127,38 +170,9 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 		}
 		repo := c.GetRepositoryByRepositoryId(repositoryId)
 		if repo.Type == enums.GITHUB {
-			for i := range apps {
-				usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
-				gitWebhook, err := NewGithubService(c, nil, c.client).CreateRepositoryWebhook(usernameOrorgName, repoName, repo.Token, companyId)
-				if err != nil {
-					apps[i].Webhook = gitWebhook
-					apps[i].MetaData.IsWebhookEnabled = false
-				} else {
-					apps[i].Webhook = gitWebhook
-					apps[i].MetaData.IsWebhookEnabled = true
-				}
-				apps[i].Status = enums.ACTIVE
-			}
+			c.webHookForGithub(apps, companyId, repo.Token)
 		} else if repo.Type == enums.BIT_BUCKET {
-			for i := range apps {
-				usernameOrOrgName, repoName := getUsernameAndRepoNameFromBitbucketRepositoryUrl(apps[i].Url)
-				b, err := c.client.Get(enums.BITBUCKET_API_BASE_URL+"repositories/"+usernameOrOrgName+"/"+repoName, nil)
-				var repositoryDetails v1.BitbucketRepository
-				err = yaml.Unmarshal(b, &repositoryDetails)
-				if err != nil {
-					log.Println(err.Error())
-					return err
-				}
-				bitbucketWebhook, err := NewBitBucketService(c, nil, c.client).CreateRepositoryWebhook(repositoryDetails.Workspace.Slug, repositoryDetails.Slug, repo.Token, companyId)
-				if err != nil {
-					apps[i].Webhook = bitbucketWebhook
-					apps[i].MetaData.IsWebhookEnabled = false
-				} else {
-					apps[i].Webhook = bitbucketWebhook
-					apps[i].MetaData.IsWebhookEnabled = true
-				}
-				apps[i].Status = enums.ACTIVE
-			}
+			c.webHookForBitbucket(apps, companyId, repo.Token)
 		}
 		err := c.repo.AppendApplications(companyId, repositoryId, apps)
 		if err != nil {

@@ -75,7 +75,12 @@ func (h httpClientService) Post(url string, header map[string]string, body []byt
 	defer resp.Body.Close()
 	body, err = ioutil.ReadAll(resp.Body)
 	if resp.StatusCode != 200 && resp.StatusCode != 201 {
-		return nil, err
+		if err != nil {
+			log.Println("[ERROR] Failed communicate ", err.Error())
+			return nil, err
+		} else {
+			log.Println("[ERROR] Failed communicate :", string(body))
+		}
 	}
 	if err != nil {
 		return nil, err
