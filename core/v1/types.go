@@ -29,13 +29,6 @@ type Repository struct {
 	Applications []Application         `bson:"applications" json:"applications"`
 }
 
-// RepositoryWithoutApplications contains repository info without applications
-type RepositoryWithoutApplications struct {
-	Id    string                `bson:"id" json:"id"`
-	Type  enums.REPOSITORY_TYPE `bson:"type" json:"type"`
-	Token string                `bson:"token" json:"token"`
-}
-
 // Validate validates repository info
 func (repository Repository) Validate() error {
 	if repository.Id == "" {
