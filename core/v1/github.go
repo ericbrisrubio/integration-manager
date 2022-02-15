@@ -228,7 +228,8 @@ type GithubWebHookEvent struct {
 // GithubCreateWebhookRequest contains github web hook creation data
 type GithubCreateWebhookRequest struct {
 	Config struct {
-		URL string `json:"url"`
+		URL         string `json:"url"`
+		ContentType string `json:"content_type"`
 	} `json:"config"`
 	Events []enums.GITHUB_EVENT `json:"events"`
 }

@@ -40,9 +40,11 @@ func (githubService githubService) CreateRepositoryWebhook(username, repositoryN
 	header["cache-control"] = "no-cache"
 	body := v1.GithubCreateWebhookRequest{
 		Config: struct {
-			URL string `json:"url"`
+			URL         string `json:"url"`
+			ContentType string `json:"content_type"`
 		}{
-			URL: config.GithubWebhookConsumingUrl + "?companyId=" + companyId,
+			URL:         config.GithubWebhookConsumingUrl + "?companyId=" + companyId,
+			ContentType: "json",
 		},
 		Events: []enums.GITHUB_EVENT{enums.GITHUB_PUSH_EVENT, enums.GITHUB_DELETE_EVENT, enums.GITHUB_RELEASE_EVENT},
 	}
