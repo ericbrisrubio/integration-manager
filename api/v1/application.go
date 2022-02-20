@@ -15,6 +15,25 @@ type applicationApi struct {
 	observerList   []service.Observer
 }
 
+func (a applicationApi) GetApplicationByApplicationId(context echo.Context) error {
+	id := context.Param("id")
+	if id == "" {
+		return common.GenerateErrorResponse(context, nil, "Company Id is required!")
+	}
+	appId := context.QueryParam("applicationId")
+	if appId == "" {
+		return context.JSON(404, common.ResponseDTO{
+			Message: "repository id is required",
+		})
+	}
+	data := a.companyService.GetApplicationByApplicationId(id, appId)
+	if data.MetaData.Id == "" {
+		return common.GenerateErrorResponse(context, nil, "Company not found!")
+	}
+	return common.GenerateSuccessResponse(context, data,
+		nil, "Successfully")
+}
+
 // Update ... Update Application
 // @Summary  Update Application
 // @Description Update Application by company id and  repository id

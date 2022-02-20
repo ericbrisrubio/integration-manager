@@ -20,4 +20,5 @@ type Company interface {
 	GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption) []v1.Application
 	GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository
 	GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application
+	GetApplicationByApplicationId(companyId string, applicationId string) v1.Application
 }

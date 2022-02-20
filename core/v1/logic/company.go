@@ -17,6 +17,10 @@ type companyService struct {
 	client service.HttpClient
 }
 
+func (c companyService) GetApplicationByApplicationId(companyId string, applicationId string) v1.Application {
+	return c.repo.GetApplicationByApplicationId(companyId, applicationId)
+}
+
 func (c companyService) GetRepositoryByRepositoryId(id string) v1.Repository {
 	return c.repo.GetRepositoryByRepositoryId(id)
 }

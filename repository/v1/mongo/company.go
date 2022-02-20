@@ -25,10 +25,8 @@ type companyRepository struct {
 func (c companyRepository) GetApplicationByApplicationId(companyId string, applicationId string) v1.Application {
 	var app v1.Application
 	query := bson.M{
-		"$and": []bson.M{},
+		"$and": []bson.M{{"id": companyId}},
 	}
-	and := []bson.M{{"id": companyId}}
-	query["$and"] = and
 	coll := c.manager.Db.Collection(CompanyCollection)
 	result, err := coll.Find(c.manager.Ctx, query)
 	if err != nil {

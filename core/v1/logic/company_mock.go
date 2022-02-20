@@ -12,6 +12,11 @@ type mockCompanyService struct {
 	client service.HttpClient
 }
 
+func (m mockCompanyService) GetApplicationByApplicationId(companyId string, applicationId string) v1.Application {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (m mockCompanyService) Store(company v1.Company) error {
 	return m.repo.Store(company)
 }
