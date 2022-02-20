@@ -1099,6 +1099,35 @@ paths:
       summary: Update Application
       tags:
       - Application
+  /api/v1/applications/{id}:
+    get:
+      description: Gets Application by Application id
+      parameters:
+      - description: Company id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: application id
+        in: query
+        name: applicationId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.ResponseDTO'
+            - properties:
+                data:
+                  $ref: '#/definitions/v1.Application'
+              type: object
+      summary: Get Application by Application id
+      tags:
+      - Application
   /api/v1/bitbuckets:
     post:
       consumes:

@@ -77,6 +77,54 @@ var doc = `{
                 }
             }
         },
+        "/api/v1/applications/{id}": {
+            "get": {
+                "description": "Gets Application by Application id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Application"
+                ],
+                "summary": "Get Application by Application id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "application id",
+                        "name": "applicationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common.ResponseDTO"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/v1.Application"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/bitbuckets": {
             "post": {
                 "description": "Listens Bitbucket Web hook events. Register this endpoint as Bitbucket web hook endpoint",

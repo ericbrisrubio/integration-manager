@@ -15,6 +15,15 @@ type applicationApi struct {
 	observerList   []service.Observer
 }
 
+// Get.. Get Application by Application id
+// @Summary Get Application by Application id
+// @Description Gets Application by Application id
+// @Tags Application
+// @Produce json
+// @Param id path string true "Company id"
+// @Param applicationId query string true "application id"
+// @Success 200 {object} common.ResponseDTO{data=v1.Application}
+// @Router /api/v1/applications/{id} [GET]
 func (a applicationApi) GetApplicationByApplicationId(context echo.Context) error {
 	id := context.Param("id")
 	if id == "" {
@@ -34,7 +43,7 @@ func (a applicationApi) GetApplicationByApplicationId(context echo.Context) erro
 		nil, "Successfully")
 }
 
-// Update ... Update Application
+// Update... Update Application
 // @Summary  Update Application
 // @Description Update Application by company id and  repository id
 // @Tags Application
