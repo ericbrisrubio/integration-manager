@@ -9,7 +9,7 @@ import (
 type companyRepository struct {
 }
 
-func (c companyRepository) GetApplicationByApplicationId(companyId string, applicationId string) v1.Application {
+func (c companyRepository) GetApplicationByApplicationId(companyId string, repoId string, applicationId string) v1.Application {
 	//TODO implement me
 	panic("implement me")
 }
@@ -154,11 +154,13 @@ func (c companyRepository) GetCompanyByApplicationUrl(url string) v1.Company {
 	return result
 }
 
-func (c companyRepository) GetCompanies(option v1.CompanyQueryOption) ([]v1.Company, int64) {
+func (c companyRepository) GetCompanies(option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Company, int64) {
 	var companies []v1.Company
 	var result []v1.Company
 	for _, each := range IndexedCompanies {
-		companies = append(companies, each)
+		if status.Option == each.Status {
+			companies = append(companies, each)
+		}
 	}
 	for i := range companies {
 		if option.LoadRepositories {
@@ -216,7 +218,7 @@ func (c companyRepository) GetRepositoriesByCompanyId(id string, option v1.Compa
 	return repository, int64(len(companies.Repositories))
 }
 
-func (c companyRepository) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Application, int64) {
+func (c companyRepository) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Application, int64) {
 	var applications []v1.Application
 	var companies v1.Company
 	companies = IndexedCompanies[id]
@@ -237,7 +239,7 @@ func (c companyRepository) GetApplicationsByCompanyId(id string, option v1.Compa
 	}
 	return applications, int64(len(companies.Repositories))
 }
-func (c companyRepository) GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption) []v1.Application {
+func (c companyRepository) GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption, status v1.StatusQueryOption) []v1.Application {
 	var applications []v1.Application
 	var companies v1.Company
 	companies = IndexedCompanies[id]

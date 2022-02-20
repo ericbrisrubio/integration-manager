@@ -48,6 +48,7 @@ func CompanyRouter(g *echo.Group) {
 	g.GET("/:id", companyApi.GetById, AuthenticationAndAuthorizationHandler)
 	g.GET("/:id/repositories", companyApi.GetRepositoriesById, AuthenticationAndAuthorizationHandler)
 	g.PUT("/:id/repositories", companyApi.UpdateRepositories, AuthenticationAndAuthorizationHandler)
+	g.GET("/:id/applications", companyApi.GetApplicationsByCompanyIdAndRepositoryType, AuthenticationAndAuthorizationHandler)
 }
 
 // RepositoryRouter api/v1/repositories/* router

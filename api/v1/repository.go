@@ -46,7 +46,8 @@ func (r repositoryApi) GetApplicationsById(context echo.Context) error {
 		return errors.New("company id is required")
 	}
 	option := getQueryOption(context)
-	data, total := r.companyService.GetApplicationsByCompanyId(id, option)
+	status := getStatusOption(context)
+	data, total := r.companyService.GetApplicationsByCompanyId(id, option, status)
 	metadata := common.GetPaginationMetadata(option.Pagination.Page, option.Pagination.Limit, total, int64(len(data)))
 	uri := strings.Split(context.Request().RequestURI, "?")[0]
 	if option.Pagination.Page > 0 {

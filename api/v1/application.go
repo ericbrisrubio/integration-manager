@@ -20,8 +20,9 @@ type applicationApi struct {
 // @Description Gets Application by Application id
 // @Tags Application
 // @Produce json
-// @Param id path string true "Company id"
-// @Param applicationId query string true "application id"
+// @Param id path string true "Application id"
+// @Param companyId query string true "company id"
+// @Param repositoryId query string true "repository id"
 // @Success 200 {object} common.ResponseDTO{data=v1.Application}
 // @Router /api/v1/applications/{id} [GET]
 func (a applicationApi) GetApplicationByApplicationId(context echo.Context) error {
@@ -29,13 +30,19 @@ func (a applicationApi) GetApplicationByApplicationId(context echo.Context) erro
 	if id == "" {
 		return common.GenerateErrorResponse(context, nil, "Company Id is required!")
 	}
-	appId := context.QueryParam("applicationId")
-	if appId == "" {
+	companyId := context.QueryParam("companyId")
+	if companyId == "" {
+		return context.JSON(404, common.ResponseDTO{
+			Message: "company id is required",
+		})
+	}
+	repositoryId := context.QueryParam("repositoryId")
+	if repositoryId == "" {
 		return context.JSON(404, common.ResponseDTO{
 			Message: "repository id is required",
 		})
 	}
-	data := a.companyService.GetApplicationByApplicationId(id, appId)
+	data := a.companyService.GetApplicationByApplicationId(companyId, repositoryId, id)
 	if data.MetaData.Id == "" {
 		return common.GenerateErrorResponse(context, nil, "Company not found!")
 	}

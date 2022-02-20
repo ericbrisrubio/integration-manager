@@ -17,8 +17,8 @@ type companyService struct {
 	client service.HttpClient
 }
 
-func (c companyService) GetApplicationByApplicationId(companyId string, applicationId string) v1.Application {
-	return c.repo.GetApplicationByApplicationId(companyId, applicationId)
+func (c companyService) GetApplicationByApplicationId(companyId string, repoId string, applicationId string) v1.Application {
+	return c.repo.GetApplicationByApplicationId(companyId, repoId, applicationId)
 }
 
 func (c companyService) GetRepositoryByRepositoryId(id string) v1.Repository {
@@ -248,8 +248,8 @@ func (c companyService) Delete(companyId string) error {
 	return nil
 }
 
-func (c companyService) GetCompanies(option v1.CompanyQueryOption) []v1.Company {
-	companies, _ := c.repo.GetCompanies(option)
+func (c companyService) GetCompanies(option v1.CompanyQueryOption, status v1.StatusQueryOption) []v1.Company {
+	companies, _ := c.repo.GetCompanies(option, status)
 	return companies
 }
 
@@ -261,12 +261,12 @@ func (c companyService) GetRepositoriesByCompanyId(id string, option v1.CompanyQ
 	return c.repo.GetRepositoriesByCompanyId(id, option)
 }
 
-func (c companyService) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Application, int64) {
-	return c.repo.GetApplicationsByCompanyId(id, option)
+func (c companyService) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Application, int64) {
+	return c.repo.GetApplicationsByCompanyId(id, option, status)
 }
 
-func (c companyService) GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption) []v1.Application {
-	return c.repo.GetApplicationsByCompanyIdAndRepositoryType(id, _type, option)
+func (c companyService) GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption, status v1.StatusQueryOption) []v1.Application {
+	return c.repo.GetApplicationsByCompanyIdAndRepositoryType(id, _type, option, status)
 }
 
 // NewCompanyService returns Company type service

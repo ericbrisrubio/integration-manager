@@ -1103,14 +1103,19 @@ paths:
     get:
       description: Gets Application by Application id
       parameters:
-      - description: Company id
+      - description: Application id
         in: path
         name: id
         required: true
         type: string
-      - description: application id
+      - description: company id
         in: query
-        name: applicationId
+        name: companyId
+        required: true
+        type: string
+      - description: repository id
+        in: query
+        name: repositoryId
         required: true
         type: string
       produces:
@@ -1238,6 +1243,42 @@ paths:
                   $ref: '#/definitions/v1.Company'
               type: object
       summary: Get company by id
+      tags:
+      - Company
+  /api/v1/companies/{id}/applications:
+    get:
+      description: Get applications by company id and repository type
+      parameters:
+      - description: Company id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Repository type
+        in: query
+        name: repository_type
+        required: true
+        type: string
+      - description: Company Update Option
+        in: query
+        name: companyUpdateOption
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.ResponseDTO'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/v1.Application'
+                  type: array
+              type: object
+      summary: Get applications by company id and repository type
       tags:
       - Company
   /api/v1/companies/{id}/repositories:

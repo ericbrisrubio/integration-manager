@@ -12,7 +12,7 @@ type mockCompanyService struct {
 	client service.HttpClient
 }
 
-func (m mockCompanyService) GetApplicationByApplicationId(companyId string, applicationId string) v1.Application {
+func (m mockCompanyService) GetApplicationByApplicationId(companyId string, repoId string, applicationId string) v1.Application {
 	//TODO implement me
 	panic("implement me")
 }
@@ -36,8 +36,8 @@ func (m mockCompanyService) Delete(companyId string) error {
 	panic("implement me")
 }
 
-func (m mockCompanyService) GetCompanies(option v1.CompanyQueryOption) []v1.Company {
-	companies, _ := m.repo.GetCompanies(option)
+func (m mockCompanyService) GetCompanies(option v1.CompanyQueryOption, status v1.StatusQueryOption) []v1.Company {
+	companies, _ := m.repo.GetCompanies(option, status)
 	return companies
 }
 func (m mockCompanyService) initMockCompanyData() {
@@ -77,16 +77,16 @@ func (m mockCompanyService) GetRepositoryByRepositoryId(id string) v1.Repository
 	return m.repo.GetRepositoryByRepositoryId(id)
 }
 
-func (m mockCompanyService) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Application, int64) {
-	return m.repo.GetApplicationsByCompanyId(id, option)
+func (m mockCompanyService) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Application, int64) {
+	return m.repo.GetApplicationsByCompanyId(id, option, status)
 }
 
 func (m mockCompanyService) GetCompanyByApplicationUrl(url string) v1.Company {
 	return m.repo.GetCompanyByApplicationUrl(url)
 }
 
-func (m mockCompanyService) GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption) []v1.Application {
-	return m.repo.GetApplicationsByCompanyIdAndRepositoryType(id, _type, option)
+func (m mockCompanyService) GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption, status v1.StatusQueryOption) []v1.Application {
+	return m.repo.GetApplicationsByCompanyIdAndRepositoryType(id, _type, option, status)
 }
 
 func (m mockCompanyService) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {

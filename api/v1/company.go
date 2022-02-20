@@ -19,6 +19,31 @@ type companyApi struct {
 	observerList   []service.Observer
 }
 
+// Get.. Get applications
+// @Summary Get applications by company id and repository type
+// @Description Get applications by company id and repository type
+// @Tags Company
+// @Produce json
+// @Param id path string true "Company id"
+// @Param repository_type query string true "Repository type"
+// @Param companyUpdateOption query string true "Company Update Option"
+// @Success 200 {object} common.ResponseDTO{data=[]v1.Application}
+// @Router /api/v1/companies/{id}/applications [GET]
+func (c companyApi) GetApplicationsByCompanyIdAndRepositoryType(context echo.Context) error {
+	id := context.Param("id")
+	if id == "" {
+		return common.GenerateErrorResponse(context, nil, "Company Id is required!")
+	}
+	repositoryType := context.QueryParam("repository_type")
+	status := getStatusOption(context)
+	option := getQueryOption(context)
+	apps := c.companyService.GetApplicationsByCompanyIdAndRepositoryType(id, enums.REPOSITORY_TYPE(repositoryType), option, status)
+	if apps == nil {
+		return common.GenerateErrorResponse(context, nil, "Company Id is not found!")
+	}
+	return common.GenerateSuccessResponse(context, apps, nil, "success")
+}
+
 // Update... Update repositories
 // @Summary Update repositories by company id
 // @Description updates repositories
@@ -66,7 +91,8 @@ func (c companyApi) UpdateRepositories(context echo.Context) error {
 // @Router /api/v1/companies [GET]
 func (c companyApi) Get(context echo.Context) error {
 	option := getQueryOption(context)
-	data := c.companyService.GetCompanies(option)
+	status := getStatusOption(context)
+	data := c.companyService.GetCompanies(option, status)
 	return common.GenerateSuccessResponse(context, data, nil, "Success!")
 }
 
@@ -163,6 +189,11 @@ func generateRepositoryAndApplicationId(payload v1.Company) v1.Company {
 		}
 	}
 	return payload
+}
+func getStatusOption(context echo.Context) v1.StatusQueryOption {
+	status := v1.StatusQueryOption{}
+	status.Option = enums.COMPANY_STATUS(context.QueryParam("status"))
+	return status
 }
 
 func getQueryOption(context echo.Context) v1.CompanyQueryOption {

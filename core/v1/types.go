@@ -120,6 +120,11 @@ type CompanyUpdateOption struct {
 	Option enums.COMPANY_UPDATE_OPTION `json:"option"`
 }
 
+// StatusQueryOption contains company update options
+type StatusQueryOption struct {
+	Option enums.COMPANY_STATUS `json:"option"`
+}
+
 // CompanyQueryOption contains company query options
 type CompanyQueryOption struct {
 	Pagination       Pagination

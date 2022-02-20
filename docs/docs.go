@@ -90,15 +90,22 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Company id",
+                        "description": "Application id",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "application id",
-                        "name": "applicationId",
+                        "description": "company id",
+                        "name": "companyId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "repository id",
+                        "name": "repositoryId",
                         "in": "query",
                         "required": true
                     }
@@ -299,6 +306,64 @@ var doc = `{
                                     "properties": {
                                         "data": {
                                             "$ref": "#/definitions/v1.Company"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/companies/{id}/applications": {
+            "get": {
+                "description": "Get applications by company id and repository type",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Get applications by company id and repository type",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Repository type",
+                        "name": "repository_type",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Company Update Option",
+                        "name": "companyUpdateOption",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common.ResponseDTO"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/v1.Application"
+                                            }
                                         }
                                     }
                                 }
