@@ -29,6 +29,13 @@ type Repository struct {
 	Applications []Application         `bson:"applications" json:"applications"`
 }
 
+// RepositoryDto contains repository info
+type RepositoryDto struct {
+	Id           string                `bson:"id" json:"id"`
+	Type         enums.REPOSITORY_TYPE `bson:"type" json:"type"`
+	Applications []Application         `bson:"applications" json:"applications"`
+}
+
 // Validate validates repository info
 func (repository Repository) Validate() error {
 	if repository.Id == "" {
@@ -115,9 +122,14 @@ func (metadata CompanyMetadata) Validate() error {
 	return nil
 }
 
-// CompanyUpdateOption contains company update options
-type CompanyUpdateOption struct {
-	Option enums.COMPANY_UPDATE_OPTION `json:"option"`
+// ApplicationUpdateOption contains applications update options
+type ApplicationUpdateOption struct {
+	Option enums.APPLICATION_UPDATE_OPTION `json:"option"`
+}
+
+// RepositoryUpdateOption contains repository update options
+type RepositoryUpdateOption struct {
+	Option enums.REPOSITORY_UPDATE_OPTION `json:"option"`
 }
 
 // StatusQueryOption contains company update options
@@ -130,6 +142,7 @@ type CompanyQueryOption struct {
 	Pagination       Pagination
 	LoadRepositories bool
 	LoadApplications bool
+	LoadToken        bool
 }
 
 // Pagination contains pagination options
@@ -196,8 +209,8 @@ type RepositoriesDto struct {
 	Repositories []Repository `bson:"repositories" json:"repositories"`
 }
 
-// GetCompanyWithRepository returns company with repositories
-func (dto Company) GetCompanyWithRepository() Company {
+// GetCompanyWithoutApplications returns company with repositories
+func (dto Company) GetCompanyWithoutApplications(option CompanyQueryOption) Company {
 	company := Company{
 		MetaData: dto.MetaData,
 		Id:       dto.Id,
@@ -205,12 +218,22 @@ func (dto Company) GetCompanyWithRepository() Company {
 		Status:   dto.Status,
 	}
 	for _, each := range dto.Repositories {
-		company.Repositories = append(company.Repositories, Repository{
-			Id:           each.Id,
-			Type:         each.Type,
-			Token:        each.Token,
-			Applications: nil,
-		})
+		if option.LoadToken {
+			r := Repository{
+				Id:           each.Id,
+				Type:         each.Type,
+				Token:        each.Token,
+				Applications: nil,
+			}
+			company.Repositories = append(company.Repositories, r)
+		} else {
+			company.Repositories = append(company.Repositories, Repository{
+				Id:           each.Id,
+				Type:         each.Type,
+				Token:        "",
+				Applications: nil,
+			})
+		}
 	}
 	return company
 }

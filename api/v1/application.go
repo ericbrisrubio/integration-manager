@@ -28,7 +28,7 @@ type applicationApi struct {
 func (a applicationApi) GetApplicationByApplicationId(context echo.Context) error {
 	id := context.Param("id")
 	if id == "" {
-		return common.GenerateErrorResponse(context, nil, "Company Id is required!")
+		return common.GenerateErrorResponse(context, nil, "application Id is required!")
 	}
 	companyId := context.QueryParam("companyId")
 	if companyId == "" {
@@ -83,8 +83,8 @@ func (a applicationApi) Update(context echo.Context) error {
 	}
 	var payload []v1.Application
 	payload = formData.Applications
-	var options v1.CompanyUpdateOption
-	options.Option = enums.COMPANY_UPDATE_OPTION(updateOption)
+	var options v1.ApplicationUpdateOption
+	options.Option = enums.APPLICATION_UPDATE_OPTION(updateOption)
 	err := a.companyService.UpdateApplications(id, repoId, payload, options)
 	if err != nil {
 		return common.GenerateErrorResponse(context, nil, err.Error())

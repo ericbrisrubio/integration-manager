@@ -14,6 +14,15 @@ type Company struct {
 	Status       enums.COMPANY_STATUS `bson:"status" json:"status"`
 }
 
+// CompanyDto contains company data
+type CompanyDto struct {
+	MetaData     CompanyMetadata      `bson:"_metadata" json:"_metadata"`
+	Id           string               `bson:"id" json:"id"`
+	Name         string               `bson:"name" json:"name"`
+	Repositories []RepositoryDto      `bson:"repositories" json:"repositories"`
+	Status       enums.COMPANY_STATUS `bson:"status" json:"status"`
+}
+
 // Validate validates company data
 func (dto Company) Validate() error {
 	err := dto.MetaData.Validate()

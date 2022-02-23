@@ -37,9 +37,9 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		log.Println(err.Error())
 		return common.GenerateErrorResponse(context, err.Error(), "Operation Failed!")
 	}
-	companyId :=context.QueryParam("companyId")
-	if companyId==""{
-		return common.GenerateErrorResponse(context,"[ERROR] no companyId is provided","Please provide companyId")
+	companyId := context.QueryParam("companyId")
+	if companyId == "" {
+		return common.GenerateErrorResponse(context, "[ERROR] no companyId is provided", "Please provide companyId")
 	}
 	repoName := resource.Repository.Name
 	owner := resource.Repository.Owner.Login
@@ -83,7 +83,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 	}
 	data.ProcessId = uuid.NewV4().String()
 
-	company, _ := g.companyService.GetByCompanyId(companyId, v1.CompanyQueryOption{v1.Pagination{}, false, false})
+	company, _ := g.companyService.GetByCompanyId(companyId, v1.CompanyQueryOption{v1.Pagination{}, false, false, false})
 	todaysRanProcess := g.processInventoryEventService.CountTodaysRanProcessByCompanyId(companyId)
 	data.MetaData = v1.PipelineMetadata{
 		CompanyId:       companyId,

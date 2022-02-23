@@ -22,6 +22,43 @@ type companyRepository struct {
 	timeout time.Duration
 }
 
+func (c companyRepository) GetApplicationsByRepositoryId(repoId string, companyId string, option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Application, int64) {
+	var results []v1.Application
+	var repository v1.Repository
+	query := bson.M{
+		"$and": []bson.M{{"id": companyId}},
+	}
+	coll := c.manager.Db.Collection(CompanyCollection)
+	skip := option.Pagination.Page * option.Pagination.Limit
+	result, err := coll.Find(c.manager.Ctx, query, &options.FindOptions{
+		Limit: &option.Pagination.Limit,
+		Skip:  &skip,
+	})
+	if err != nil {
+		log.Println(err.Error())
+	}
+	for result.Next(context.TODO()) {
+		elemValue := new(v1.Company)
+		err := result.Decode(elemValue)
+		if err != nil {
+			log.Println("[ERROR]", err)
+			break
+		}
+		for _, eachRepo := range elemValue.Repositories {
+			if repoId == eachRepo.Id {
+				repository = eachRepo
+				break
+			}
+		}
+		for _, eachApp := range repository.Applications {
+			if eachApp.Status == status.Option {
+				results = append(results, eachApp)
+			}
+		}
+	}
+	return results, int64(len(results))
+}
+
 func (c companyRepository) GetApplicationByApplicationId(companyId string, repoId string, applicationId string) v1.Application {
 	var app v1.Application
 	var repo v1.Repository
@@ -96,13 +133,11 @@ func (c companyRepository) UpdateApplication(companyId string, repositoryId stri
 	return nil
 }
 
-func (c companyRepository) GetRepositoryByRepositoryId(id string) v1.Repository {
+func (c companyRepository) GetRepositoryByRepositoryId(id string, companyId string, option v1.CompanyQueryOption) v1.Repository {
 	var repo v1.Repository
 	query := bson.M{
-		"$and": []bson.M{},
+		"$and": []bson.M{{"id": companyId, "repositories.id": id}},
 	}
-	and := []bson.M{{"repositories.id": id}}
-	query["$and"] = and
 	coll := c.manager.Db.Collection(CompanyCollection)
 	result, err := coll.Find(c.manager.Ctx, query)
 	if err != nil {
@@ -117,7 +152,25 @@ func (c companyRepository) GetRepositoryByRepositoryId(id string) v1.Repository 
 		}
 		for _, each := range elemValues.Repositories {
 			if id == each.Id {
-				repo = each
+				if option.LoadApplications == false && option.LoadToken == false {
+					repositoryWithOutToken := v1.Repository{
+						Id:           each.Id,
+						Type:         each.Type,
+						Token:        "",
+						Applications: nil,
+					}
+					repo = repositoryWithOutToken
+				} else if option.LoadApplications == true && option.LoadToken == false {
+					repositoryWithOutToken := v1.Repository{
+						Id:           each.Id,
+						Type:         each.Type,
+						Token:        "",
+						Applications: each.Applications,
+					}
+					repo = repositoryWithOutToken
+				} else {
+					repo = each
+				}
 			}
 		}
 	}
@@ -128,10 +181,8 @@ func (c companyRepository) GetApplicationByCompanyIdAndRepositoryIdAndApplicatio
 	var app v1.Application
 	var repo v1.Repository
 	query := bson.M{
-		"$and": []bson.M{},
+		"$and": []bson.M{{"id": companyId, "repositories.id": repositoryId, "repositories.applications.url": applicationUrl}},
 	}
-	and := []bson.M{{"id": companyId, "repositories.id": repositoryId, "repositories.applications.url": applicationUrl}}
-	query["$and"] = and
 	coll := c.manager.Db.Collection(CompanyCollection)
 	result, err := coll.Find(c.manager.Ctx, query)
 	if err != nil {
@@ -350,10 +401,8 @@ func (c companyRepository) DeleteApplications(companyId, repositoryId string, ap
 func (c companyRepository) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {
 	var results v1.Repository
 	query := bson.M{
-		"$and": []bson.M{},
+		"$and": []bson.M{{"id": id, "repositories.applications.url": url}},
 	}
-	and := []bson.M{{"id": id}}
-	query["$and"] = and
 	coll := c.manager.Db.Collection(CompanyCollection)
 	result, err := coll.Find(c.manager.Ctx, query)
 	if err != nil {
@@ -369,7 +418,13 @@ func (c companyRepository) GetRepositoryByCompanyIdAndApplicationUrl(id, url str
 		for _, each := range elemValue.Repositories {
 			for _, eachApp := range each.Applications {
 				if url == eachApp.Url {
-					results = each
+					r := v1.Repository{
+						Id:           each.Id,
+						Type:         each.Type,
+						Token:        "",
+						Applications: each.Applications,
+					}
+					results = r
 				}
 			}
 		}
@@ -380,10 +435,8 @@ func (c companyRepository) GetRepositoryByCompanyIdAndApplicationUrl(id, url str
 func (c companyRepository) GetCompanyByApplicationUrl(url string) v1.Company {
 	var results v1.Company
 	query := bson.M{
-		"$and": []bson.M{},
+		"$and": []bson.M{{"repositories.applications.url": url}},
 	}
-	and := []bson.M{{"repositories.applications.url": url}}
-	query["$and"] = and
 	coll := c.manager.Db.Collection(CompanyCollection)
 	result, err := coll.Find(c.manager.Ctx, query)
 	if err != nil {
@@ -395,6 +448,15 @@ func (c companyRepository) GetCompanyByApplicationUrl(url string) v1.Company {
 		if err != nil {
 			log.Println("[ERROR]", err)
 			break
+		}
+		for i, each := range elemValue.Repositories {
+			r := v1.Repository{
+				Id:           each.Id,
+				Type:         each.Type,
+				Token:        "",
+				Applications: each.Applications,
+			}
+			elemValue.Repositories[i] = r
 		}
 		results = *elemValue
 	}
@@ -426,7 +488,7 @@ func (c companyRepository) GetCompanies(option v1.CompanyQueryOption, status v1.
 			if option.LoadApplications {
 				results = append(results, *elemValue)
 			} else {
-				results = append(results, elemValue.GetCompanyWithRepository())
+				results = append(results, elemValue.GetCompanyWithoutApplications(option))
 			}
 		} else {
 			results = append(results, elemValue.GetCompanyWithoutRepository())
@@ -462,7 +524,7 @@ func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOptio
 			if option.LoadApplications {
 				results = *elemValue
 			} else {
-				results = elemValue.GetCompanyWithRepository()
+				results = elemValue.GetCompanyWithoutApplications(option)
 			}
 		} else {
 			results = elemValue.GetCompanyWithoutRepository()
@@ -496,49 +558,25 @@ func (c companyRepository) GetRepositoriesByCompanyId(id string, option v1.Compa
 			log.Println("[ERROR]", err)
 			break
 		}
-		if option.LoadApplications == true {
-			results = elemValue.Repositories
-		} else {
-			var rep v1.Repository
-			for _, each := range elemValue.Repositories {
-				rep.Type = each.Type
-				rep.Id = each.Id
-				rep.Token = each.Token
-				rep.Applications = nil
-
-				results = append(results, rep)
-			}
-		}
-	}
-	return results, int64(len(results))
-}
-
-func (c companyRepository) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Application, int64) {
-	var results []v1.Application
-	query := bson.M{
-		"$and": []bson.M{{"id": id, "repositories.applications.status": status.Option}},
-	}
-	coll := c.manager.Db.Collection(CompanyCollection)
-	skip := option.Pagination.Page * option.Pagination.Limit
-	result, err := coll.Find(c.manager.Ctx, query, &options.FindOptions{
-		Limit: &option.Pagination.Limit,
-		Skip:  &skip,
-	})
-	if err != nil {
-		log.Println(err.Error())
-	}
-	for result.Next(context.TODO()) {
-		elemValue := new(v1.Company)
-		err := result.Decode(elemValue)
-		if err != nil {
-			log.Println("[ERROR]", err)
-			break
-		}
-		for _, eachRepo := range elemValue.Repositories {
-			for _, eachApp := range eachRepo.Applications {
-				if eachApp.Status == status.Option {
-					results = append(results, eachApp)
+		for _, each := range elemValue.Repositories {
+			if option.LoadApplications == true && option.LoadToken == true {
+				results = elemValue.Repositories
+			} else if option.LoadApplications == true && option.LoadToken == false {
+				r := v1.Repository{
+					Id:           each.Id,
+					Type:         each.Type,
+					Token:        "",
+					Applications: each.Applications,
 				}
+				results = append(results, r)
+			} else {
+				r := v1.Repository{
+					Id:           each.Id,
+					Type:         each.Type,
+					Token:        "",
+					Applications: nil,
+				}
+				results = append(results, r)
 			}
 		}
 	}
@@ -548,7 +586,7 @@ func (c companyRepository) GetApplicationsByCompanyId(id string, option v1.Compa
 func (c companyRepository) GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption, status v1.StatusQueryOption) []v1.Application {
 	var results []v1.Application
 	query := bson.M{
-		"$and": []bson.M{{"id": id, "repositories.applications.status": status.Option}},
+		"$and": []bson.M{{"id": id, "repositories.type": _type, "repositories.applications.status": status.Option}},
 	}
 	coll := c.manager.Db.Collection(CompanyCollection)
 	skip := option.Pagination.Page * option.Pagination.Limit

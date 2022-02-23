@@ -12,6 +12,16 @@ type mockCompanyService struct {
 	client service.HttpClient
 }
 
+func (m mockCompanyService) GetRepositoryByRepositoryId(id string, companyId string, option v1.CompanyQueryOption) v1.Repository {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m mockCompanyService) GetApplicationsByRepositoryId(repositoryId string, companyId string, option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Application, int64) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (m mockCompanyService) GetApplicationByApplicationId(companyId string, repoId string, applicationId string) v1.Application {
 	//TODO implement me
 	panic("implement me")
@@ -21,12 +31,12 @@ func (m mockCompanyService) Store(company v1.Company) error {
 	return m.repo.Store(company)
 }
 
-func (m mockCompanyService) UpdateRepositories(companyId string, repositories []v1.Repository, companyUpdateOption v1.CompanyUpdateOption) error {
+func (m mockCompanyService) UpdateRepositories(companyId string, repositories []v1.Repository, companyUpdateOption v1.RepositoryUpdateOption) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (m mockCompanyService) UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.CompanyUpdateOption) error {
+func (m mockCompanyService) UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.ApplicationUpdateOption) error {
 	//TODO implement me
 	panic("implement me")
 }
@@ -71,14 +81,6 @@ func (m mockCompanyService) GetByCompanyId(id string, option v1.CompanyQueryOpti
 
 func (m mockCompanyService) GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64) {
 	return m.repo.GetRepositoriesByCompanyId(id, option)
-}
-
-func (m mockCompanyService) GetRepositoryByRepositoryId(id string) v1.Repository {
-	return m.repo.GetRepositoryByRepositoryId(id)
-}
-
-func (m mockCompanyService) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Application, int64) {
-	return m.repo.GetApplicationsByCompanyId(id, option, status)
 }
 
 func (m mockCompanyService) GetCompanyByApplicationUrl(url string) v1.Company {

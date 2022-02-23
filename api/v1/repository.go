@@ -21,6 +21,7 @@ type repositoryApi struct {
 // @Tags Repository
 // @Produce json
 // @Param id path string true "Repository id"
+// @Param id query string true "company id"
 // @Success 200 {object} common.ResponseDTO{data=v1.Repository}
 // @Router /api/v1/repositories/{id} [GET]
 func (r repositoryApi) GetById(context echo.Context) error {
@@ -28,7 +29,9 @@ func (r repositoryApi) GetById(context echo.Context) error {
 	if id == "" {
 		return errors.New("repository id is required")
 	}
-	data := r.companyService.GetRepositoryByRepositoryId(id)
+	companyId := context.QueryParam("companyId")
+	options := getQueryOption(context)
+	data := r.companyService.GetRepositoryByRepositoryId(id, companyId, options)
 	return common.GenerateSuccessResponse(context, data, nil, "Success!")
 }
 
@@ -45,9 +48,10 @@ func (r repositoryApi) GetApplicationsById(context echo.Context) error {
 	if id == "" {
 		return errors.New("company id is required")
 	}
+	companyId := context.QueryParam("companyId")
 	option := getQueryOption(context)
 	status := getStatusOption(context)
-	data, total := r.companyService.GetApplicationsByCompanyId(id, option, status)
+	data, total := r.companyService.GetApplicationsByRepositoryId(id, companyId, option, status)
 	metadata := common.GetPaginationMetadata(option.Pagination.Page, option.Pagination.Limit, total, int64(len(data)))
 	uri := strings.Split(context.Request().RequestURI, "?")[0]
 	if option.Pagination.Page > 0 {

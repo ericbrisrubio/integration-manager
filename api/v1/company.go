@@ -66,9 +66,9 @@ func (c companyApi) UpdateRepositories(context echo.Context) error {
 	}
 	var payload []v1.Repository
 	payload = formData.Repositories
-	var options v1.CompanyUpdateOption
+	var options v1.RepositoryUpdateOption
 	Option := context.QueryParam("companyUpdateOption")
-	options.Option = enums.COMPANY_UPDATE_OPTION(Option)
+	options.Option = enums.REPOSITORY_UPDATE_OPTION(Option)
 	err := c.companyService.UpdateRepositories(id, payload, options)
 	if err != nil {
 		log.Println("Update Error:", err.Error())
@@ -192,7 +192,11 @@ func generateRepositoryAndApplicationId(payload v1.Company) v1.Company {
 }
 func getStatusOption(context echo.Context) v1.StatusQueryOption {
 	status := v1.StatusQueryOption{}
-	status.Option = enums.COMPANY_STATUS(context.QueryParam("status"))
+	option := context.QueryParam("status")
+	if option != "" {
+		status.Option = enums.ACTIVE
+	}
+	status.Option = enums.COMPANY_STATUS(option)
 	return status
 }
 
@@ -203,7 +207,7 @@ func getQueryOption(context echo.Context) v1.CompanyQueryOption {
 	loadApplications := context.QueryParam("loadApplications")
 	loadRepositories := context.QueryParam("loadRepositories")
 	if page == "" {
-		option.Pagination.Page = 0
+		option.Pagination.Page = 1
 		option.Pagination.Limit = 10
 		option.LoadApplications, _ = strconv.ParseBool(loadApplications)
 		option.LoadRepositories, _ = strconv.ParseBool(loadRepositories)

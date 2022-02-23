@@ -17,12 +17,16 @@ type companyService struct {
 	client service.HttpClient
 }
 
+func (c companyService) GetApplicationsByRepositoryId(repositoryId string, companyId string, option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Application, int64) {
+	return c.repo.GetApplicationsByRepositoryId(repositoryId, companyId, option, status)
+}
+
 func (c companyService) GetApplicationByApplicationId(companyId string, repoId string, applicationId string) v1.Application {
 	return c.repo.GetApplicationByApplicationId(companyId, repoId, applicationId)
 }
 
-func (c companyService) GetRepositoryByRepositoryId(id string) v1.Repository {
-	return c.repo.GetRepositoryByRepositoryId(id)
+func (c companyService) GetRepositoryByRepositoryId(id string, companyId string, option v1.CompanyQueryOption) v1.Repository {
+	return c.repo.GetRepositoryByRepositoryId(id, companyId, option)
 }
 
 func (c companyService) CreateWebHookAndUpdateApplications(companyId string, repoType enums.REPOSITORY_TYPE, repoId string, token string, apps []v1.Application) {
@@ -72,7 +76,7 @@ func (c companyService) CreateBitbucketWebHookAndUpdateApplication(companyId str
 func (c companyService) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
 	return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl)
 }
-func (c companyService) UpdateRepositories(companyId string, repositories []v1.Repository, companyUpdateOption v1.CompanyUpdateOption) error {
+func (c companyService) UpdateRepositories(companyId string, repositories []v1.Repository, companyUpdateOption v1.RepositoryUpdateOption) error {
 	if companyUpdateOption.Option == enums.APPEND_REPOSITORY {
 		for i, each := range repositories {
 			repositories[i].Id = uuid.New().String()
@@ -167,12 +171,13 @@ func (c companyService) webHookForBitbucket(apps []v1.Application, companyId str
 	}
 }
 
-func (c companyService) UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.CompanyUpdateOption) error {
+func (c companyService) UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.ApplicationUpdateOption) error {
+	option := v1.CompanyQueryOption{LoadApplications: true, LoadToken: true}
 	if companyUpdateOption.Option == enums.APPEND_APPLICATION {
 		for i := range apps {
 			apps[i].MetaData.Id = uuid.New().String()
 		}
-		repo := c.GetRepositoryByRepositoryId(repositoryId)
+		repo := c.GetRepositoryByRepositoryId(repositoryId, companyId, option)
 		if repo.Type == enums.GITHUB {
 			c.webHookForGithub(apps, companyId, repo.Token)
 		} else if repo.Type == enums.BIT_BUCKET {
@@ -190,7 +195,7 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 		}
 	}
 	if companyUpdateOption.Option == enums.DELETE_APPLICATION {
-		repo := c.GetRepositoryByRepositoryId(repositoryId)
+		repo := c.GetRepositoryByRepositoryId(repositoryId, companyId, option)
 		if repo.Type == enums.GITHUB {
 			for i := range apps {
 				usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
@@ -259,10 +264,6 @@ func (c companyService) GetByCompanyId(id string, option v1.CompanyQueryOption) 
 
 func (c companyService) GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64) {
 	return c.repo.GetRepositoriesByCompanyId(id, option)
-}
-
-func (c companyService) GetApplicationsByCompanyId(id string, option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Application, int64) {
-	return c.repo.GetApplicationsByCompanyId(id, option, status)
 }
 
 func (c companyService) GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption, status v1.StatusQueryOption) []v1.Application {
