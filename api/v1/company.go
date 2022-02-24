@@ -207,7 +207,7 @@ func getQueryOption(context echo.Context) v1.CompanyQueryOption {
 	loadApplications := context.QueryParam("loadApplications")
 	loadRepositories := context.QueryParam("loadRepositories")
 	if page == "" {
-		option.Pagination.Page = 1
+		option.Pagination.Page = 0
 		option.Pagination.Limit = 10
 		option.LoadApplications, _ = strconv.ParseBool(loadApplications)
 		option.LoadRepositories, _ = strconv.ParseBool(loadRepositories)

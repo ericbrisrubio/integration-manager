@@ -1,5 +1,11 @@
 package mongo
 
+import (
+	"github.com/stretchr/testify/assert"
+	"log"
+	"testing"
+)
+
 //import (
 //	"github.com/joho/godotenv"
 //	v1 "github.com/klovercloud-ci-cd/integration-manager/core/v1"
@@ -706,3 +712,86 @@ package mongo
 //		assert.ElementsMatch(t, testCase.expected, testCase.actual)
 //	}
 //}
+
+func TestGetPagination(t *testing.T) {
+	type TestCase struct {
+		size, page, limit                    int64
+		expectedStartIndex, expectedEndIndex int64
+		actualStartIndex, actualEndIndex     int64
+	}
+
+	var testCases []TestCase
+
+	testCase := TestCase{
+		size:               20,
+		page:               0,
+		limit:              10,
+		expectedStartIndex: 0,
+		expectedEndIndex:   10,
+	}
+	startIndex, endIndex := GetPagination(testCase.size, testCase.page, testCase.limit)
+	testCase.actualStartIndex = startIndex
+	testCase.actualEndIndex = endIndex
+	testCases = append(testCases, testCase)
+
+	testCase = TestCase{
+		size:               8,
+		page:               0,
+		limit:              10,
+		expectedStartIndex: 0,
+		expectedEndIndex:   8,
+	}
+	startIndex, endIndex = GetPagination(testCase.size, testCase.page, testCase.limit)
+	testCase.actualStartIndex = startIndex
+	testCase.actualEndIndex = endIndex
+	testCases = append(testCases, testCase)
+
+	testCase = TestCase{
+		size:               0,
+		page:               0,
+		limit:              10,
+		expectedStartIndex: 0,
+		expectedEndIndex:   0,
+	}
+
+	startIndex, endIndex = GetPagination(testCase.size, testCase.page, testCase.limit)
+	testCase.actualStartIndex = startIndex
+	testCase.actualEndIndex = endIndex
+	testCases = append(testCases, testCase)
+
+	testCase = TestCase{
+		size:               30,
+		page:               3,
+		limit:              10,
+		expectedStartIndex: 0,
+		expectedEndIndex:   0,
+	}
+
+	startIndex, endIndex = GetPagination(testCase.size, testCase.page, testCase.limit)
+	testCase.actualStartIndex = startIndex
+	testCase.actualEndIndex = endIndex
+	testCases = append(testCases, testCase)
+
+	testCase = TestCase{
+		size:               35,
+		page:               3,
+		limit:              10,
+		expectedStartIndex: 30,
+		expectedEndIndex:   35,
+	}
+
+	startIndex, endIndex = GetPagination(testCase.size, testCase.page, testCase.limit)
+	testCase.actualStartIndex = startIndex
+	testCase.actualEndIndex = endIndex
+	testCases = append(testCases, testCase)
+	for _, each := range testCases {
+		log.Println(each.expectedStartIndex == each.actualStartIndex, each.expectedEndIndex == each.actualEndIndex)
+		if each.expectedStartIndex != each.actualStartIndex || each.expectedEndIndex != each.actualEndIndex {
+			log.Println("ERROR:", "expected:", testCase.expectedStartIndex, each.expectedEndIndex, "actual:", each.actualStartIndex, each.actualEndIndex)
+			//assert.ElementsMatch(t, each.expectedStartIndex, each.expectedEndIndex, each.actualStartIndex, each.actualEndIndex)
+			assert.ElementsMatch(t, each.actualStartIndex, each.expectedStartIndex)
+			assert.ElementsMatch(t, each.actualEndIndex, each.expectedEndIndex)
+		}
+	}
+
+}

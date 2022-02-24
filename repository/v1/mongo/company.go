@@ -29,11 +29,7 @@ func (c companyRepository) GetApplicationsByRepositoryId(repoId string, companyI
 		"$and": []bson.M{{"id": companyId}},
 	}
 	coll := c.manager.Db.Collection(CompanyCollection)
-	skip := option.Pagination.Page * option.Pagination.Limit
-	result, err := coll.Find(c.manager.Ctx, query, &options.FindOptions{
-		Limit: &option.Pagination.Limit,
-		Skip:  &skip,
-	})
+	result, err := coll.Find(c.manager.Ctx, query, nil)
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -50,7 +46,9 @@ func (c companyRepository) GetApplicationsByRepositoryId(repoId string, companyI
 				break
 			}
 		}
-		for _, eachApp := range repository.Applications {
+		startIndex, endIndex := GetPagination(int64(len(repository.Applications)), option.Pagination.Page, option.Pagination.Limit)
+		apps := repository.Applications[startIndex:endIndex]
+		for _, eachApp := range apps {
 			if eachApp.Status == status.Option {
 				results = append(results, eachApp)
 			}
@@ -531,17 +529,24 @@ func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOptio
 	return results, count
 }
 
+func GetPagination(size int64, page int64, limit int64) (int64, int64) {
+	startIndex := page * limit
+	if startIndex >= size {
+		return 0, 0
+	}
+	if size <= startIndex+limit {
+		return startIndex, size
+	}
+	return startIndex, startIndex + limit
+}
+
 func (c companyRepository) GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64) {
 	var results []v1.Repository
 	query := bson.M{
 		"$and": []bson.M{{"id": id}},
 	}
 	coll := c.manager.Db.Collection(CompanyCollection)
-	skip := option.Pagination.Page * option.Pagination.Limit
-	result, err := coll.Find(c.manager.Ctx, query, &options.FindOptions{
-		Limit: &option.Pagination.Limit,
-		Skip:  &skip,
-	})
+	result, err := coll.Find(c.manager.Ctx, query, nil)
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -552,7 +557,9 @@ func (c companyRepository) GetRepositoriesByCompanyId(id string, option v1.Compa
 			log.Println("[ERROR]", err)
 			break
 		}
-		for _, each := range elemValue.Repositories {
+		startIndex, endIndex := GetPagination(int64(len(elemValue.Repositories)), option.Pagination.Page, option.Pagination.Limit)
+		repo := elemValue.Repositories[startIndex:endIndex]
+		for _, each := range repo {
 			if option.LoadApplications == true && option.LoadToken == true {
 				results = elemValue.Repositories
 			} else if option.LoadApplications == true && option.LoadToken == false {
@@ -583,11 +590,7 @@ func (c companyRepository) GetApplicationsByCompanyIdAndRepositoryType(id string
 		"$and": []bson.M{{"id": id, "repositories.type": _type, "repositories.applications.status": status.Option}},
 	}
 	coll := c.manager.Db.Collection(CompanyCollection)
-	skip := option.Pagination.Page * option.Pagination.Limit
-	result, err := coll.Find(c.manager.Ctx, query, &options.FindOptions{
-		Limit: &option.Pagination.Limit,
-		Skip:  &skip,
-	})
+	result, err := coll.Find(c.manager.Ctx, query, nil)
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -604,6 +607,8 @@ func (c companyRepository) GetApplicationsByCompanyIdAndRepositoryType(id string
 				app = each.Applications
 			}
 		}
+		startIndex, endIndex := GetPagination(int64(len(app)), option.Pagination.Page, option.Pagination.Limit)
+		app = app[startIndex:endIndex]
 		for _, each := range app {
 			if each.Status == status.Option {
 				results = append(results, each)
