@@ -63,5 +63,5 @@ func ApplicationRouter(g *echo.Group) {
 	applicationApi := NewApplicationApi(dependency.GetV1CompanyService(), nil)
 	//companyId, repositoryId via query param
 	g.POST("", applicationApi.Update, AuthenticationAndAuthorizationHandler)
-	g.GET("/:id", applicationApi.GetApplicationByApplicationId, AuthenticationAndAuthorizationHandler)
+	g.GET("/:id", applicationApi.GetById, AuthenticationAndAuthorizationHandler)
 }

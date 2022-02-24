@@ -47,7 +47,7 @@ package inmemory
 //	repo := NewCompanyRepository(10)
 //	for _, each := range testdata {
 //		repo.Store(each.data)
-//		com, size := repo.GetCompanies(v1.CompanyQueryOption{
+//		com, size := repo.Get(v1.CompanyQueryOption{
 //			Pagination: v1.Pagination{
 //				Page:  0,
 //				Limit: 10,
@@ -102,7 +102,7 @@ package inmemory
 //		if i%2 == 0 {
 //			flag = false
 //		}
-//		com, size := repo.GetCompanies(v1.CompanyQueryOption{
+//		com, size := repo.Get(v1.CompanyQueryOption{
 //			Pagination: v1.Pagination{
 //				Page:  0,
 //				Limit: 10,

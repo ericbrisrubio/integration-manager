@@ -500,16 +500,10 @@ func (c companyRepository) GetCompanies(option v1.CompanyQueryOption, status v1.
 func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64) {
 	var results v1.Company
 	query := bson.M{
-		"$and": []bson.M{},
+		"$and": []bson.M{{"id": id}},
 	}
-	and := []bson.M{{"id": id}}
-	query["$and"] = and
 	coll := c.manager.Db.Collection(CompanyCollection)
-	skip := option.Pagination.Page * option.Pagination.Limit
-	result, err := coll.Find(c.manager.Ctx, query, &options.FindOptions{
-		Limit: &option.Pagination.Limit,
-		Skip:  &skip,
-	})
+	result, err := coll.Find(c.manager.Ctx, query, nil)
 	if err != nil {
 		log.Println(err.Error())
 	}

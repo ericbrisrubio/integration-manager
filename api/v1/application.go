@@ -25,7 +25,7 @@ type applicationApi struct {
 // @Param repositoryId query string true "repository id"
 // @Success 200 {object} common.ResponseDTO{data=v1.Application}
 // @Router /api/v1/applications/{id} [GET]
-func (a applicationApi) GetApplicationByApplicationId(context echo.Context) error {
+func (a applicationApi) GetById(context echo.Context) error {
 	id := context.Param("id")
 	if id == "" {
 		return common.GenerateErrorResponse(context, nil, "application Id is required!")

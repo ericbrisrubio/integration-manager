@@ -64,7 +64,7 @@ package mongo
 //			t.Fail()
 //		}
 //	}
-//	_, testCase.actual = repo.GetCompanies(option)
+//	_, testCase.actual = repo.Get(option)
 //	if !reflect.DeepEqual(testCase.expected, testCase.actual) {
 //		log.Println("ERROR:", "expected:", testCase.expected, "actual:", testCase.actual)
 //		assert.ElementsMatch(t, testCase.expected, testCase.actual)
