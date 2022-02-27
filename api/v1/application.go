@@ -83,6 +83,12 @@ func (a applicationApi) Update(context echo.Context) error {
 	}
 	var payload []v1.Application
 	payload = formData.Applications
+	for i, _ := range payload {
+		if payload[i].MetaData.Labels == nil {
+			payload[i].MetaData.Labels = make(map[string]string)
+		}
+		payload[i].MetaData.Labels["CompanyId"] = id
+	}
 	var options v1.ApplicationUpdateOption
 	options.Option = enums.APPLICATION_UPDATE_OPTION(updateOption)
 	err := a.companyService.UpdateApplications(id, repoId, payload, options)
