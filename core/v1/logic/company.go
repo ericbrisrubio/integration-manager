@@ -91,23 +91,20 @@ func (c companyService) UpdateRepositories(companyId string, repositories []v1.R
 		}
 		err := c.repo.AppendRepositories(companyId, repositories)
 		if err != nil {
-			log.Println(err)
 			return err
 		}
-	}
-	if companyUpdateOption.Option == enums.SOFT_DELETE_REPOSITORY {
+	} else if companyUpdateOption.Option == enums.SOFT_DELETE_REPOSITORY {
 		err := c.repo.DeleteRepositories(companyId, repositories, true)
 		if err != nil {
-			log.Println(err)
 			return err
 		}
-	}
-	if companyUpdateOption.Option == enums.DELETE_REPOSITORY {
+	} else if companyUpdateOption.Option == enums.DELETE_REPOSITORY {
 		err := c.repo.DeleteRepositories(companyId, repositories, false)
 		if err != nil {
-			log.Println(err)
 			return err
 		}
+	} else {
+		return errors.New("invalid repository update option")
 	}
 	return nil
 }
@@ -187,14 +184,12 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 		if err != nil {
 			return err
 		}
-	}
-	if companyUpdateOption.Option == enums.SOFT_DELETE_APPLICATION {
+	} else if companyUpdateOption.Option == enums.SOFT_DELETE_APPLICATION {
 		err := c.repo.DeleteApplications(companyId, repositoryId, apps, true)
 		if err != nil {
 			return err
 		}
-	}
-	if companyUpdateOption.Option == enums.DELETE_APPLICATION {
+	} else if companyUpdateOption.Option == enums.DELETE_APPLICATION {
 		repo := c.GetRepositoryByRepositoryId(repositoryId, companyId, option)
 		if repo.Type == enums.GITHUB {
 			for i := range apps {
@@ -219,6 +214,8 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 		if err != nil {
 			return err
 		}
+	} else {
+		return errors.New("invalid application update option")
 	}
 	return nil
 }
