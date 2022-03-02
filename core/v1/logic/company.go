@@ -175,6 +175,9 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 			apps[i].MetaData.Id = uuid.New().String()
 		}
 		repo := c.GetRepositoryByRepositoryId(repositoryId, companyId, option)
+		if repo.Id == "" {
+			return errors.New("repository not found")
+		}
 		if repo.Type == enums.GITHUB {
 			c.webHookForGithub(apps, companyId, repo.Token)
 		} else if repo.Type == enums.BIT_BUCKET {
