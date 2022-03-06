@@ -8,11 +8,47 @@ import (
 	"github.com/klovercloud-ci-cd/integration-manager/enums"
 	"github.com/labstack/echo/v4"
 	"log"
+	"strconv"
+	"strings"
 )
 
 type applicationApi struct {
 	companyService service.Company
 	observerList   []service.Observer
+}
+
+// GetAll.. Get All Applications
+// @Summary Get All Applications
+// @Description Get All Applications
+// @Tags Application
+// @Produce json
+// @Param companyId query string true "company id"
+// @Success 200 {object} common.ResponseDTO{data=[]v1.Application}
+// @Router /api/v1/applications [GET]
+
+func (a applicationApi) GetAll(context echo.Context) error {
+	companyId := context.QueryParam("companyId")
+	if companyId == "" {
+		return context.JSON(404, common.ResponseDTO{
+			Message: "company id is required",
+		})
+	}
+	option := getQueryOption(context)
+	option.LoadRepositories = true
+	option.LoadApplications = true
+	data, total := a.companyService.GetAllApplications(companyId, option)
+	metadata := common.GetPaginationMetadata(option.Pagination.Page, option.Pagination.Limit, total, int64(len(data)))
+	uri := strings.Split(context.Request().RequestURI, "?")[0]
+	if option.Pagination.Page > 0 {
+		metadata.Links = append(metadata.Links, map[string]string{"prev": uri + "?order=" + context.QueryParam("order") + "&page=" + strconv.FormatInt(option.Pagination.Page-1, 10) + "&limit=" + strconv.FormatInt(option.Pagination.Limit, 10)})
+	}
+	metadata.Links = append(metadata.Links, map[string]string{"self": uri + "?order=" + context.QueryParam("order") + "&page=" + strconv.FormatInt(option.Pagination.Page, 10) + "&limit=" + strconv.FormatInt(option.Pagination.Limit, 10)})
+
+	if (option.Pagination.Page+1)*option.Pagination.Limit < metadata.TotalCount {
+		metadata.Links = append(metadata.Links, map[string]string{"next": uri + "?order=" + context.QueryParam("order") + "&page=" + strconv.FormatInt(option.Pagination.Page+1, 10) + "&limit=" + strconv.FormatInt(option.Pagination.Limit, 10)})
+	}
+	return common.GenerateSuccessResponse(context, data,
+		&metadata, "Successful")
 }
 
 // Get.. Get Application by Application id
@@ -47,7 +83,7 @@ func (a applicationApi) GetById(context echo.Context) error {
 		return common.GenerateErrorResponse(context, nil, "Company not found!")
 	}
 	return common.GenerateSuccessResponse(context, data,
-		nil, "Successfully")
+		nil, "Successful")
 }
 
 // Update... Update Application

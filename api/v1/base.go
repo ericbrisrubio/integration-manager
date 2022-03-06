@@ -64,4 +64,5 @@ func ApplicationRouter(g *echo.Group) {
 	//companyId, repositoryId via query param
 	g.POST("", applicationApi.Update, AuthenticationAndAuthorizationHandler)
 	g.GET("/:id", applicationApi.GetById, AuthenticationAndAuthorizationHandler)
+	g.GET("", applicationApi.GetAll, AuthenticationAndAuthorizationHandler)
 }
