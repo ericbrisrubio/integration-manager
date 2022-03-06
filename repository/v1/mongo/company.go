@@ -399,8 +399,9 @@ func (c companyRepository) DeleteApplications(companyId, repositoryId string, ap
 func (c companyRepository) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {
 	var results v1.Repository
 	query := bson.M{
-		"$and": []bson.M{{"id": id, "repositories.applications.url": url}},
+		"$and": []bson.M{{"id": id}},
 	}
+	log.Println(query)
 	coll := c.manager.Db.Collection(CompanyCollection)
 	result, err := coll.Find(c.manager.Ctx, query)
 	if err != nil {
@@ -419,7 +420,7 @@ func (c companyRepository) GetRepositoryByCompanyIdAndApplicationUrl(id, url str
 					r := v1.Repository{
 						Id:           each.Id,
 						Type:         each.Type,
-						Token:        "",
+						Token:        each.Token,
 						Applications: each.Applications,
 					}
 					results = r

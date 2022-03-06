@@ -9,6 +9,12 @@ import (
 	"strings"
 )
 
+//CompanyId refers to company id
+var CompanyId string
+
+//CompanyName refers to company name
+var CompanyName string
+
 // ServerPort refers to server port.
 var ServerPort string
 
@@ -91,6 +97,8 @@ func InitEnvironmentVariables() {
 	DatabaseName = os.Getenv("DATABASE_NAME")
 	EventStoreUrl = os.Getenv("EVENT_STORE_URL")
 	Environment = os.Getenv("ENVIRONMENT")
+	CompanyId = os.Getenv("COMPANY_ID")
+	CompanyName = os.Getenv("COMPANY_NAME")
 	Database = os.Getenv("DATABASE")
 	if Database == enums.MONGO {
 		DatabaseConnectionString = "mongodb://" + DbUsername + ":" + DbPassword + "@" + DbServer + ":" + DbPort
