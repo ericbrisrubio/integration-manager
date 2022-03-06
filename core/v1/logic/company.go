@@ -74,7 +74,13 @@ func (c companyService) CreateBitbucketWebHookAndUpdateApplication(companyId str
 }
 
 func (c companyService) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
-	return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl)
+	return v1.Application{
+		MetaData: v1.ApplicationMetadata{
+			Id:               "1001",
+			IsWebhookEnabled: true,
+		},
+	}
+	//return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl)
 }
 func (c companyService) UpdateRepositories(companyId string, repositories []v1.Repository, companyUpdateOption v1.RepositoryUpdateOption) error {
 	if companyUpdateOption.Option == enums.APPEND_REPOSITORY {
@@ -224,7 +230,11 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 }
 
 func (c companyService) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {
-	return c.repo.GetRepositoryByCompanyIdAndApplicationUrl(id, url)
+	return v1.Repository{
+		Id:    "1",
+		Token: "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",
+	}
+	//return c.repo.GetRepositoryByCompanyIdAndApplicationUrl(id, url)
 }
 
 func (c companyService) GetCompanyByApplicationUrl(url string) v1.Company {
@@ -259,7 +269,15 @@ func (c companyService) GetCompanies(option v1.CompanyQueryOption, status v1.Sta
 }
 
 func (c companyService) GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64) {
-	return c.repo.GetByCompanyId(id, option)
+	company:=v1.Company{MetaData: struct {
+		Labels                    map[string]string `bson:"labels" json:"labels" yaml:"labels"`
+		NumberOfConcurrentProcess int64             `bson:"number_of_concurrent_process" json:"number_of_concurrent_process" yaml:"number_of_concurrent_process"`
+		TotalProcessPerDay        int64             `bson:"total_process_per_day" json:"total_process_per_day" yaml:"total_process_per_day"`
+	}{Labels: nil, NumberOfConcurrentProcess: 10, TotalProcessPerDay: 10}}
+	var total int64
+	//company, total := c.repo.GetByCompanyId(id, option)
+	return company, total
+	//return c.repo.GetByCompanyId(id, option)
 }
 
 func (c companyService) GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64) {

@@ -54,7 +54,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		log.Println("[ERROR]:Failed to trigger pipeline process! ", err.Error())
 		return common.GenerateErrorResponse(context, err.Error(), "Failed to trigger pipeline process!")
 	}
-	checkingFlag := branchExists(data.Steps, resource)
+	checkingFlag := branchExists(data.Steps, resource.Ref)
 	if !checkingFlag {
 		return common.GenerateErrorResponse(context, "Branch does not exist!", "Operation Failed!")
 	}
@@ -66,14 +66,29 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 				}
 
 			} else if data.Steps[i].Type == enums.DEPLOY {
-				data.Steps[i].Params["images"] = setDeploymentVersion(data.Steps[i], revision)
-				descriptor := g.setDescriptors(data.Steps[i], repoName, owner, revision, repository.Token)
-				if descriptor != nil {
-					data.Steps[i].Descriptors = descriptor
-				} else {
-					return common.GenerateErrorResponse(context, err.Error(), "Failed to trigger pipeline process!")
-				}
 
+				isThisStepValidForThisCommit:=false
+				if data.Steps[i].Params["revision"]!=""{
+					allowedRevisions:=strings.Split(data.Steps[i].Params[enums.REVISION],",")
+					branch := strings.Split( resource.Ref, "/")[2]
+					for _,each:=range allowedRevisions{
+						if each==branch{
+							isThisStepValidForThisCommit=true
+							break
+						}
+					}
+				}
+				if isThisStepValidForThisCommit {
+					data.Steps[i].Params["images"] = setDeploymentVersion(data.Steps[i], revision)
+					descriptor := g.setDescriptors(data.Steps[i], repoName, owner, revision, repository.Token)
+					if descriptor != nil {
+						data.Steps[i].Descriptors = descriptor
+					} else {
+						return common.GenerateErrorResponse(context, err.Error(), "Failed to trigger pipeline process!")
+					}
+				}else {
+					data.Steps=append(data.Steps[:i], data.Steps[i+1:]...)
+				}
 			} else if data.Steps[i].Type == enums.INTERMEDIARY {
 				if images, ok := data.Steps[i].Params["images"]; ok {
 					data.Steps[i].Params["images"] = setImageVersionForIntermediary(data.Steps[i], revision, images)
@@ -150,14 +165,18 @@ func setImageVersionForIntermediary(step v1.Step, revision string, img string) s
 }
 
 // branchExists returns boolean for branch existence
-func branchExists(steps []v1.Step, resource *v1.GithubWebHookEvent) bool {
+func branchExists(steps []v1.Step,  resourceRef string) bool {
 	for _, step := range steps {
 		if step.Type == enums.BUILD && step.Params[enums.REVISION] != "" {
-			branch := strings.Split(resource.Ref, "/")[2]
-			if step.Params[enums.REVISION] != branch {
-				log.Println("[Forbidden]: Branch wasn't matched!")
-				return false
+			branch := strings.Split(resourceRef, "/")[2]
+			branches:=strings.Split(step.Params[enums.REVISION],",")
+			for _,each:=range branches{
+				if  branch== each {
+					return true
+				}
 			}
+			log.Println("[Forbidden]: Branch wasn't matched!")
+			return false
 		}
 	}
 	return true
