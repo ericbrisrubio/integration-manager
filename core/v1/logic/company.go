@@ -17,6 +17,16 @@ type companyService struct {
 	client service.HttpClient
 }
 
+func (c companyService) GetAllApplications(companyId string, option v1.CompanyQueryOption) ([]v1.Application, int64) {
+	repositories, _ := c.GetRepositoriesByCompanyId(companyId, option)
+	var applications []v1.Application
+	for _, eachRepo := range repositories {
+		apps := eachRepo.Applications
+		applications = append(applications, apps...)
+	}
+	return applications, int64(len(applications))
+}
+
 func (c companyService) GetApplicationsByRepositoryId(repositoryId string, companyId string, option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Application, int64) {
 	return c.repo.GetApplicationsByRepositoryId(repositoryId, companyId, option, status)
 }

@@ -12,6 +12,10 @@ type mockCompanyService struct {
 	client service.HttpClient
 }
 
+func (m mockCompanyService) GetAllApplications(companyId string, option v1.CompanyQueryOption) ([]v1.Application, int64) {
+	panic("implement me")
+}
+
 func (m mockCompanyService) GetRepositoryByRepositoryId(id string, companyId string, option v1.CompanyQueryOption) v1.Repository {
 	//TODO implement me
 	panic("implement me")
