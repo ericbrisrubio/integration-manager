@@ -66,6 +66,11 @@ func (c companyApi) UpdateRepositories(context echo.Context) error {
 	}
 	var payload []v1.Repository
 	payload = formData.Repositories
+	for _, each := range payload {
+		for j, eachApp := range each.Applications {
+			each.Applications[j].Url = UrlFormatter(eachApp.Url)
+		}
+	}
 	var options v1.RepositoryUpdateOption
 	Option := context.QueryParam("companyUpdateOption")
 	options.Option = enums.REPOSITORY_UPDATE_OPTION(Option)
@@ -124,6 +129,11 @@ func (c companyApi) Save(context echo.Context) error {
 		payload.MetaData.TotalProcessPerDay = config.DefaultPerDayTotalProcess
 	}
 	contextData := generateRepositoryAndApplicationId(payload)
+	for _, each := range contextData.Repositories {
+		for j, eachApp := range each.Applications {
+			each.Applications[j].Url = UrlFormatter(eachApp.Url)
+		}
+	}
 	err := c.companyService.Store(contextData)
 	if err != nil {
 		log.Println("[Error]:", err.Error())

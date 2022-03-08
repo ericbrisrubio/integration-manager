@@ -11,6 +11,7 @@ import (
 	"github.com/twinj/uuid"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"log"
+	"strings"
 )
 
 type v1BitbucketApi struct {
@@ -36,15 +37,15 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 		log.Println(err.Error())
 		return common.GenerateErrorResponse(context, err.Error(), "Operation Failed!")
 	}
-	companyId :=context.QueryParam("companyId")
-	if companyId==""{
-		return common.GenerateErrorResponse(context,"[ERROR] no companyId is provided","Please provide companyId")
+	companyId := context.QueryParam("companyId")
+	if companyId == "" {
+		return common.GenerateErrorResponse(context, "[ERROR] no companyId is provided", "Please provide companyId")
 	}
 	repoName := resource.Repository.Name
 	owner := resource.Repository.Workspace.Slug
 	revision := resource.Push.Changes[len(resource.Push.Changes)-1].New.Target.Hash
 	repository := b.companyService.GetRepositoryByCompanyIdAndApplicationUrl(companyId, resource.Repository.Links.HTML.Href)
-	application := b.companyService.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, resource.Repository.UUID, resource.Repository.Links.HTML.Href)
+	application := b.companyService.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repository.Id, resource.Repository.Links.HTML.Href)
 	if !application.MetaData.IsWebhookEnabled {
 		return common.GenerateForbiddenResponse(context, "[Forbidden]: Web hook is disabled!", "Operation Failed!")
 	}
@@ -53,13 +54,9 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 		log.Println("[ERROR]:Failed to trigger pipeline process! ", err.Error())
 		return common.GenerateErrorResponse(context, err.Error(), "Failed to trigger pipeline process!")
 	}
-	for _, step := range data.Steps {
-		if step.Type == enums.BUILD && step.Params[enums.REVISION] != "" {
-			branch := resource.Push.Changes[len(resource.Push.Changes)-1].New.Name
-			if step.Params[enums.REVISION] != branch {
-				return common.GenerateForbiddenResponse(context, "[Forbidden]: Branch wasn't matched!", "Operation Failed!")
-			}
-		}
+	checkingFlag := BranchExists(data.Steps, resource.Push.Changes[len(resource.Push.Changes)-1].New.Name, "BIT_BUCKET")
+	if !checkingFlag {
+		return common.GenerateErrorResponse(context, "Branch does not exist!", "Operation Failed!")
 	}
 	if data != nil {
 		for i := range data.Steps {
@@ -69,14 +66,29 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 				}
 
 			} else if data.Steps[i].Type == enums.DEPLOY {
-				data.Steps[i].Params["images"] = setDeploymentVersion(data.Steps[i], revision)
-				descriptor := b.setDescriptors(data.Steps[i], repoName, owner, revision, repository.Token)
-				if descriptor != nil {
-					data.Steps[i].Descriptors = descriptor
-				} else {
-					return common.GenerateErrorResponse(context, err.Error(), "Failed to trigger pipeline process!")
-				}
 
+				isThisStepValidForThisCommit := false
+				if data.Steps[i].Params[enums.REVISION] != "" {
+					allowedRevisions := strings.Split(data.Steps[i].Params[enums.REVISION], ",")
+					branch := resource.Push.Changes[len(resource.Push.Changes)-1].New.Name
+					for _, each := range allowedRevisions {
+						if each == branch {
+							isThisStepValidForThisCommit = true
+							break
+						}
+					}
+				}
+				if isThisStepValidForThisCommit {
+					data.Steps[i].Params["images"] = setDeploymentVersion(data.Steps[i], revision)
+					descriptor := b.setDescriptors(data.Steps[i], repoName, owner, revision, repository.Token)
+					if descriptor != nil {
+						data.Steps[i].Descriptors = descriptor
+					} else {
+						return common.GenerateErrorResponse(context, err.Error(), "Failed to trigger pipeline process!")
+					}
+				} else {
+					data.Steps = append(data.Steps[:i], data.Steps[i+1:]...)
+				}
 			} else if data.Steps[i].Type == enums.INTERMEDIARY {
 				if images, ok := data.Steps[i].Params["images"]; ok {
 					data.Steps[i].Params["images"] = setImageVersionForIntermediary(data.Steps[i], revision, images)

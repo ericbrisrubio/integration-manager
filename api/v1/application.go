@@ -119,6 +119,7 @@ func (a applicationApi) Update(context echo.Context) error {
 	var payload []v1.Application
 	payload = formData.Applications
 	for i, _ := range payload {
+		payload[i].Url = UrlFormatter(payload[i].Url)
 		if payload[i].MetaData.Labels == nil {
 			payload[i].MetaData.Labels = make(map[string]string)
 		}
