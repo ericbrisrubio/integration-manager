@@ -54,7 +54,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		log.Println("[ERROR]:Failed to trigger pipeline process! ", err.Error())
 		return common.GenerateErrorResponse(context, err.Error(), "Failed to trigger pipeline process!")
 	}
-	checkingFlag := branchExists(data.Steps, resource.Ref)
+	checkingFlag := BranchExists(data.Steps, resource.Ref, "GITHUB")
 	if !checkingFlag {
 		return common.GenerateErrorResponse(context, "Branch does not exist!", "Operation Failed!")
 	}
@@ -67,13 +67,13 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 
 			} else if data.Steps[i].Type == enums.DEPLOY {
 
-				isThisStepValidForThisCommit:=false
-				if data.Steps[i].Params["revision"]!=""{
-					allowedRevisions:=strings.Split(data.Steps[i].Params[enums.REVISION],",")
-					branch := strings.Split( resource.Ref, "/")[2]
-					for _,each:=range allowedRevisions{
-						if each==branch{
-							isThisStepValidForThisCommit=true
+				isThisStepValidForThisCommit := false
+				if data.Steps[i].Params[enums.REVISION] != "" {
+					allowedRevisions := strings.Split(data.Steps[i].Params[enums.REVISION], ",")
+					branch := strings.Split(resource.Ref, "/")[2]
+					for _, each := range allowedRevisions {
+						if each == branch {
+							isThisStepValidForThisCommit = true
 							break
 						}
 					}
@@ -86,8 +86,8 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 					} else {
 						return common.GenerateErrorResponse(context, err.Error(), "Failed to trigger pipeline process!")
 					}
-				}else {
-					data.Steps=append(data.Steps[:i], data.Steps[i+1:]...)
+				} else {
+					data.Steps = append(data.Steps[:i], data.Steps[i+1:]...)
 				}
 			} else if data.Steps[i].Type == enums.INTERMEDIARY {
 				if images, ok := data.Steps[i].Params["images"]; ok {
@@ -163,24 +163,6 @@ func setImageVersionForIntermediary(step v1.Step, revision string, img string) s
 		}
 	}
 	return strings.Join(images, ",")
-}
-
-// branchExists returns boolean for branch existence
-func branchExists(steps []v1.Step,  resourceRef string) bool {
-	for _, step := range steps {
-		if step.Type == enums.BUILD && step.Params[enums.REVISION] != "" {
-			branch := strings.Split(resourceRef, "/")[2]
-			branches:=strings.Split(step.Params[enums.REVISION],",")
-			for _,each:=range branches{
-				if  branch== each {
-					return true
-				}
-			}
-			log.Println("[Forbidden]: Branch wasn't matched!")
-			return false
-		}
-	}
-	return true
 }
 
 // setDeploymentVersion returns image version for deployment

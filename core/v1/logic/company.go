@@ -84,15 +84,20 @@ func (c companyService) CreateBitbucketWebHookAndUpdateApplication(companyId str
 }
 
 func (c companyService) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
-	return v1.Application{
-		MetaData: v1.ApplicationMetadata{
-			Id:               "1001",
-			IsWebhookEnabled: true,
-		},
-	}
-	//return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl)
+	//return v1.Application{
+	//	MetaData: v1.ApplicationMetadata{
+	//		Id:               "1001",
+	//		IsWebhookEnabled: true,
+	//	},
+	//}
+	return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl)
 }
 func (c companyService) UpdateRepositories(companyId string, repositories []v1.Repository, companyUpdateOption v1.RepositoryUpdateOption) error {
+	option := v1.CompanyQueryOption{}
+	company, _ := c.repo.GetByCompanyId(companyId, option)
+	if company.Id == "" {
+		return errors.New("[ERROR] Company already exists")
+	}
 	if companyUpdateOption.Option == enums.APPEND_REPOSITORY {
 		for i, each := range repositories {
 			repositories[i].Id = uuid.New().String()
@@ -136,16 +141,6 @@ func getUsernameAndRepoNameFromGithubRepositoryUrl(url string) (username string,
 	return usernameOrorgName, repositoryName
 }
 
-func getUsernameAndRepoNameFromBitbucketRepositoryUrl(url string) (username string, repoName string) {
-	trim := strings.TrimSuffix(url, ".git")
-	urlArray := strings.Split(trim, "/")
-	if len(urlArray) < 3 {
-		return "", ""
-	}
-	repositoryName := urlArray[len(urlArray)-4]
-	usernameOrOrgName := urlArray[len(urlArray)-5]
-	return usernameOrOrgName, repositoryName
-}
 func (c companyService) webHookForGithub(apps []v1.Application, companyId string, token string) {
 	for i := range apps {
 		usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
@@ -164,7 +159,7 @@ func (c companyService) webHookForGithub(apps []v1.Application, companyId string
 
 func (c companyService) webHookForBitbucket(apps []v1.Application, companyId string, token string) {
 	for i := range apps {
-		usernameOrOrgName, repoName := getUsernameAndRepoNameFromBitbucketRepositoryUrl(apps[i].Url)
+		usernameOrOrgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
 		b, err := c.client.Get(enums.BITBUCKET_API_BASE_URL+"repositories/"+usernameOrOrgName+"/"+repoName, nil)
 		var repositoryDetails v1.BitbucketRepository
 		err = yaml.Unmarshal(b, &repositoryDetails)
@@ -221,7 +216,7 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 			}
 		} else if repo.Type == enums.BIT_BUCKET {
 			for i := range apps {
-				usernameOrOrgName, repoName := getUsernameAndRepoNameFromBitbucketRepositoryUrl(apps[i].Url)
+				usernameOrOrgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
 				err := NewBitBucketService(c, nil, c.client).DeleteRepositoryWebhookById(usernameOrOrgName, repoName, apps[i].Webhook.ID, repo.Token)
 				if err != nil {
 					return err
@@ -240,11 +235,11 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 }
 
 func (c companyService) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {
-	return v1.Repository{
-		Id:    "1",
-		Token: "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",
-	}
-	//return c.repo.GetRepositoryByCompanyIdAndApplicationUrl(id, url)
+	//return v1.Repository{
+	//	Id:    "1",
+	//	Token: "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",
+	//}
+	return c.repo.GetRepositoryByCompanyIdAndApplicationUrl(id, url)
 }
 
 func (c companyService) GetCompanyByApplicationUrl(url string) v1.Company {
@@ -279,15 +274,15 @@ func (c companyService) GetCompanies(option v1.CompanyQueryOption, status v1.Sta
 }
 
 func (c companyService) GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64) {
-	company:=v1.Company{MetaData: struct {
-		Labels                    map[string]string `bson:"labels" json:"labels" yaml:"labels"`
-		NumberOfConcurrentProcess int64             `bson:"number_of_concurrent_process" json:"number_of_concurrent_process" yaml:"number_of_concurrent_process"`
-		TotalProcessPerDay        int64             `bson:"total_process_per_day" json:"total_process_per_day" yaml:"total_process_per_day"`
-	}{Labels: nil, NumberOfConcurrentProcess: 10, TotalProcessPerDay: 10}}
-	var total int64
-	//company, total := c.repo.GetByCompanyId(id, option)
-	return company, total
-	//return c.repo.GetByCompanyId(id, option)
+	//company := v1.Company{MetaData: struct {
+	//	Labels                    map[string]string `bson:"labels" json:"labels" yaml:"labels"`
+	//	NumberOfConcurrentProcess int64             `bson:"number_of_concurrent_process" json:"number_of_concurrent_process" yaml:"number_of_concurrent_process"`
+	//	TotalProcessPerDay        int64             `bson:"total_process_per_day" json:"total_process_per_day" yaml:"total_process_per_day"`
+	//}{Labels: nil, NumberOfConcurrentProcess: 10, TotalProcessPerDay: 10}}
+	//var total int64
+	////company, total := c.repo.GetByCompanyId(id, option)
+	//return company, total
+	return c.repo.GetByCompanyId(id, option)
 }
 
 func (c companyService) GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64) {
