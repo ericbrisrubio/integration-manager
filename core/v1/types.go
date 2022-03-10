@@ -157,6 +157,7 @@ type Process struct {
 	CompanyId    string                 `bson:"company_id" json:"company_id"`
 	AppId        string                 `bson:"app_id" json:"app_id"`
 	RepositoryId string                 `bson:"repository_id" json:"repository_id"`
+	CommitId	 string					`bson:"commit_id" json:"commit_id"`
 	Data         map[string]interface{} `bson:"data" json:"data"`
 }
 
@@ -164,6 +165,7 @@ type Process struct {
 type PipelineMetadata struct {
 	CompanyId       string          `json:"company_id" yaml:"company_id"`
 	CompanyMetadata CompanyMetadata `json:"company_metadata" yaml:"company_metadata"`
+	CommitId		string			`json:"commit_id" yaml:"commit_id"`
 }
 
 // OnlyCompanyDto contains only company info

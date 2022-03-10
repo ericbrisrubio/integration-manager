@@ -103,6 +103,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 	data.MetaData = v1.PipelineMetadata{
 		CompanyId:       companyId,
 		CompanyMetadata: company.MetaData,
+		CommitId: 	     revision,
 	}
 	subject := v1.Subject{
 		Log:                   "Pipeline triggered",
