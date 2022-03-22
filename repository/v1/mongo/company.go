@@ -401,7 +401,6 @@ func (c companyRepository) GetRepositoryByCompanyIdAndApplicationUrl(id, url str
 	query := bson.M{
 		"$and": []bson.M{{"id": id}},
 	}
-	log.Println(query)
 	coll := c.manager.Db.Collection(CompanyCollection)
 	result, err := coll.Find(c.manager.Ctx, query)
 	if err != nil {

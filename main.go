@@ -20,7 +20,7 @@ func main() {
 
 func initCompany() {
 	companyService := dependency.GetV1CompanyService()
-	companyService.Store(v1.Company{
+	err := companyService.Store(v1.Company{
 		MetaData: v1.CompanyMetadata(struct {
 			Labels                    map[string]string
 			NumberOfConcurrentProcess int64
@@ -30,4 +30,7 @@ func initCompany() {
 		Name:   config.CompanyName,
 		Status: enums.ACTIVE,
 	})
+	if err != nil {
+		return
+	}
 }

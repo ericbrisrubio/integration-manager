@@ -59,10 +59,22 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 		return common.GenerateErrorResponse(context, "Branch does not exist!", "Operation Failed!")
 	}
 	if data != nil {
-		for i := range data.Steps {
+		stepsCount := len(data.Steps)
+		for i := 0; i < stepsCount; i++ {
 			if data.Steps[i].Type == enums.BUILD {
 				if images, ok := data.Steps[i].Params["images"]; ok {
 					data.Steps[i].Params["images"] = setImageVersionForBuild(data.Steps[i], revision, images)
+				}
+				if storage, ok := data.Steps[i].Params[enums.STORAGE]; ok {
+					data.Steps[i].Params[enums.STORAGE] = storage
+				} else {
+					data.Steps[i].Params[enums.STORAGE] = "500Mi"
+				}
+				if accessMode, ok := data.Steps[i].Params[enums.ACCESS]; ok {
+					data.Steps[i].Params[enums.ACCESS] = setAccessModeForBuild(accessMode)
+				}
+				if buildType, ok := data.Steps[i].Params[enums.BUILD_TYPE]; ok {
+					data.Steps[i].Params[enums.BUILD_TYPE] = buildType
 				}
 
 			} else if data.Steps[i].Type == enums.DEPLOY {
@@ -88,6 +100,8 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 					}
 				} else {
 					data.Steps = append(data.Steps[:i], data.Steps[i+1:]...)
+					stepsCount = stepsCount - 1
+					i = i - 1
 				}
 			} else if data.Steps[i].Type == enums.INTERMEDIARY {
 				if images, ok := data.Steps[i].Params["images"]; ok {
@@ -103,7 +117,7 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 	data.MetaData = v1.PipelineMetadata{
 		CompanyId:       companyId,
 		CompanyMetadata: company.MetaData,
-		CommitId: revision,
+		CommitId:        revision,
 	}
 	subject := v1.Subject{
 		Log:                   "Pipeline triggered",

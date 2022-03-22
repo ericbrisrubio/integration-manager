@@ -120,6 +120,34 @@ type PARAMS string
 const (
 	// REVISION resource revision key for  pipeline step param
 	REVISION = PARAMS("revision")
+
+	// IMAGE resource image key for  pipeline step param
+	IMAGE = PARAMS("images")
+
+	// STORAGE resource storage key for  pipeline step param
+	STORAGE = PARAMS("storage")
+
+	// ACCESS resource access mode key for  pipeline step param
+	ACCESS = PARAMS("access_mode")
+
+	// BUILD_TYPE resource build type key for  pipeline step param
+	BUILD_TYPE = PARAMS("build_type")
+)
+
+type ACCESS_MODE string
+
+const (
+	// READ_WRITE_ONCE access mode for read and write once
+	READ_WRITE_ONCE = ACCESS_MODE("ReadWriteOnce")
+
+	// READ_WRITE_MANY access mode for read write many
+	READ_WRITE_MANY = ACCESS_MODE("ReadWriteMany")
+
+	// READ_ONLY_MANY access mode for read only many
+	READ_ONLY_MANY = ACCESS_MODE("ReadOnlyMany")
+
+	// READ_WRITE_ONCE_POD access mode for read write once pod
+	READ_WRITE_ONCE_POD = ACCESS_MODE("ReadWriteOncePod")
 )
 
 // PIPELINE_FILE_BASE_DIRECTORY pipeline file base directory
