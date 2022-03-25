@@ -68,25 +68,26 @@ func (c companyRepository) AppendRepositories(companyId string, repos []v1.Repos
 	return nil
 }
 
-func (c companyRepository) DeleteRepositories(companyId string, repos []v1.Repository, isSoftDelete bool) error {
-	var repositories []v1.Repository
-	for _, each := range IndexedCompanies {
-		if companyId == each.Id {
-			if isSoftDelete {
-				each.Status = enums.INACTIVE
-			} else {
-				for i, eachRepo := range each.Repositories {
-					for _, DeleteRepo := range repos {
-						if eachRepo.Id == DeleteRepo.Id {
-							repositories = RemoveRepository(each.Repositories, i)
-						}
-					}
-				}
-				each.Repositories = repositories
-			}
-		}
-	}
-	return nil
+func (c companyRepository) DeleteRepositories(companyId string, repos []v1.Repository) error {
+	//var repositories []v1.Repository
+	//for _, each := range IndexedCompanies {
+	//	if companyId == each.Id {
+	//		if isSoftDelete {
+	//			each.Status = enums.INACTIVE
+	//		} else {
+	//			for i, eachRepo := range each.Repositories {
+	//				for _, DeleteRepo := range repos {
+	//					if eachRepo.Id == DeleteRepo.Id {
+	//						repositories = RemoveRepository(each.Repositories, i)
+	//					}
+	//				}
+	//			}
+	//			each.Repositories = repositories
+	//		}
+	//	}
+	//}
+	//return nil
+	panic("implement me")
 }
 
 func (c companyRepository) AppendApplications(companyId, repositoryId string, apps []v1.Application) error {
@@ -102,29 +103,30 @@ func (c companyRepository) AppendApplications(companyId, repositoryId string, ap
 	return nil
 }
 
-func (c companyRepository) DeleteApplications(companyId, repositoryId string, apps []v1.Application, isSoftDelete bool) error {
-	var applications []v1.Application
-	for _, each := range IndexedCompanies {
-		if companyId == each.Id {
-			if isSoftDelete {
-				each.Status = enums.INACTIVE
-			} else {
-				for _, eachRepo := range each.Repositories {
-					if eachRepo.Id == repositoryId {
-						for i, eachApp := range eachRepo.Applications {
-							for _, deleteApp := range apps {
-								if eachApp.MetaData.Id == deleteApp.MetaData.Id {
-									applications = RemoveApplication(eachRepo.Applications, i)
-								}
-							}
-						}
-					}
-					eachRepo.Applications = applications
-				}
-			}
-		}
-	}
-	return nil
+func (c companyRepository) DeleteApplications(companyId, repositoryId string, repos []v1.Repository) error {
+	//var applications []v1.Application
+	//for _, each := range IndexedCompanies {
+	//	if companyId == each.Id {
+	//		if isSoftDelete {
+	//			each.Status = enums.INACTIVE
+	//		} else {
+	//			for _, eachRepo := range each.Repositories {
+	//				if eachRepo.Id == repositoryId {
+	//					for i, eachApp := range eachRepo.Applications {
+	//						for _, deleteApp := range apps {
+	//							if eachApp.MetaData.Id == deleteApp.MetaData.Id {
+	//								applications = RemoveApplication(eachRepo.Applications, i)
+	//							}
+	//						}
+	//					}
+	//				}
+	//				eachRepo.Applications = applications
+	//			}
+	//		}
+	//	}
+	//}
+	//return nil
+	panic("implement me")
 }
 
 func (c companyRepository) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {

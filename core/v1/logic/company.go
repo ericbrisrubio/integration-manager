@@ -14,6 +14,7 @@ import (
 
 type companyService struct {
 	repo   repository.CompanyRepository
+	applicationMetadataRepository repository.ApplicationMetadataRepository
 	client service.HttpClient
 }
 
@@ -61,6 +62,14 @@ func (c companyService) CreateGithubWebHookAndUpdateApplication(companyId string
 		app.Webhook = gitWebhook
 		app.MetaData.IsWebhookEnabled = true
 	}
+	applicationMetadataCollection := v1.ApplicationMetadataCollection{
+		MetaData: app.MetaData,
+		Status:   app.Status,
+	}
+	err = c.applicationMetadataRepository.Update(companyId, applicationMetadataCollection)
+	if err != nil {
+		return
+	}
 	err = c.repo.UpdateApplication(companyId, repoId, app.MetaData.Id, app)
 	if err != nil {
 		return
@@ -77,6 +86,14 @@ func (c companyService) CreateBitbucketWebHookAndUpdateApplication(companyId str
 		app.Webhook = gitWebhook
 		app.MetaData.IsWebhookEnabled = true
 	}
+	applicationMetadataCollection := v1.ApplicationMetadataCollection{
+		MetaData: app.MetaData,
+		Status:   app.Status,
+	}
+	err = c.applicationMetadataRepository.Update(companyId, applicationMetadataCollection)
+	if err != nil {
+		return
+	}
 	err = c.repo.UpdateApplication(companyId, repoId, app.MetaData.Id, app)
 	if err != nil {
 		return
@@ -84,19 +101,13 @@ func (c companyService) CreateBitbucketWebHookAndUpdateApplication(companyId str
 }
 
 func (c companyService) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
-	//return v1.Application{
-	//	MetaData: v1.ApplicationMetadata{
-	//		Id:               "1001",
-	//		IsWebhookEnabled: true,
-	//	},
-	//}
 	return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl)
 }
 func (c companyService) UpdateRepositories(companyId string, repositories []v1.Repository, companyUpdateOption v1.RepositoryUpdateOption) error {
-	option := v1.CompanyQueryOption{}
+	option := v1.CompanyQueryOption{LoadRepositories: true, LoadApplications: true, LoadToken: true}
 	company, _ := c.repo.GetByCompanyId(companyId, option)
 	if company.Id == "" {
-		return errors.New("[ERROR] Company already exists")
+		return errors.New("[ERROR] Company does not exist")
 	}
 	if companyUpdateOption.Option == enums.APPEND_REPOSITORY {
 		for i, each := range repositories {
@@ -115,12 +126,53 @@ func (c companyService) UpdateRepositories(companyId string, repositories []v1.R
 			return err
 		}
 	} else if companyUpdateOption.Option == enums.SOFT_DELETE_REPOSITORY {
-		err := c.repo.DeleteRepositories(companyId, repositories, true)
+		var count int64
+		for i, _ := range company.Repositories {
+			for j, _ := range repositories {
+				if company.Repositories[i].Id == repositories[j].Id {
+					for k := range company.Repositories[i].Applications {
+						company.Repositories[i].Applications[k].Status = enums.INACTIVE
+						applicationMetadataCollection := v1.ApplicationMetadataCollection{
+							MetaData: company.Repositories[i].Applications[k].MetaData,
+							Status:   company.Repositories[i].Applications[k].Status,
+						}
+						err := c.applicationMetadataRepository.Update(companyId, applicationMetadataCollection)
+						if err != nil {
+							return err
+						}
+					}
+					count++
+				}
+			}
+		}
+		if count < 1 {
+			return errors.New("repository id does not match")
+		}
+		err := c.repo.DeleteRepositories(companyId, company.Repositories)
 		if err != nil {
 			return err
 		}
 	} else if companyUpdateOption.Option == enums.DELETE_REPOSITORY {
-		err := c.repo.DeleteRepositories(companyId, repositories, false)
+		var count int64
+		for i := range repositories {
+			for j, eachRepo := range company.Repositories {
+				if repositories[i].Id == eachRepo.Id {
+					for _, eachApp := range eachRepo.Applications {
+						err := c.applicationMetadataRepository.Delete(eachApp.MetaData.Id, companyId)
+						if err != nil {
+							return err
+						}
+					}
+					company.Repositories = v1.RemoveRepository(company.Repositories, j)
+					count++
+					break
+				}
+			}
+		}
+		if count < 1 {
+			return errors.New("repository id does not match")
+		}
+		err := c.repo.DeleteRepositories(companyId, company.Repositories)
 		if err != nil {
 			return err
 		}
@@ -153,7 +205,14 @@ func (c companyService) webHookForGithub(apps []v1.Application, companyId string
 			apps[i].MetaData.IsWebhookEnabled = true
 			apps[i].Status = enums.ACTIVE
 		}
-
+		applicationMetadataCollection := v1.ApplicationMetadataCollection{
+			MetaData: apps[i].MetaData,
+			Status:   apps[i].Status,
+		}
+		err = c.applicationMetadataRepository.Store(applicationMetadataCollection)
+		if err != nil {
+			return
+		}
 	}
 }
 
@@ -175,12 +234,23 @@ func (c companyService) webHookForBitbucket(apps []v1.Application, companyId str
 			apps[i].MetaData.IsWebhookEnabled = true
 			apps[i].Status = enums.ACTIVE
 		}
-
+		applicationMetadataCollection := v1.ApplicationMetadataCollection{
+			MetaData: apps[i].MetaData,
+			Status:   apps[i].Status,
+		}
+		err = c.applicationMetadataRepository.Store(applicationMetadataCollection)
+		if err != nil {
+			return
+		}
 	}
 }
 
 func (c companyService) UpdateApplications(companyId string, repositoryId string, apps []v1.Application, companyUpdateOption v1.ApplicationUpdateOption) error {
-	option := v1.CompanyQueryOption{LoadApplications: true, LoadToken: true}
+	option := v1.CompanyQueryOption{LoadRepositories: true, LoadApplications: true, LoadToken: true}
+	company, _ := c.repo.GetByCompanyId(companyId, option)
+	if company.Id == "" {
+		return errors.New("[ERROR] Company does not exist")
+	}
 	if companyUpdateOption.Option == enums.APPEND_APPLICATION {
 		for i := range apps {
 			apps[i].MetaData.Id = uuid.New().String()
@@ -199,7 +269,26 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 			return err
 		}
 	} else if companyUpdateOption.Option == enums.SOFT_DELETE_APPLICATION {
-		err := c.repo.DeleteApplications(companyId, repositoryId, apps, true)
+		for i, each := range company.Repositories {
+			if repositoryId == each.Id {
+				for j, eachApp := range each.Applications {
+					for k := range apps {
+						if apps[k].MetaData.Id == eachApp.MetaData.Id {
+							company.Repositories[i].Applications[j].Status = enums.INACTIVE
+							applicationMetadataCollection := v1.ApplicationMetadataCollection{
+								MetaData: company.Repositories[i].Applications[j].MetaData,
+								Status:   company.Repositories[i].Applications[j].Status,
+							}
+							err := c.applicationMetadataRepository.Update(companyId, applicationMetadataCollection)
+							if err != nil {
+								return err
+							}
+						}
+					}
+				}
+			}
+		}
+		err := c.repo.DeleteApplications(companyId, repositoryId, company.Repositories)
 		if err != nil {
 			return err
 		}
@@ -213,6 +302,10 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 					return err
 				}
 				apps[i].MetaData.IsWebhookEnabled = false
+				err = c.applicationMetadataRepository.Delete(apps[i].MetaData.Id, companyId)
+				if err != nil {
+					return err
+				}
 			}
 		} else if repo.Type == enums.BIT_BUCKET {
 			for i := range apps {
@@ -222,9 +315,34 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 					return err
 				}
 				apps[i].MetaData.IsWebhookEnabled = false
+				err = c.applicationMetadataRepository.Delete(apps[i].MetaData.Id, companyId)
+				if err != nil {
+					return err
+				}
 			}
 		}
-		err := c.repo.DeleteApplications(companyId, repositoryId, apps, false)
+		var count int64 = 0
+		var applications []v1.Application
+		for i, each := range company.Repositories {
+			applications = each.Applications
+			if company.Repositories[i].Id == repositoryId {
+				for j := range apps {
+					for k := range applications {
+						if each.Applications[k].MetaData.Id == apps[j].MetaData.Id {
+							applications = v1.RemoveApplication(applications, k)
+							count++
+							break
+						}
+					}
+				}
+				company.Repositories[i].Applications = applications
+				break
+			}
+		}
+		if count < 1 {
+			return errors.New("application id does not match")
+		}
+		err := c.repo.DeleteApplications(companyId, repositoryId, company.Repositories)
 		if err != nil {
 			return err
 		}
@@ -235,10 +353,6 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 }
 
 func (c companyService) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {
-	//return v1.Repository{
-	//	Id:    "1",
-	//	Token: "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",
-	//}
 	return c.repo.GetRepositoryByCompanyIdAndApplicationUrl(id, url)
 }
 
@@ -274,14 +388,6 @@ func (c companyService) GetCompanies(option v1.CompanyQueryOption, status v1.Sta
 }
 
 func (c companyService) GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64) {
-	//company := v1.Company{MetaData: struct {
-	//	Labels                    map[string]string `bson:"labels" json:"labels" yaml:"labels"`
-	//	NumberOfConcurrentProcess int64             `bson:"number_of_concurrent_process" json:"number_of_concurrent_process" yaml:"number_of_concurrent_process"`
-	//	TotalProcessPerDay        int64             `bson:"total_process_per_day" json:"total_process_per_day" yaml:"total_process_per_day"`
-	//}{Labels: nil, NumberOfConcurrentProcess: 10, TotalProcessPerDay: 10}}
-	//var total int64
-	////company, total := c.repo.GetByCompanyId(id, option)
-	//return company, total
 	return c.repo.GetByCompanyId(id, option)
 }
 
@@ -294,9 +400,10 @@ func (c companyService) GetApplicationsByCompanyIdAndRepositoryType(id string, _
 }
 
 // NewCompanyService returns Company type service
-func NewCompanyService(repo repository.CompanyRepository, client service.HttpClient) service.Company {
+func NewCompanyService(repo repository.CompanyRepository, applicationMetadataRepository repository.ApplicationMetadataRepository, client service.HttpClient) service.Company {
 	return &companyService{
 		repo:   repo,
+		applicationMetadataRepository: applicationMetadataRepository,
 		client: client,
 	}
 }

@@ -48,9 +48,9 @@ func GetV1Observers() []service.Observer {
 func GetV1CompanyService() service.Company {
 	var company service.Company
 	if config.Database == enums.MONGO {
-		company = logic.NewCompanyService(mongo.NewCompanyRepository(3000), logic.NewHttpClientService())
+		company = logic.NewCompanyService(mongo.NewCompanyRepository(3000), mongo.NewApplicationMetadataRepository(3000), logic.NewHttpClientService())
 	} else {
-		company = logic.NewCompanyService(inmemory.NewCompanyRepository(3000), logic.NewHttpClientService())
+		company = logic.NewCompanyService(inmemory.NewCompanyRepository(3000), nil, logic.NewHttpClientService())
 	}
 	return company
 }
@@ -70,4 +70,11 @@ func GetV1ProcessInventoryEventService() service.ProcessInventoryEvent {
 // GetV1JwtService returns Jwt service
 func GetV1JwtService() service.Jwt {
 	return logic.NewJwtService()
+}
+
+// GetV1SearchService returns Search service
+func GetV1SearchService() service.Search {
+	var search service.Search
+	search = logic.NewSearchService(mongo.NewApplicationMetadataRepository(3000))
+	return search
 }

@@ -9,9 +9,9 @@ import (
 type CompanyRepository interface {
 	Store(company v1.Company) error
 	AppendRepositories(companyId string, repos []v1.Repository) error
-	DeleteRepositories(companyId string, repos []v1.Repository, isSoftDelete bool) error
+	DeleteRepositories(companyId string, repos []v1.Repository) error
 	AppendApplications(companyId, repositoryId string, apps []v1.Application) error
-	DeleteApplications(companyId, repositoryId string, apps []v1.Application, isSoftDelete bool) error
+	DeleteApplications(companyId, repositoryId string, repos []v1.Repository) error
 	Delete(companyId string) error
 	GetCompanies(option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Company, int64)
 	GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64)

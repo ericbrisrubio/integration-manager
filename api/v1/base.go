@@ -15,6 +15,7 @@ func Router(g *echo.Group) {
 	RepositoryRouter(g.Group("/repositories"))
 	ApplicationRouter(g.Group("/applications"))
 	BitbucketEventRouter(g.Group("/bitbuckets"))
+	SearchRouter(g.Group("/search"))
 }
 
 // BitbucketEventRouter api/v1/bitbuckets event router
@@ -65,4 +66,10 @@ func ApplicationRouter(g *echo.Group) {
 	g.POST("", applicationApi.Update, AuthenticationAndAuthorizationHandler)
 	g.GET("/:id", applicationApi.GetById, AuthenticationAndAuthorizationHandler)
 	g.GET("", applicationApi.GetAll, AuthenticationAndAuthorizationHandler)
+}
+
+// SearchRouter api/v1/search/* router
+func SearchRouter(g *echo.Group) {
+	searchApi := NewSearchApi(dependency.GetV1SearchService())
+	g.GET("", searchApi.SearchReposAndAppsByCompanyIdAndName, AuthenticationAndAuthorizationHandler)
 }

@@ -6,6 +6,12 @@ import (
 	"reflect"
 )
 
+// SearchData contains repositories and applications info
+type SearchData struct {
+	Repositories []Repository  `json:"repositories" bson:"repositories"`
+	Applications []ApplicationMetadataCollection `json:"applications" bson:"applications"`
+}
+
 // Subject observers listen event with an object of this struct
 type Subject struct {
 	Step, Log             string
@@ -85,6 +91,17 @@ type ApplicationMetadata struct {
 	Id               string            `bson:"id" json:"id"`
 	Name             string            `bson:"name" json:"name"`
 	IsWebhookEnabled bool              `bson:"is_webhook_enabled" json:"is_webhook_enabled"`
+}
+
+// ApplicationMetadataCollection contains application metadata collection info
+type ApplicationMetadataCollection struct {
+	MetaData 	ApplicationMetadata  		`bson:"_metadata" json:"_metadata"`
+	Status   	enums.COMPANY_STATUS 		`bson:"status" json:"status"`
+}
+
+// ApplicationMetadataCollectionsDto contains application metadata collections list
+type ApplicationMetadataCollections struct {
+	ApplicationMetadataCollection	[]ApplicationMetadataCollection	`bson:"application_metadata_collection" json:"application_metadata_collection"`
 }
 
 // Validate validates application metadata
