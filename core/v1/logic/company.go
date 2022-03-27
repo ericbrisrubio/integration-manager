@@ -110,74 +110,88 @@ func (c companyService) UpdateRepositories(companyId string, repositories []v1.R
 		return errors.New("[ERROR] Company does not exist")
 	}
 	if companyUpdateOption.Option == enums.APPEND_REPOSITORY {
-		for i, each := range repositories {
-			repositories[i].Id = uuid.New().String()
-			for j := range each.Applications {
-				each.Applications[j].MetaData.Id = uuid.New().String()
-			}
-			if each.Type == enums.GITHUB {
-				c.webHookForGithub(each.Applications, companyId, each.Token)
-			} else if each.Type == enums.BIT_BUCKET {
-				c.webHookForBitbucket(each.Applications, companyId, each.Token)
-			}
-		}
-		err := c.repo.AppendRepositories(companyId, repositories)
-		if err != nil {
-			return err
-		}
+		return c.AppendRepositories(companyId, repositories)
 	} else if companyUpdateOption.Option == enums.SOFT_DELETE_REPOSITORY {
-		var count int64
-		for i, _ := range company.Repositories {
-			for j, _ := range repositories {
-				if company.Repositories[i].Id == repositories[j].Id {
-					for k := range company.Repositories[i].Applications {
-						company.Repositories[i].Applications[k].Status = enums.INACTIVE
-						applicationMetadataCollection := v1.ApplicationMetadataCollection{
-							MetaData: company.Repositories[i].Applications[k].MetaData,
-							Status:   company.Repositories[i].Applications[k].Status,
-						}
-						err := c.applicationMetadataRepository.Update(companyId, applicationMetadataCollection)
-						if err != nil {
-							return err
-						}
-					}
-					count++
-				}
-			}
-		}
-		if count < 1 {
-			return errors.New("repository id does not match")
-		}
-		err := c.repo.DeleteRepositories(companyId, company.Repositories)
-		if err != nil {
-			return err
-		}
+		return c.SoftDeleteRepositories(companyId, company, repositories)
 	} else if companyUpdateOption.Option == enums.DELETE_REPOSITORY {
-		var count int64
-		for i := range repositories {
-			for j, eachRepo := range company.Repositories {
-				if repositories[i].Id == eachRepo.Id {
-					for _, eachApp := range eachRepo.Applications {
-						err := c.applicationMetadataRepository.Delete(eachApp.MetaData.Id, companyId)
-						if err != nil {
-							return err
-						}
-					}
-					company.Repositories = v1.RemoveRepository(company.Repositories, j)
-					count++
-					break
-				}
-			}
-		}
-		if count < 1 {
-			return errors.New("repository id does not match")
-		}
-		err := c.repo.DeleteRepositories(companyId, company.Repositories)
-		if err != nil {
-			return err
-		}
+		return c.DeleteRepositories(companyId, company, repositories)
 	} else {
 		return errors.New("invalid repository update option")
+	}
+}
+
+func (c companyService) AppendRepositories(companyId string, repositories []v1.Repository) error {
+	for i, each := range repositories {
+		repositories[i].Id = uuid.New().String()
+		for j := range each.Applications {
+			each.Applications[j].MetaData.Id = uuid.New().String()
+		}
+		if each.Type == enums.GITHUB {
+			c.webHookForGithub(each.Applications, companyId, each.Token)
+		} else if each.Type == enums.BIT_BUCKET {
+			c.webHookForBitbucket(each.Applications, companyId, each.Token)
+		}
+	}
+	err := c.repo.AppendRepositories(companyId, repositories)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c companyService) SoftDeleteRepositories(companyId string, company v1.Company, repositories []v1.Repository) error {
+	var count int64
+	for i, _ := range company.Repositories {
+		for j, _ := range repositories {
+			if company.Repositories[i].Id == repositories[j].Id {
+				for k := range company.Repositories[i].Applications {
+					company.Repositories[i].Applications[k].Status = enums.INACTIVE
+					applicationMetadataCollection := v1.ApplicationMetadataCollection{
+						MetaData: company.Repositories[i].Applications[k].MetaData,
+						Status:   company.Repositories[i].Applications[k].Status,
+					}
+					err := c.applicationMetadataRepository.Update(companyId, applicationMetadataCollection)
+					if err != nil {
+						return err
+					}
+				}
+				count++
+			}
+		}
+	}
+	if count < 1 {
+		return errors.New("repository id does not match")
+	}
+	err := c.repo.DeleteRepositories(companyId, company.Repositories)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c companyService) DeleteRepositories(companyId string, company v1.Company, repositories []v1.Repository) error {
+	var count int64
+	for i := range repositories {
+		for j, eachRepo := range company.Repositories {
+			if repositories[i].Id == eachRepo.Id {
+				for _, eachApp := range eachRepo.Applications {
+					err := c.applicationMetadataRepository.Delete(eachApp.MetaData.Id, companyId)
+					if err != nil {
+						return err
+					}
+				}
+				company.Repositories = v1.RemoveRepository(company.Repositories, j)
+				count++
+				break
+			}
+		}
+	}
+	if count < 1 {
+		return errors.New("repository id does not match")
+	}
+	err := c.repo.DeleteRepositories(companyId, company.Repositories)
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -252,102 +266,115 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 		return errors.New("[ERROR] Company does not exist")
 	}
 	if companyUpdateOption.Option == enums.APPEND_APPLICATION {
-		for i := range apps {
-			apps[i].MetaData.Id = uuid.New().String()
-		}
-		repo := c.GetRepositoryByRepositoryId(repositoryId, companyId, option)
-		if repo.Id == "" {
-			return errors.New("repository not found")
-		}
-		if repo.Type == enums.GITHUB {
-			c.webHookForGithub(apps, companyId, repo.Token)
-		} else if repo.Type == enums.BIT_BUCKET {
-			c.webHookForBitbucket(apps, companyId, repo.Token)
-		}
-		err := c.repo.AppendApplications(companyId, repositoryId, apps)
-		if err != nil {
-			return err
-		}
+		return c.AppendApplications(companyId, repositoryId, apps, option)
 	} else if companyUpdateOption.Option == enums.SOFT_DELETE_APPLICATION {
-		for i, each := range company.Repositories {
-			if repositoryId == each.Id {
-				for j, eachApp := range each.Applications {
-					for k := range apps {
-						if apps[k].MetaData.Id == eachApp.MetaData.Id {
-							company.Repositories[i].Applications[j].Status = enums.INACTIVE
-							applicationMetadataCollection := v1.ApplicationMetadataCollection{
-								MetaData: company.Repositories[i].Applications[j].MetaData,
-								Status:   company.Repositories[i].Applications[j].Status,
-							}
-							err := c.applicationMetadataRepository.Update(companyId, applicationMetadataCollection)
-							if err != nil {
-								return err
-							}
-						}
-					}
-				}
-			}
-		}
-		err := c.repo.DeleteApplications(companyId, repositoryId, company.Repositories)
-		if err != nil {
-			return err
-		}
+		return c.SoftDeleteApplications(companyId, repositoryId, company, apps)
 	} else if companyUpdateOption.Option == enums.DELETE_APPLICATION {
-		repo := c.GetRepositoryByRepositoryId(repositoryId, companyId, option)
-		if repo.Type == enums.GITHUB {
-			for i := range apps {
-				usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
-				err := NewGithubService(c, nil, c.client).DeleteRepositoryWebhookById(usernameOrorgName, repoName, apps[i].Webhook.ID, repo.Token)
-				if err != nil {
-					return err
-				}
-				apps[i].MetaData.IsWebhookEnabled = false
-				err = c.applicationMetadataRepository.Delete(apps[i].MetaData.Id, companyId)
-				if err != nil {
-					return err
-				}
-			}
-		} else if repo.Type == enums.BIT_BUCKET {
-			for i := range apps {
-				usernameOrOrgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
-				err := NewBitBucketService(c, nil, c.client).DeleteRepositoryWebhookById(usernameOrOrgName, repoName, apps[i].Webhook.ID, repo.Token)
-				if err != nil {
-					return err
-				}
-				apps[i].MetaData.IsWebhookEnabled = false
-				err = c.applicationMetadataRepository.Delete(apps[i].MetaData.Id, companyId)
-				if err != nil {
-					return err
-				}
-			}
-		}
-		var count int64 = 0
-		var applications []v1.Application
-		for i, each := range company.Repositories {
-			applications = each.Applications
-			if company.Repositories[i].Id == repositoryId {
-				for j := range apps {
-					for k := range applications {
-						if each.Applications[k].MetaData.Id == apps[j].MetaData.Id {
-							applications = v1.RemoveApplication(applications, k)
-							count++
-							break
-						}
-					}
-				}
-				company.Repositories[i].Applications = applications
-				break
-			}
-		}
-		if count < 1 {
-			return errors.New("application id does not match")
-		}
-		err := c.repo.DeleteApplications(companyId, repositoryId, company.Repositories)
-		if err != nil {
-			return err
-		}
+		return c.DeleteApplications(companyId, repositoryId, company, apps, option)
 	} else {
 		return errors.New("invalid application update option")
+	}
+}
+func (c companyService) AppendApplications(companyId, repositoryId string, apps []v1.Application, option v1.CompanyQueryOption) error {
+	for i := range apps {
+		apps[i].MetaData.Id = uuid.New().String()
+	}
+	repo := c.GetRepositoryByRepositoryId(repositoryId, companyId, option)
+	if repo.Id == "" {
+		return errors.New("repository not found")
+	}
+	if repo.Type == enums.GITHUB {
+		c.webHookForGithub(apps, companyId, repo.Token)
+	} else if repo.Type == enums.BIT_BUCKET {
+		c.webHookForBitbucket(apps, companyId, repo.Token)
+	}
+	err := c.repo.AppendApplications(companyId, repositoryId, apps)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c companyService) SoftDeleteApplications(companyId, repositoryId string, company v1.Company, apps []v1.Application) error {
+	for i, each := range company.Repositories {
+		if repositoryId == each.Id {
+			for j, eachApp := range each.Applications {
+				for k := range apps {
+					if apps[k].MetaData.Id == eachApp.MetaData.Id {
+						company.Repositories[i].Applications[j].Status = enums.INACTIVE
+						applicationMetadataCollection := v1.ApplicationMetadataCollection{
+							MetaData: company.Repositories[i].Applications[j].MetaData,
+							Status:   company.Repositories[i].Applications[j].Status,
+						}
+						err := c.applicationMetadataRepository.Update(companyId, applicationMetadataCollection)
+						if err != nil {
+							return err
+						}
+					}
+				}
+			}
+		}
+	}
+	err := c.repo.DeleteApplications(companyId, repositoryId, company.Repositories)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c companyService) DeleteApplications(companyId, repositoryId string, company v1.Company, apps []v1.Application, option v1.CompanyQueryOption) error {
+	repo := c.GetRepositoryByRepositoryId(repositoryId, companyId, option)
+	if repo.Type == enums.GITHUB {
+		for i := range apps {
+			usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
+			err := NewGithubService(c, nil, c.client).DeleteRepositoryWebhookById(usernameOrorgName, repoName, apps[i].Webhook.ID, repo.Token)
+			if err != nil {
+				return err
+			}
+			apps[i].MetaData.IsWebhookEnabled = false
+			err = c.applicationMetadataRepository.Delete(apps[i].MetaData.Id, companyId)
+			if err != nil {
+				return err
+			}
+		}
+	} else if repo.Type == enums.BIT_BUCKET {
+		for i := range apps {
+			usernameOrOrgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
+			err := NewBitBucketService(c, nil, c.client).DeleteRepositoryWebhookById(usernameOrOrgName, repoName, apps[i].Webhook.ID, repo.Token)
+			if err != nil {
+				return err
+			}
+			apps[i].MetaData.IsWebhookEnabled = false
+			err = c.applicationMetadataRepository.Delete(apps[i].MetaData.Id, companyId)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	var count int64 = 0
+	var applications []v1.Application
+	for i, each := range company.Repositories {
+		applications = each.Applications
+		if company.Repositories[i].Id == repositoryId {
+			for j := range apps {
+				for k := range applications {
+					if each.Applications[k].MetaData.Id == apps[j].MetaData.Id {
+						applications = v1.RemoveApplication(applications, k)
+						count++
+						break
+					}
+				}
+			}
+			company.Repositories[i].Applications = applications
+			break
+		}
+	}
+	if count < 1 {
+		return errors.New("application id does not match")
+	}
+	err := c.repo.DeleteApplications(companyId, repositoryId, company.Repositories)
+	if err != nil {
+		return err
 	}
 	return nil
 }

@@ -12,6 +12,30 @@ type mockCompanyService struct {
 	client service.HttpClient
 }
 
+func (m mockCompanyService) AppendRepositories(companyId string, repositories []v1.Repository) error {
+	panic("implement me")
+}
+
+func (m mockCompanyService) SoftDeleteRepositories(companyId string, company v1.Company, repositories []v1.Repository) error {
+	panic("implement me")
+}
+
+func (m mockCompanyService) DeleteRepositories(companyId string, company v1.Company, repositories []v1.Repository) error {
+	panic("implement me")
+}
+
+func (m mockCompanyService) AppendApplications(companyId, repositoryId string, apps []v1.Application, option v1.CompanyQueryOption) error {
+	panic("implement me")
+}
+
+func (m mockCompanyService) SoftDeleteApplications(companyId, repositoryId string, company v1.Company, apps []v1.Application) error {
+	panic("implement me")
+}
+
+func (m mockCompanyService) DeleteApplications(companyId, repositoryId string, company v1.Company, apps []v1.Application, option v1.CompanyQueryOption) error {
+	panic("implement me")
+}
+
 func (m mockCompanyService) GetAllApplications(companyId string, option v1.CompanyQueryOption) ([]v1.Application, int64) {
 	panic("implement me")
 }

@@ -22,4 +22,10 @@ type Company interface {
 	GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository
 	GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application
 	GetApplicationByApplicationId(companyId string, repoId string, applicationId string) v1.Application
+	AppendRepositories(companyId string, repositories []v1.Repository) error
+	SoftDeleteRepositories(companyId string, company v1.Company, repositories []v1.Repository) error
+	DeleteRepositories(companyId string, company v1.Company, repositories []v1.Repository) error
+	AppendApplications(companyId, repositoryId string, apps []v1.Application, option v1.CompanyQueryOption) error
+	SoftDeleteApplications(companyId, repositoryId string, company v1.Company, apps []v1.Application) error
+	DeleteApplications(companyId, repositoryId string, company v1.Company, apps []v1.Application, option v1.CompanyQueryOption) error
 }
