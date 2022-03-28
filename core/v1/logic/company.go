@@ -13,9 +13,9 @@ import (
 )
 
 type companyService struct {
-	repo   repository.CompanyRepository
+	repo                          repository.CompanyRepository
 	applicationMetadataRepository repository.ApplicationMetadataRepository
-	client service.HttpClient
+	client                        service.HttpClient
 }
 
 func (c companyService) GetAllApplications(companyId string, option v1.CompanyQueryOption) ([]v1.Application, int64) {
@@ -212,13 +212,10 @@ func (c companyService) webHookForGithub(apps []v1.Application, companyId string
 		usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
 		gitWebhook, err := NewGithubService(c, nil, c.client).CreateRepositoryWebhook(usernameOrorgName, repoName, token, companyId)
 		if err != nil {
-			apps[i].Webhook = gitWebhook
-			apps[i].MetaData.IsWebhookEnabled = false
-		} else {
-			apps[i].Webhook = gitWebhook
-			apps[i].MetaData.IsWebhookEnabled = true
-			apps[i].Status = enums.ACTIVE
+			log.Println("[ERROR] Failed to create webhook ", err.Error())
 		}
+		apps[i].Webhook = gitWebhook
+		apps[i].MetaData.IsWebhookEnabled = gitWebhook.Active
 		applicationMetadataCollection := v1.ApplicationMetadataCollection{
 			MetaData: apps[i].MetaData,
 			Status:   apps[i].Status,
@@ -241,13 +238,10 @@ func (c companyService) webHookForBitbucket(apps []v1.Application, companyId str
 		}
 		bitbucketWebhook, err := NewBitBucketService(c, nil, c.client).CreateRepositoryWebhook(repositoryDetails.Workspace.Slug, repositoryDetails.Slug, token, companyId)
 		if err != nil {
-			apps[i].Webhook = bitbucketWebhook
-			apps[i].MetaData.IsWebhookEnabled = false
-		} else {
-			apps[i].Webhook = bitbucketWebhook
-			apps[i].MetaData.IsWebhookEnabled = true
-			apps[i].Status = enums.ACTIVE
+			log.Println("ERROR failed to create webhook", err.Error())
 		}
+		apps[i].Webhook = bitbucketWebhook
+		apps[i].MetaData.IsWebhookEnabled = bitbucketWebhook.Active
 		applicationMetadataCollection := v1.ApplicationMetadataCollection{
 			MetaData: apps[i].MetaData,
 			Status:   apps[i].Status,
@@ -429,8 +423,8 @@ func (c companyService) GetApplicationsByCompanyIdAndRepositoryType(id string, _
 // NewCompanyService returns Company type service
 func NewCompanyService(repo repository.CompanyRepository, applicationMetadataRepository repository.ApplicationMetadataRepository, client service.HttpClient) service.Company {
 	return &companyService{
-		repo:   repo,
+		repo:                          repo,
 		applicationMetadataRepository: applicationMetadataRepository,
-		client: client,
+		client:                        client,
 	}
 }
