@@ -56,12 +56,11 @@ func (c companyService) CreateGithubWebHookAndUpdateApplication(companyId string
 	usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(app.Url)
 	gitWebhook, err := NewGithubService(c, nil, c.client).CreateRepositoryWebhook(usernameOrorgName, repoName, token, companyId)
 	if err != nil {
-		app.Webhook = gitWebhook
-		app.MetaData.IsWebhookEnabled = false
-	} else {
-		app.Webhook = gitWebhook
-		app.MetaData.IsWebhookEnabled = true
+		log.Println("ERROR while creating webhook for application: ", err.Error())
 	}
+	app.Webhook = gitWebhook
+	app.MetaData.IsWebhookEnabled = gitWebhook.Active
+	app.Status = enums.ACTIVE
 	applicationMetadataCollection := v1.ApplicationMetadataCollection{
 		MetaData: app.MetaData,
 		Status:   app.Status,
@@ -80,12 +79,11 @@ func (c companyService) CreateBitbucketWebHookAndUpdateApplication(companyId str
 	usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(app.Url)
 	gitWebhook, err := NewBitBucketService(c, nil, c.client).CreateRepositoryWebhook(usernameOrorgName, repoName, token, companyId)
 	if err != nil {
-		app.Webhook = gitWebhook
-		app.MetaData.IsWebhookEnabled = false
-	} else {
-		app.Webhook = gitWebhook
-		app.MetaData.IsWebhookEnabled = true
+		log.Println("ERROR while creating webhook for application: ", err.Error())
 	}
+	app.Webhook = gitWebhook
+	app.MetaData.IsWebhookEnabled = gitWebhook.Active
+	app.Status = enums.ACTIVE
 	applicationMetadataCollection := v1.ApplicationMetadataCollection{
 		MetaData: app.MetaData,
 		Status:   app.Status,
@@ -216,6 +214,7 @@ func (c companyService) webHookForGithub(apps []v1.Application, companyId string
 		}
 		apps[i].Webhook = gitWebhook
 		apps[i].MetaData.IsWebhookEnabled = gitWebhook.Active
+		apps[i].Status = enums.ACTIVE
 		applicationMetadataCollection := v1.ApplicationMetadataCollection{
 			MetaData: apps[i].MetaData,
 			Status:   apps[i].Status,
@@ -242,6 +241,7 @@ func (c companyService) webHookForBitbucket(apps []v1.Application, companyId str
 		}
 		apps[i].Webhook = bitbucketWebhook
 		apps[i].MetaData.IsWebhookEnabled = bitbucketWebhook.Active
+		apps[i].Status = enums.ACTIVE
 		applicationMetadataCollection := v1.ApplicationMetadataCollection{
 			MetaData: apps[i].MetaData,
 			Status:   apps[i].Status,
