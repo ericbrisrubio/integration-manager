@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"errors"
 	"github.com/klovercloud-ci-cd/integration-manager/api/common"
 	"github.com/klovercloud-ci-cd/integration-manager/config"
 	v1 "github.com/klovercloud-ci-cd/integration-manager/core/v1"
@@ -19,6 +20,30 @@ type v1GithubApi struct {
 	companyService               service.Company
 	processInventoryEventService service.ProcessInventoryEvent
 	observerList                 []service.Observer
+}
+
+func (g v1GithubApi) GetBranches(context echo.Context) error {
+	repoId := context.QueryParam("repoId")
+	option := v1.CompanyQueryOption{
+		Pagination:       v1.Pagination{},
+		LoadRepositories: true,
+		LoadApplications: true,
+		LoadToken:        true,
+	}
+	repo := g.companyService.GetRepositoryByRepositoryId(repoId, option)
+	userName := context.QueryParam("userName")
+	if userName == "" {
+		return errors.New("userName is required")
+	}
+	repoName := context.QueryParam("repoName")
+	if repoName == "" {
+		return errors.New("repoName is required")
+	}
+	branches, err := g.gitService.GetBranches(userName, repoName, repo.Token)
+	if err != nil {
+		return err
+	}
+	return common.GenerateSuccessResponse(context, branches, nil, "success")
 }
 
 // Listen ... Listen Github Web hook event

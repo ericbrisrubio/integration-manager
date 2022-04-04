@@ -21,6 +21,11 @@ type GitWebhook struct {
 	DeliveriesURL string    `json:"deliveries_url"`
 }
 
+// GitBranches contains github branches
+type GitBranches struct {
+	Name string `json:"name"`
+}
+
 // GitDirectoryContent contains github directory data
 type GitDirectoryContent struct {
 	Name        string      `json:"name"`

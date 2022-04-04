@@ -2,6 +2,7 @@ package v1
 
 import (
 	_ "encoding/json"
+	"errors"
 	"github.com/klovercloud-ci-cd/integration-manager/api/common"
 	v1 "github.com/klovercloud-ci-cd/integration-manager/core/v1"
 	"github.com/klovercloud-ci-cd/integration-manager/core/v1/api"
@@ -19,6 +20,30 @@ type v1BitbucketApi struct {
 	companyService               service.Company
 	processInventoryEventService service.ProcessInventoryEvent
 	observerList                 []service.Observer
+}
+
+func (b v1BitbucketApi) GetBranches(context echo.Context) error {
+	repoId := context.QueryParam("repoId")
+	option := v1.CompanyQueryOption{
+		Pagination:       v1.Pagination{},
+		LoadRepositories: true,
+		LoadApplications: true,
+		LoadToken:        true,
+	}
+	repo := b.companyService.GetRepositoryByRepositoryId(repoId, option)
+	userName := context.QueryParam("userName")
+	if userName == "" {
+		return errors.New("userName is required")
+	}
+	repoName := context.QueryParam("repoName")
+	if repoName == "" {
+		return errors.New("repoName is required")
+	}
+	branches, err := b.gitService.GetBranches(userName, repoName, repo.Token)
+	if err != nil {
+		return err
+	}
+	return common.GenerateSuccessResponse(context, branches, nil, "success")
 }
 
 // Listen ... Listen Bitbucket Web hook event

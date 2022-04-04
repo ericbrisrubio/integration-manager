@@ -131,10 +131,10 @@ func (c companyRepository) UpdateApplication(companyId string, repositoryId stri
 	return nil
 }
 
-func (c companyRepository) GetRepositoryByRepositoryId(id string, companyId string, option v1.CompanyQueryOption) v1.Repository {
+func (c companyRepository) GetRepositoryByRepositoryId(id string, option v1.CompanyQueryOption) v1.Repository {
 	var repo v1.Repository
 	query := bson.M{
-		"$and": []bson.M{{"id": companyId, "repositories.id": id}},
+		"$and": []bson.M{{"repositories.id": id}},
 	}
 	coll := c.manager.Db.Collection(CompanyCollection)
 	result, err := coll.Find(c.manager.Ctx, query)

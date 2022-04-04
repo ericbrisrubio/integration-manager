@@ -216,16 +216,19 @@ func getQueryOption(context echo.Context) v1.CompanyQueryOption {
 	limit := context.QueryParam("limit")
 	loadApplications := context.QueryParam("loadApplications")
 	loadRepositories := context.QueryParam("loadRepositories")
+	loadToken := context.QueryParam("loadToken")
 	if page == "" {
 		option.Pagination.Page = 0
 		option.Pagination.Limit = 10
 		option.LoadApplications, _ = strconv.ParseBool(loadApplications)
 		option.LoadRepositories, _ = strconv.ParseBool(loadRepositories)
+		option.LoadToken, _ = strconv.ParseBool(loadToken)
 	} else {
 		option.Pagination.Page, _ = strconv.ParseInt(page, 10, 64)
 		option.Pagination.Limit, _ = strconv.ParseInt(limit, 10, 64)
 		option.LoadApplications, _ = strconv.ParseBool(loadApplications)
 		option.LoadRepositories, _ = strconv.ParseBool(loadRepositories)
+		option.LoadToken, _ = strconv.ParseBool(loadToken)
 	}
 	return option
 }

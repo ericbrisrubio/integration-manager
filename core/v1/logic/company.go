@@ -36,8 +36,8 @@ func (c companyService) GetApplicationByApplicationId(companyId string, repoId s
 	return c.repo.GetApplicationByApplicationId(companyId, repoId, applicationId)
 }
 
-func (c companyService) GetRepositoryByRepositoryId(id string, companyId string, option v1.CompanyQueryOption) v1.Repository {
-	return c.repo.GetRepositoryByRepositoryId(id, companyId, option)
+func (c companyService) GetRepositoryByRepositoryId(id string, option v1.CompanyQueryOption) v1.Repository {
+	return c.repo.GetRepositoryByRepositoryId(id, option)
 }
 
 func (c companyService) CreateWebHookAndUpdateApplications(companyId string, repoType enums.REPOSITORY_TYPE, repoId string, token string, apps []v1.Application) {
@@ -273,7 +273,7 @@ func (c companyService) AppendApplications(companyId, repositoryId string, apps 
 	for i := range apps {
 		apps[i].MetaData.Id = uuid.New().String()
 	}
-	repo := c.GetRepositoryByRepositoryId(repositoryId, companyId, option)
+	repo := c.GetRepositoryByRepositoryId(repositoryId, option)
 	if repo.Id == "" {
 		return errors.New("repository not found")
 	}
@@ -317,7 +317,7 @@ func (c companyService) SoftDeleteApplications(companyId, repositoryId string, c
 }
 
 func (c companyService) DeleteApplications(companyId, repositoryId string, company v1.Company, apps []v1.Application, option v1.CompanyQueryOption) error {
-	repo := c.GetRepositoryByRepositoryId(repositoryId, companyId, option)
+	repo := c.GetRepositoryByRepositoryId(repositoryId, option)
 	if repo.Type == enums.GITHUB {
 		for i := range apps {
 			usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)

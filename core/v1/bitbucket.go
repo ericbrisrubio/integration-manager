@@ -2,6 +2,13 @@ package v1
 
 import "time"
 
+// BitBucketBranches is a list of branches
+type BitBucketBranches struct {
+	Values []struct {
+		Name string `json:"name"`
+	} `json:"values"`
+}
+
 // BitbucketRepository contains bitbucket repository information
 type BitbucketRepository struct {
 	Scm     string      `json:"scm"`

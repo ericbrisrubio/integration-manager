@@ -17,6 +17,11 @@ type bitbucketMockService struct {
 	client         service.HttpClient
 }
 
+func (b bitbucketMockService) GetBranches(username, repositoryName, token string) ([]v1.GitBranches, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (b bitbucketMockService) GetPipeline(repositoryName, username, revision, token string) (*v1.Pipeline, error) {
 	contents, err := b.GetDirectoryContents(repositoryName, username, revision, token, enums.PIPELINE_FILE_BASE_DIRECTORY)
 	if err != nil {

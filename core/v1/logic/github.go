@@ -19,6 +19,27 @@ type githubService struct {
 	client         service.HttpClient
 }
 
+func (githubService githubService) GetBranches(username, repositoryName, token string) ([]v1.GitBranches, error) {
+	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repositoryName + "/branches"
+	header := make(map[string]string)
+	header["Authorization"] = "token " + token
+	header["Accept"] = "application/vnd.github.v3+json"
+	header["cache-control"] = "no-cache"
+
+	response, err := githubService.client.Get(url, header)
+	if err != nil {
+		return nil, err
+	}
+	var gitBranches []v1.GitBranches
+	err = json.Unmarshal(response, &gitBranches)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return gitBranches, nil
+}
+
 func (githubService githubService) DeleteRepositoryWebhookById(username, repositoryName, webhookId, token string) error {
 	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repositoryName + "/hooks/" + webhookId
 	header := make(map[string]string)

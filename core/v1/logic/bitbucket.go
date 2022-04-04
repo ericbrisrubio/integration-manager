@@ -20,6 +20,31 @@ type bitbucketService struct {
 	client         service.HttpClient
 }
 
+func (b bitbucketService) GetBranches(username, repositoryName, token string) ([]v1.GitBranches, error) {
+	url := enums.BITBUCKET_API_BASE_URL + "repositories/" + username + "/" + repositoryName + "/refs/branches?pagelen=100"
+	base64ConvertedToken := base64.StdEncoding.EncodeToString([]byte(username + ":" + token))
+	header := make(map[string]string)
+	header["Authorization"] = "Basic " + base64ConvertedToken
+	header["Content-Type"] = "application/json"
+
+	var branches v1.BitBucketBranches
+	data, _ := b.client.Get(url, header)
+	err := json.Unmarshal(data, &branches)
+	if err != nil {
+		return nil, err
+	}
+	var gitBranches []v1.GitBranches
+
+	if len(branches.Values) > 0 {
+		for _, branch := range branches.Values {
+			gitBranches = append(gitBranches, v1.GitBranches{
+				Name: branch.Name,
+			})
+		}
+	}
+	return gitBranches, nil
+}
+
 func (b bitbucketService) GetPipeline(repositoryName, username, revision, token string) (*v1.Pipeline, error) {
 	contents, err := b.GetDirectoryContents(repositoryName, username, revision, token, enums.PIPELINE_FILE_BASE_DIRECTORY)
 	if err != nil {
@@ -41,7 +66,6 @@ func (b bitbucketService) GetPipeline(repositoryName, username, revision, token 
 	header["Content-Type"] = "application/json"
 	data, err := b.client.Get(url, header)
 	if err != nil {
-		// send to observer
 		return nil, err
 	}
 	pipeline := v1.Pipeline{}
@@ -84,7 +108,6 @@ func (b bitbucketService) GetDescriptors(repositoryName, username, revision, tok
 		header["Content-Type"] = "application/json"
 		data, err := b.client.Get(url, header)
 		if err != nil {
-			// send to observer
 			return nil, err
 		}
 
@@ -119,14 +142,12 @@ func (b bitbucketService) GetDirectoryContents(repositoryName, username, revisio
 	header["Content-Type"] = "application/json"
 	data, err := b.client.Get(url, header)
 	if err != nil {
-		// send to observer
 		return nil, err
 	}
 	var bitBucketDirectoryContents v1.BitbucketDirectoryContent
 	err = json.Unmarshal(data, &bitBucketDirectoryContents)
 	if err != nil {
 		log.Println(err.Error())
-		// send to observer
 		return nil, err
 	}
 	var gitDirectoryContents []v1.GitDirectoryContent

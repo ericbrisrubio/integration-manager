@@ -12,4 +12,5 @@ type Git interface {
 	GetDirectoryContents(repositoryName, username, revision, token, path string) ([]v1.GitDirectoryContent, error)
 	CreateRepositoryWebhook(username, repositoryName, token string, companyId string) (v1.GitWebhook, error)
 	DeleteRepositoryWebhookById(username, repositoryName, webhookId, token string) error
+	GetBranches(username, repositoryName, token string) ([]v1.GitBranches, error)
 }
