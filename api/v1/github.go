@@ -22,6 +22,17 @@ type v1GithubApi struct {
 	observerList                 []service.Observer
 }
 
+// GetBranches... Get Branches
+// @Summary Get Branches
+// @Description Gets Branches
+// @Tags Github
+// @Produce json
+// @Param userName query string true "User Name"
+// @Param repoName query string true "Repository Name"
+// @Param loadApplications query bool false "Loads ApplicationsDto"
+// @Param loadToken query bool true "Loads Token"
+// @Success 200 {object} common.ResponseDTO{data=[]v1.GitBranches}
+// @Router /api/v1/githubs [GET]
 func (g v1GithubApi) GetBranches(context echo.Context) error {
 	repoId := context.QueryParam("repoId")
 	option := v1.CompanyQueryOption{

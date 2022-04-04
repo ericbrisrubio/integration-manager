@@ -133,6 +133,68 @@ var doc = `{
             }
         },
         "/api/v1/bitbuckets": {
+            "get": {
+                "description": "Gets Branches",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bitbucket"
+                ],
+                "summary": "Get Branches",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Name",
+                        "name": "userName",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Repository Name",
+                        "name": "repoName",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Loads ApplicationsDto",
+                        "name": "loadApplications",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Loads Token",
+                        "name": "loadToken",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common.ResponseDTO"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/v1.GitBranches"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Listens Bitbucket Web hook events. Register this endpoint as Bitbucket web hook endpoint",
                 "consumes": [
@@ -467,6 +529,68 @@ var doc = `{
             }
         },
         "/api/v1/githubs": {
+            "get": {
+                "description": "Gets Branches",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Github"
+                ],
+                "summary": "Get Branches",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Name",
+                        "name": "userName",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Repository Name",
+                        "name": "repoName",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Loads ApplicationsDto",
+                        "name": "loadApplications",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Loads Token",
+                        "name": "loadToken",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common.ResponseDTO"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/v1.GitBranches"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Listens Github Web hook events. Register this endpoint as github web hook endpoint",
                 "consumes": [
@@ -1642,6 +1766,14 @@ var doc = `{
                 },
                 "total_process_per_day": {
                     "type": "integer"
+                }
+            }
+        },
+        "v1.GitBranches": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
                 }
             }
         },

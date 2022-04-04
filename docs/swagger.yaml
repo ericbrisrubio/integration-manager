@@ -660,6 +660,11 @@ definitions:
       total_process_per_day:
         type: integer
     type: object
+  v1.GitBranches:
+    properties:
+      name:
+        type: string
+    type: object
   v1.GitWebhook:
     properties:
       active:
@@ -1134,6 +1139,45 @@ paths:
       tags:
       - Application
   /api/v1/bitbuckets:
+    get:
+      description: Gets Branches
+      parameters:
+      - description: User Name
+        in: query
+        name: userName
+        required: true
+        type: string
+      - description: Repository Name
+        in: query
+        name: repoName
+        required: true
+        type: string
+      - description: Loads ApplicationsDto
+        in: query
+        name: loadApplications
+        type: boolean
+      - description: Loads Token
+        in: query
+        name: loadToken
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.ResponseDTO'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/v1.GitBranches'
+                  type: array
+              type: object
+      summary: Get Branches
+      tags:
+      - Bitbucket
     post:
       consumes:
       - application/json
@@ -1341,6 +1385,45 @@ paths:
       tags:
       - Company
   /api/v1/githubs:
+    get:
+      description: Gets Branches
+      parameters:
+      - description: User Name
+        in: query
+        name: userName
+        required: true
+        type: string
+      - description: Repository Name
+        in: query
+        name: repoName
+        required: true
+        type: string
+      - description: Loads ApplicationsDto
+        in: query
+        name: loadApplications
+        type: boolean
+      - description: Loads Token
+        in: query
+        name: loadToken
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.ResponseDTO'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/v1.GitBranches'
+                  type: array
+              type: object
+      summary: Get Branches
+      tags:
+      - Github
     post:
       consumes:
       - application/json

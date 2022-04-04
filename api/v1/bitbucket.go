@@ -22,6 +22,17 @@ type v1BitbucketApi struct {
 	observerList                 []service.Observer
 }
 
+// GetBranches... Get Branches
+// @Summary Get Branches
+// @Description Gets Branches
+// @Tags Bitbucket
+// @Produce json
+// @Param userName query string true "User Name"
+// @Param repoName query string true "Repository Name"
+// @Param loadApplications query bool false "Loads ApplicationsDto"
+// @Param loadToken query bool true "Loads Token"
+// @Success 200 {object} common.ResponseDTO{data=[]v1.GitBranches}
+// @Router /api/v1/bitbuckets [GET]
 func (b v1BitbucketApi) GetBranches(context echo.Context) error {
 	repoId := context.QueryParam("repoId")
 	option := v1.CompanyQueryOption{
