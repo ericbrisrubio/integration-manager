@@ -152,6 +152,20 @@ var doc = `{
                     },
                     {
                         "type": "string",
+                        "description": "Repository Id",
+                        "name": "repoId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "company Id",
+                        "name": "companyId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "Repository Name",
                         "name": "repoName",
                         "in": "query",
@@ -548,6 +562,20 @@ var doc = `{
                     },
                     {
                         "type": "string",
+                        "description": "Repository Id",
+                        "name": "repoId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "company Id",
+                        "name": "companyId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "Repository Name",
                         "name": "repoName",
                         "in": "query",
@@ -658,6 +686,13 @@ var doc = `{
                         "description": "Repository id",
                         "name": "id",
                         "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "company id",
+                        "name": "companyId",
+                        "in": "query",
                         "required": true
                     }
                 ],

@@ -1147,6 +1147,16 @@ paths:
         name: userName
         required: true
         type: string
+      - description: Repository Id
+        in: query
+        name: repoId
+        required: true
+        type: string
+      - description: company Id
+        in: query
+        name: companyId
+        required: true
+        type: string
       - description: Repository Name
         in: query
         name: repoName
@@ -1393,6 +1403,16 @@ paths:
         name: userName
         required: true
         type: string
+      - description: Repository Id
+        in: query
+        name: repoId
+        required: true
+        type: string
+      - description: company Id
+        in: query
+        name: companyId
+        required: true
+        type: string
       - description: Repository Name
         in: query
         name: repoName
@@ -1462,6 +1482,11 @@ paths:
       - description: Repository id
         in: path
         name: id
+        required: true
+        type: string
+      - description: company id
+        in: query
+        name: companyId
         required: true
         type: string
       produces:

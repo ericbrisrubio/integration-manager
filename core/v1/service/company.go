@@ -14,7 +14,7 @@ type Company interface {
 	GetCompanies(option v1.CompanyQueryOption, status v1.StatusQueryOption) []v1.Company
 	GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64)
 	GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64)
-	GetRepositoryByRepositoryId(id string, option v1.CompanyQueryOption) v1.Repository
+	GetRepositoryByRepositoryId(id, repoId string, option v1.CompanyQueryOption) v1.Repository
 	GetAllApplications(companyId string, option v1.CompanyQueryOption) ([]v1.Application, int64)
 	GetApplicationsByRepositoryId(repositoryId string, companyId string, option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Application, int64)
 	GetCompanyByApplicationUrl(url string) v1.Company

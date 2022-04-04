@@ -28,6 +28,8 @@ type v1BitbucketApi struct {
 // @Tags Bitbucket
 // @Produce json
 // @Param userName query string true "User Name"
+// @Param repoId query string true "Repository Id"
+// @Param companyId query string true "company Id"
 // @Param repoName query string true "Repository Name"
 // @Param loadApplications query bool false "Loads ApplicationsDto"
 // @Param loadToken query bool true "Loads Token"
@@ -41,7 +43,8 @@ func (b v1BitbucketApi) GetBranches(context echo.Context) error {
 		LoadApplications: true,
 		LoadToken:        true,
 	}
-	repo := b.companyService.GetRepositoryByRepositoryId(repoId, option)
+	id := context.QueryParam("companyId")
+	repo := b.companyService.GetRepositoryByRepositoryId(id, repoId, option)
 	userName := context.QueryParam("userName")
 	if userName == "" {
 		return errors.New("userName is required")

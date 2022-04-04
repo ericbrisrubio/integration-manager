@@ -9,7 +9,7 @@ import (
 type companyRepository struct {
 }
 
-func (c companyRepository) GetRepositoryByRepositoryId(id string, option v1.CompanyQueryOption) v1.Repository {
+func (c companyRepository) GetRepositoryByRepositoryId(id, repoId string, option v1.CompanyQueryOption) v1.Repository {
 	var repo v1.Repository
 	for _, each := range IndexedCompanies {
 		for _, eachrepo := range each.Repositories {

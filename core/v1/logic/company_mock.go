@@ -40,7 +40,7 @@ func (m mockCompanyService) GetAllApplications(companyId string, option v1.Compa
 	panic("implement me")
 }
 
-func (m mockCompanyService) GetRepositoryByRepositoryId(id string, option v1.CompanyQueryOption) v1.Repository {
+func (m mockCompanyService) GetRepositoryByRepositoryId(id, repoId string, option v1.CompanyQueryOption) v1.Repository {
 	//TODO implement me
 	panic("implement me")
 }

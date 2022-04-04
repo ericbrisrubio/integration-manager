@@ -28,6 +28,8 @@ type v1GithubApi struct {
 // @Tags Github
 // @Produce json
 // @Param userName query string true "User Name"
+// @Param repoId query string true "Repository Id"
+// @Param companyId query string true "company Id"
 // @Param repoName query string true "Repository Name"
 // @Param loadApplications query bool false "Loads ApplicationsDto"
 // @Param loadToken query bool true "Loads Token"
@@ -41,7 +43,8 @@ func (g v1GithubApi) GetBranches(context echo.Context) error {
 		LoadApplications: true,
 		LoadToken:        true,
 	}
-	repo := g.companyService.GetRepositoryByRepositoryId(repoId, option)
+	id := context.QueryParam("companyId")
+	repo := g.companyService.GetRepositoryByRepositoryId(id, repoId, option)
 	userName := context.QueryParam("userName")
 	if userName == "" {
 		return errors.New("userName is required")

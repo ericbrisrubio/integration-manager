@@ -21,15 +21,17 @@ type repositoryApi struct {
 // @Tags Repository
 // @Produce json
 // @Param id path string true "Repository id"
+// @Param companyId query string true "company id"
 // @Success 200 {object} common.ResponseDTO{data=v1.Repository}
 // @Router /api/v1/repositories/{id} [GET]
 func (r repositoryApi) GetById(context echo.Context) error {
-	id := context.Param("id")
+	id := context.QueryParam("companyId")
 	if id == "" {
-		return errors.New("repository id is required")
+		return errors.New("company id is required")
 	}
+	repoId := context.Param("id")
 	options := getQueryOption(context)
-	data := r.companyService.GetRepositoryByRepositoryId(id, options)
+	data := r.companyService.GetRepositoryByRepositoryId(id, repoId, options)
 	return common.GenerateSuccessResponse(context, data, nil, "Success!")
 }
 
