@@ -241,7 +241,11 @@ func setDeploymentVersion(step v1.Step, revision string) string {
 		for i, image := range images {
 			strs := strings.Split(image, ":")
 			if len(strs) == 1 {
-				images[i] = images[i] + ":" + revision
+				if step.Params["trunk_based"]=="enabled"{
+					images[i] = images[i] + ":" + revision
+				}else{
+					images[i] = images[i]
+				}
 			}
 		}
 		deploymentVersion = strings.Join(images, ",")
