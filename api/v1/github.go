@@ -31,8 +31,6 @@ type v1GithubApi struct {
 // @Param repoId query string true "Repository Id"
 // @Param companyId query string true "company Id"
 // @Param repoName query string true "Repository Name"
-// @Param loadApplications query bool false "Loads ApplicationsDto"
-// @Param loadToken query bool true "Loads Token"
 // @Success 200 {object} common.ResponseDTO{data=[]v1.GitBranches}
 // @Router /api/v1/githubs [GET]
 func (g v1GithubApi) GetBranches(context echo.Context) error {
@@ -241,9 +239,9 @@ func setDeploymentVersion(step v1.Step, revision string) string {
 		for i, image := range images {
 			strs := strings.Split(image, ":")
 			if len(strs) == 1 {
-				if step.Params["trunk_based"]=="enabled"{
+				if step.Params["trunk_based"] == "enabled" {
 					images[i] = images[i] + ":" + revision
-				}else{
+				} else {
 					images[i] = images[i]
 				}
 			}
