@@ -7,3 +7,5 @@
 /out/
 *.exe
 /k8s/
+.env
+.env.mongo.test
