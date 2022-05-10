@@ -660,11 +660,6 @@ definitions:
       total_process_per_day:
         type: integer
     type: object
-  v1.GitBranches:
-    properties:
-      name:
-        type: string
-    type: object
   v1.GitWebhook:
     properties:
       active:
@@ -1139,6 +1134,38 @@ paths:
       tags:
       - Application
   /api/v1/bitbuckets:
+    post:
+      consumes:
+      - application/json
+      description: Listens Bitbucket Web hook events. Register this endpoint as Bitbucket
+        web hook endpoint
+      parameters:
+      - description: GithubWebHookEvent Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.BitbucketWebHookEvent'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.ResponseDTO'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Listen Bitbucket Web hook event
+      tags:
+      - Bitbucket
+  /api/v1/bitbuckets/branches:
     get:
       description: Gets Branches
       parameters:
@@ -1182,41 +1209,15 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/v1.GitBranches'
+                    items:
+                      properties:
+                        name:
+                          type: string
+                      type: object
+                    type: array
                   type: array
               type: object
       summary: Get Branches
-      tags:
-      - Bitbucket
-    post:
-      consumes:
-      - application/json
-      description: Listens Bitbucket Web hook events. Register this endpoint as Bitbucket
-        web hook endpoint
-      parameters:
-      - description: GithubWebHookEvent Data
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/v1.BitbucketWebHookEvent'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/common.ResponseDTO'
-            - properties:
-                data:
-                  type: string
-              type: object
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/common.ResponseDTO'
-      summary: Listen Bitbucket Web hook event
       tags:
       - Bitbucket
   /api/v1/companies:
@@ -1395,55 +1396,6 @@ paths:
       tags:
       - Company
   /api/v1/githubs:
-    get:
-      description: Gets Branches
-      parameters:
-      - description: User Name
-        in: query
-        name: userName
-        required: true
-        type: string
-      - description: Repository Id
-        in: query
-        name: repoId
-        required: true
-        type: string
-      - description: company Id
-        in: query
-        name: companyId
-        required: true
-        type: string
-      - description: Repository Name
-        in: query
-        name: repoName
-        required: true
-        type: string
-      - description: Loads ApplicationsDto
-        in: query
-        name: loadApplications
-        type: boolean
-      - description: Loads Token
-        in: query
-        name: loadToken
-        required: true
-        type: boolean
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/common.ResponseDTO'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/v1.GitBranches'
-                  type: array
-              type: object
-      summary: Get Branches
-      tags:
-      - Github
     post:
       consumes:
       - application/json
@@ -1473,6 +1425,50 @@ paths:
           schema:
             $ref: '#/definitions/common.ResponseDTO'
       summary: Listen Github Web hook event
+      tags:
+      - Github
+  /api/v1/githubs/branches:
+    get:
+      description: Gets Branches
+      parameters:
+      - description: User Name
+        in: query
+        name: userName
+        required: true
+        type: string
+      - description: Repository Id
+        in: query
+        name: repoId
+        required: true
+        type: string
+      - description: company Id
+        in: query
+        name: companyId
+        required: true
+        type: string
+      - description: Repository Name
+        in: query
+        name: repoName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.ResponseDTO'
+            - properties:
+                data:
+                  items:
+                    properties:
+                      name:
+                        type: string
+                    type: object
+                  type: array
+              type: object
+      summary: Get Branches
       tags:
       - Github
   /api/v1/repositories/{id}:
