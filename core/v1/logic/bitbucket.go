@@ -20,7 +20,39 @@ type bitbucketService struct {
 	client         service.HttpClient
 }
 
-func (b bitbucketService) GetBranches(username, repositoryName, token string) ([]v1.GitBranches, error) {
+func (b bitbucketService) GetCommitByBranch(username, repositoryName, branch, token string) (v1.GitCommit, error) {
+	url := enums.BITBUCKET_API_BASE_URL + "repositories/" + username + "/" + repositoryName + "/commits?include=" + branch
+	base64ConvertedToken := base64.StdEncoding.EncodeToString([]byte(username + ":" + token))
+	header := make(map[string]string)
+	header["Authorization"] = "Basic " + base64ConvertedToken
+	header["Content-Type"] = "application/json"
+
+	var commits v1.BitBucketCommits
+	data, err := b.client.Get(url, header)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(data, &commits)
+	if err != nil {
+		return nil, err
+	}
+	var gitCommit v1.GitCommit
+	for _, each := range commits.Values {
+		commit := v1.Commit{
+			URL:     each.Links.Self.Href,
+			Sha:     each.Hash,
+			NodeID:  each.Hash,
+			HTMLURL: each.Links.HTML.Href,
+			Commit: struct {
+				Message string `json:"message"`
+			}(struct{ Message string }{Message: each.Message}),
+		}
+		gitCommit = append(gitCommit, commit)
+	}
+	return gitCommit, nil
+}
+
+func (b bitbucketService) GetBranches(username, repositoryName, token string) (v1.GitBranches, error) {
 	url := enums.BITBUCKET_API_BASE_URL + "repositories/" + username + "/" + repositoryName + "/refs/branches?pagelen=100"
 	base64ConvertedToken := base64.StdEncoding.EncodeToString([]byte(username + ":" + token))
 	header := make(map[string]string)
@@ -28,19 +60,17 @@ func (b bitbucketService) GetBranches(username, repositoryName, token string) ([
 	header["Content-Type"] = "application/json"
 
 	var branches v1.BitBucketBranches
-	data, _ := b.client.Get(url, header)
-	err := json.Unmarshal(data, &branches)
+	data, err := b.client.Get(url, header)
 	if err != nil {
 		return nil, err
 	}
-	var gitBranches []v1.GitBranches
-
-	if len(branches.Values) > 0 {
-		for _, branch := range branches.Values {
-			gitBranches = append(gitBranches, v1.GitBranches{
-				Name: branch.Name,
-			})
-		}
+	err = json.Unmarshal(data, &branches)
+	if err != nil {
+		return nil, err
+	}
+	var gitBranches v1.GitBranches
+	for _, each := range branches.Values {
+		gitBranches = append(gitBranches, each)
 	}
 	return gitBranches, nil
 }

@@ -19,7 +19,26 @@ type githubService struct {
 	client         service.HttpClient
 }
 
-func (githubService githubService) GetBranches(username, repositoryName, token string) ([]v1.GitBranches, error) {
+func (githubService githubService) GetCommitByBranch(username, repositoryName, branch, token string) (v1.GitCommit, error) {
+	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repositoryName + "/commits?sha=" + branch + "&per_page=5&page=0"
+	header := make(map[string]string)
+	header["Authorization"] = "token " + token
+	header["Accept"] = "application/vnd.github.v3+json"
+	header["cache-control"] = "no-cache"
+	response, err := githubService.client.Get(url, header)
+	if err != nil {
+		return nil, err
+	}
+	var gitCommits v1.GitCommit
+	err = json.Unmarshal(response, &gitCommits)
+
+	if err != nil {
+		return nil, err
+	}
+	return gitCommits, nil
+}
+
+func (githubService githubService) GetBranches(username, repositoryName, token string) (v1.GitBranches, error) {
 	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repositoryName + "/branches"
 	header := make(map[string]string)
 	header["Authorization"] = "token " + token
@@ -30,7 +49,7 @@ func (githubService githubService) GetBranches(username, repositoryName, token s
 	if err != nil {
 		return nil, err
 	}
-	var gitBranches []v1.GitBranches
+	var gitBranches v1.GitBranches
 	err = json.Unmarshal(response, &gitBranches)
 
 	if err != nil {

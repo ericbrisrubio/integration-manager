@@ -22,6 +22,32 @@ type v1GithubApi struct {
 	observerList                 []service.Observer
 }
 
+func (g v1GithubApi) GetCommitByBranch(context echo.Context) error {
+	repoId := context.QueryParam("repoId")
+	option := v1.CompanyQueryOption{
+		Pagination:       v1.Pagination{},
+		LoadRepositories: true,
+		LoadApplications: true,
+		LoadToken:        true,
+	}
+	id := context.QueryParam("companyId")
+	repo := g.companyService.GetRepositoryByRepositoryId(id, repoId, option)
+	userName := context.QueryParam("userName")
+	if userName == "" {
+		return errors.New("userName is required")
+	}
+	repoName := context.QueryParam("repoName")
+	if repoName == "" {
+		return errors.New("repoName is required")
+	}
+	branch := context.QueryParam("branch")
+	commits, err := g.gitService.GetCommitByBranch(userName, repoName, branch, repo.Token)
+	if err != nil {
+		return err
+	}
+	return common.GenerateSuccessResponse(context, commits, nil, "success")
+}
+
 // GetBranches... Get Branches
 // @Summary Get Branches
 // @Description Gets Branches
@@ -31,8 +57,8 @@ type v1GithubApi struct {
 // @Param repoId query string true "Repository Id"
 // @Param companyId query string true "company Id"
 // @Param repoName query string true "Repository Name"
-// @Success 200 {object} common.ResponseDTO{data=[]v1.GitBranches}
-// @Router /api/v1/githubs [GET]
+// @Success 200 {object} common.ResponseDTO{data=v1.GitBranches}
+// @Router /api/v1/githubs/branches [GET]
 func (g v1GithubApi) GetBranches(context echo.Context) error {
 	repoId := context.QueryParam("repoId")
 	option := v1.CompanyQueryOption{

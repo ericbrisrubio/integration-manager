@@ -17,7 +17,12 @@ type bitbucketMockService struct {
 	client         service.HttpClient
 }
 
-func (b bitbucketMockService) GetBranches(username, repositoryName, token string) ([]v1.GitBranches, error) {
+func (b bitbucketMockService) GetCommitByBranch(username, repositoryName, branch, token string) (v1.GitCommit, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (b bitbucketMockService) GetBranches(username, repositoryName, token string) (v1.GitBranches, error) {
 	//TODO implement me
 	panic("implement me")
 }

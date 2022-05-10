@@ -6,4 +6,5 @@ import "github.com/labstack/echo/v4"
 type Git interface {
 	ListenEvent(context echo.Context) error
 	GetBranches(context echo.Context) error
+	GetCommitByBranch(context echo.Context) error
 }

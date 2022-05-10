@@ -22,7 +22,7 @@ type GitWebhook struct {
 }
 
 // GitBranches contains github branches
-type GitBranches struct {
+type GitBranches []struct {
 	Name string `json:"name"`
 }
 
@@ -42,4 +42,25 @@ type GitDirectoryContent struct {
 		Git  string `json:"git"`
 		HTML string `json:"html"`
 	} `json:"_links"`
+}
+
+type Commit struct {
+	URL     string `json:"url"`
+	Sha     string `json:"sha"`
+	NodeID  string `json:"node_id"`
+	HTMLURL string `json:"html_url"`
+	Commit  struct {
+		Message string `json:"message"`
+	} `json:"commit"`
+}
+
+// GitCommit contains github commit data
+type GitCommit []struct {
+	URL     string `json:"url"`
+	Sha     string `json:"sha"`
+	NodeID  string `json:"node_id"`
+	HTMLURL string `json:"html_url"`
+	Commit  struct {
+		Message string `json:"message"`
+	} `json:"commit"`
 }

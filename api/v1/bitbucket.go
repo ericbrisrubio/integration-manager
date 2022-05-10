@@ -22,6 +22,32 @@ type v1BitbucketApi struct {
 	observerList                 []service.Observer
 }
 
+func (b v1BitbucketApi) GetCommitByBranch(context echo.Context) error {
+	repoId := context.QueryParam("repoId")
+	option := v1.CompanyQueryOption{
+		Pagination:       v1.Pagination{},
+		LoadRepositories: true,
+		LoadApplications: true,
+		LoadToken:        true,
+	}
+	id := context.QueryParam("companyId")
+	repo := b.companyService.GetRepositoryByRepositoryId(id, repoId, option)
+	userName := context.QueryParam("userName")
+	if userName == "" {
+		return errors.New("userName is required")
+	}
+	repoName := context.QueryParam("repoName")
+	if repoName == "" {
+		return errors.New("repoName is required")
+	}
+	branch := context.QueryParam("branch")
+	commits, err := b.gitService.GetCommitByBranch(userName, repoName, branch, repo.Token)
+	if err != nil {
+		return common.GenerateErrorResponse(context, err, err.Error())
+	}
+	return common.GenerateSuccessResponse(context, commits, nil, "success")
+}
+
 // GetBranches... Get Branches
 // @Summary Get Branches
 // @Description Gets Branches
@@ -34,7 +60,7 @@ type v1BitbucketApi struct {
 // @Param loadApplications query bool false "Loads ApplicationsDto"
 // @Param loadToken query bool true "Loads Token"
 // @Success 200 {object} common.ResponseDTO{data=[]v1.GitBranches}
-// @Router /api/v1/bitbuckets [GET]
+// @Router /api/v1/bitbuckets/branches [GET]
 func (b v1BitbucketApi) GetBranches(context echo.Context) error {
 	repoId := context.QueryParam("repoId")
 	option := v1.CompanyQueryOption{
@@ -55,7 +81,7 @@ func (b v1BitbucketApi) GetBranches(context echo.Context) error {
 	}
 	branches, err := b.gitService.GetBranches(userName, repoName, repo.Token)
 	if err != nil {
-		return err
+		return common.GenerateErrorResponse(context, err, err.Error())
 	}
 	return common.GenerateSuccessResponse(context, branches, nil, "success")
 }
