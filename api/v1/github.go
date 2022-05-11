@@ -22,6 +22,107 @@ type v1GithubApi struct {
 	observerList                 []service.Observer
 }
 
+// DisableWebhook... Disable Webhook
+// @Summary Disable Webhook
+// @Description Disable Webhook
+// @Tags github
+// @Produce json
+// @Param userName query string true "User Name"
+// @Param repoName query string true "Repository Name"
+// @Param companyId query string true "Company Id"
+// @Param repoId query string true "Repository Id"
+// @Param webhookId query string true "Webhook Id"
+// @Success 200 {object} common.ResponseDTO
+// @Failure 400 {object} common.ResponseDTO
+// @Route /api/v1/github/webhooks [DELETE]
+func (g v1GithubApi) DisableWebhook(context echo.Context) error {
+	username := context.QueryParam("userName")
+	if username == "" {
+		return errors.New("userName is required")
+	}
+	repoName := context.QueryParam("repoName")
+	if repoName == "" {
+		return errors.New("repository name is required")
+	}
+	companyId := context.QueryParam("companyId")
+	if companyId == "" {
+		return errors.New("companyId is required")
+	}
+	repoId := context.QueryParam("repoId")
+	if repoId == "" {
+		return errors.New("repoId is required")
+	}
+	webhookId := context.QueryParam("webhookId")
+	option := v1.CompanyQueryOption{
+		Pagination:       v1.Pagination{},
+		LoadRepositories: true,
+		LoadApplications: true,
+		LoadToken:        true,
+	}
+	repo := g.companyService.GetRepositoryByRepositoryId(companyId, repoId, option)
+	err := g.gitService.DeleteRepositoryWebhookById(username, repoName, webhookId, repo.Token)
+	if err != nil {
+		return common.GenerateErrorResponse(context, err, err.Error())
+	}
+	return common.GenerateSuccessResponse(context, nil, nil, "successfully disable webhook")
+}
+
+// EnableWebhook... Enable Webhook
+// @Summary Enable Webhook
+// @Description Enable Webhook
+// @Tags github
+// @Produce json
+// @Param userName query string true "User Name"
+// @Param repoName query string true "Repository Name"
+// @Param companyId query string true "Company Id"
+// @Param repoId query string true "Repository Id"
+// @Success 200 {object} common.ResponseDTO
+// @Failure 400 {object} common.ResponseDTO
+// @Route /api/v1/github/webhooks [PUT]
+func (g v1GithubApi) EnableWebhook(context echo.Context) error {
+	username := context.QueryParam("userName")
+	if username == "" {
+		return errors.New("userName is required")
+	}
+	repoName := context.QueryParam("repoName")
+	if repoName == "" {
+		return errors.New("repository name is required")
+	}
+	companyId := context.QueryParam("companyId")
+	if companyId == "" {
+		return errors.New("companyId is required")
+	}
+	repoId := context.QueryParam("repoId")
+	if repoId == "" {
+		return errors.New("repoId is required")
+	}
+	option := v1.CompanyQueryOption{
+		Pagination:       v1.Pagination{},
+		LoadRepositories: true,
+		LoadApplications: true,
+		LoadToken:        true,
+	}
+	repo := g.companyService.GetRepositoryByRepositoryId(companyId, repoId, option)
+	_, err := g.gitService.CreateRepositoryWebhook(username, repoName, repo.Token, companyId)
+	if err != nil {
+		return common.GenerateErrorResponse(context, err, err.Error())
+	}
+	return common.GenerateSuccessResponse(context, nil, nil, "successfully enable webhook")
+}
+
+// GetCommitByBranch... Get Commit By Branch
+// @Summary Get Commit By Branch
+// @Description Get Commit By Branch
+// @Tags github
+// @Produce json
+// @Param userName query string true "User Name"
+// @Param repoName query string true "Repository Name"
+// @Param companyId query string true "Company Id"
+// @Param repoId query string true "Repository Id"
+// @Param branch query string true "Branch"
+// @Success 200 {object} common.ResponseDTO
+// @Failure 400 {object} common.ResponseDTO
+// @Route /api/v1/github/commits [GET]
 func (g v1GithubApi) GetCommitByBranch(context echo.Context) error {
 	repoId := context.QueryParam("repoId")
 	option := v1.CompanyQueryOption{
@@ -57,7 +158,8 @@ func (g v1GithubApi) GetCommitByBranch(context echo.Context) error {
 // @Param repoId query string true "Repository Id"
 // @Param companyId query string true "company Id"
 // @Param repoName query string true "Repository Name"
-// @Success 200 {object} common.ResponseDTO{data=v1.GitBranches}
+// @Success 200 {object} common.ResponseDTO
+// @Failure 400 {object} common.ResponseDTO
 // @Router /api/v1/githubs/branches [GET]
 func (g v1GithubApi) GetBranches(context echo.Context) error {
 	repoId := context.QueryParam("repoId")

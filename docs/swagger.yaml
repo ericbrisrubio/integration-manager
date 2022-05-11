@@ -1133,6 +1133,49 @@ paths:
       summary: Get Application by Application id
       tags:
       - Application
+  /api/v1/bitbucket/commits:
+    get:
+      description: Get Commit By Branch
+      parameters:
+      - description: User Name
+        in: query
+        name: userName
+        required: true
+        type: string
+      - description: Repository Name
+        in: query
+        name: repoName
+        required: true
+        type: string
+      - description: Company Id
+        in: query
+        name: companyId
+        required: true
+        type: string
+      - description: Repository Id
+        in: query
+        name: repoId
+        required: true
+        type: string
+      - description: Branch
+        in: query
+        name: branch
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Get Commit By Branch
+      tags:
+      - Bitbucket
   /api/v1/bitbuckets:
     post:
       consumes:
@@ -1204,20 +1247,92 @@ paths:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/common.ResponseDTO'
-            - properties:
-                data:
-                  items:
-                    items:
-                      properties:
-                        name:
-                          type: string
-                      type: object
-                    type: array
-                  type: array
-              type: object
+            $ref: '#/definitions/common.ResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
       summary: Get Branches
+      tags:
+      - Bitbucket
+  /api/v1/bitbuckets/webhook:
+    delete:
+      description: Disable Webhook
+      parameters:
+      - description: User Name
+        in: query
+        name: userName
+        required: true
+        type: string
+      - description: Repository Name
+        in: query
+        name: repoName
+        required: true
+        type: string
+      - description: Company Id
+        in: query
+        name: companyId
+        required: true
+        type: string
+      - description: Repository Id
+        in: query
+        name: repoId
+        required: true
+        type: string
+      - description: Webhook Id
+        in: query
+        name: webhookId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Disable Webhook
+      tags:
+      - Bitbucket
+    put:
+      description: Enable Webhook
+      parameters:
+      - description: User Name
+        in: query
+        name: userName
+        required: true
+        type: string
+      - description: Repository Name
+        in: query
+        name: repoName
+        required: true
+        type: string
+      - description: Company Id
+        in: query
+        name: companyId
+        required: true
+        type: string
+      - description: Repository Id
+        in: query
+        name: repoId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Enable Webhook
       tags:
       - Bitbucket
   /api/v1/companies:
@@ -1457,17 +1572,11 @@ paths:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/common.ResponseDTO'
-            - properties:
-                data:
-                  items:
-                    properties:
-                      name:
-                        type: string
-                    type: object
-                  type: array
-              type: object
+            $ref: '#/definitions/common.ResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
       summary: Get Branches
       tags:
       - Github

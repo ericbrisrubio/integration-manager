@@ -166,6 +166,10 @@ const (
 	GITHUB_RELEASE_EVENT = GITHUB_EVENT("release")
 	// GITHUB_DELETE_EVENT git web hook delete event option
 	GITHUB_DELETE_EVENT = GITHUB_EVENT("delete")
+	// WEBHOOK_ENABLE git web hook enable event option
+	WEBHOOK_EANBLE = GITHUB_EVENT("enable")
+	// WEBHOOK_DISABLE git web hook disable event option
+	WEBHOOK_DISABLE = GITHUB_EVENT("disable")
 )
 
 // BITBUCKET_EVENT git web hook event options

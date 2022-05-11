@@ -22,6 +22,107 @@ type v1BitbucketApi struct {
 	observerList                 []service.Observer
 }
 
+// DisableWebhook... Disable Webhook
+// @Summary Disable Webhook
+// @Description Disable Webhook
+// @Tags Bitbucket
+// @Produce json
+// @Param userName query string true "User Name"
+// @Param repoName query string true "Repository Name"
+// @Param companyId query string true "Company Id"
+// @Param repoId query string true "Repository Id"
+// @Param webhookId query string true "Webhook Id"
+// @Success 200 {object} common.ResponseDTO
+// @Failure 400 {object} common.ResponseDTO
+// @Router /api/v1/bitbuckets/webhook [DELETE]
+func (b v1BitbucketApi) DisableWebhook(context echo.Context) error {
+	username := context.QueryParam("userName")
+	if username == "" {
+		return errors.New("userName is required")
+	}
+	repoName := context.QueryParam("repoName")
+	if repoName == "" {
+		return errors.New("repository name is required")
+	}
+	companyId := context.QueryParam("companyId")
+	if companyId == "" {
+		return errors.New("companyId is required")
+	}
+	repoId := context.QueryParam("repoId")
+	if repoId == "" {
+		return errors.New("repoId is required")
+	}
+	webhookId := context.QueryParam("webhookId")
+	option := v1.CompanyQueryOption{
+		Pagination:       v1.Pagination{},
+		LoadRepositories: true,
+		LoadApplications: true,
+		LoadToken:        true,
+	}
+	repo := b.companyService.GetRepositoryByRepositoryId(companyId, repoId, option)
+	err := b.gitService.DeleteRepositoryWebhookById(username, repoName, webhookId, repo.Token)
+	if err != nil {
+		return common.GenerateErrorResponse(context, err, err.Error())
+	}
+	return common.GenerateSuccessResponse(context, nil, nil, "successfully disable webhook")
+}
+
+// EnableWebhook... Enable Webhook
+// @Summary Enable Webhook
+// @Description Enable Webhook
+// @Tags Bitbucket
+// @Produce json
+// @Param userName query string true "User Name"
+// @Param repoName query string true "Repository Name"
+// @Param companyId query string true "Company Id"
+// @Param repoId query string true "Repository Id"
+// @Success 200 {object} common.ResponseDTO
+// @Failure 400 {object} common.ResponseDTO
+// @Router /api/v1/bitbuckets/webhook [PUT]
+func (b v1BitbucketApi) EnableWebhook(context echo.Context) error {
+	username := context.QueryParam("userName")
+	if username == "" {
+		return errors.New("userName is required")
+	}
+	repoName := context.QueryParam("repoName")
+	if repoName == "" {
+		return errors.New("repository name is required")
+	}
+	companyId := context.QueryParam("companyId")
+	if companyId == "" {
+		return errors.New("companyId is required")
+	}
+	repoId := context.QueryParam("repoId")
+	if repoId == "" {
+		return errors.New("repoId is required")
+	}
+	option := v1.CompanyQueryOption{
+		Pagination:       v1.Pagination{},
+		LoadRepositories: true,
+		LoadApplications: true,
+		LoadToken:        true,
+	}
+	repo := b.companyService.GetRepositoryByRepositoryId(companyId, repoId, option)
+	_, err := b.gitService.CreateRepositoryWebhook(username, repoName, repo.Token, companyId)
+	if err != nil {
+		return common.GenerateErrorResponse(context, err, err.Error())
+	}
+	return common.GenerateSuccessResponse(context, nil, nil, "successfully enable webhook")
+}
+
+// GetCommitByBranch... Get Commit By Branch
+// @Summary Get Commit By Branch
+// @Description Get Commit By Branch
+// @Tags Bitbucket
+// @Produce json
+// @Param userName query string true "User Name"
+// @Param repoName query string true "Repository Name"
+// @Param companyId query string true "Company Id"
+// @Param repoId query string true "Repository Id"
+// @Param branch query string true "Branch"
+// @Success 200 {object} common.ResponseDTO
+// @Failure 400 {object} common.ResponseDTO
+// @Router /api/v1/bitbucket/commits [GET]
 func (b v1BitbucketApi) GetCommitByBranch(context echo.Context) error {
 	repoId := context.QueryParam("repoId")
 	option := v1.CompanyQueryOption{
@@ -59,7 +160,8 @@ func (b v1BitbucketApi) GetCommitByBranch(context echo.Context) error {
 // @Param repoName query string true "Repository Name"
 // @Param loadApplications query bool false "Loads ApplicationsDto"
 // @Param loadToken query bool true "Loads Token"
-// @Success 200 {object} common.ResponseDTO{data=[]v1.GitBranches}
+// @Success 200 {object} common.ResponseDTO
+// @Failure 400 {object} common.ResponseDTO
 // @Router /api/v1/bitbuckets/branches [GET]
 func (b v1BitbucketApi) GetBranches(context echo.Context) error {
 	repoId := context.QueryParam("repoId")

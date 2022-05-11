@@ -125,6 +125,69 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/bitbucket/commits": {
+            "get": {
+                "description": "Get Commit By Branch",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bitbucket"
+                ],
+                "summary": "Get Commit By Branch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Name",
+                        "name": "userName",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Repository Name",
+                        "name": "repoName",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Company Id",
+                        "name": "companyId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Repository Id",
+                        "name": "repoId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Branch",
+                        "name": "branch",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/bitbuckets": {
             "post": {
                 "description": "Listens Bitbucket Web hook events. Register this endpoint as Bitbucket web hook endpoint",
@@ -234,30 +297,130 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/common.ResponseDTO"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "name": {
-                                                            "type": "string"
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/bitbuckets/webhook": {
+            "put": {
+                "description": "Enable Webhook",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bitbucket"
+                ],
+                "summary": "Enable Webhook",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Name",
+                        "name": "userName",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Repository Name",
+                        "name": "repoName",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Company Id",
+                        "name": "companyId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Repository Id",
+                        "name": "repoId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Disable Webhook",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bitbucket"
+                ],
+                "summary": "Disable Webhook",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Name",
+                        "name": "userName",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Repository Name",
+                        "name": "repoName",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Company Id",
+                        "name": "companyId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Repository Id",
+                        "name": "repoId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Webhook Id",
+                        "name": "webhookId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
                         }
                     }
                 }
@@ -641,27 +804,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/common.ResponseDTO"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "object",
-                                                "properties": {
-                                                    "name": {
-                                                        "type": "string"
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
                         }
                     }
                 }
