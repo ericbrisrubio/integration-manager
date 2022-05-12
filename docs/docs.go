@@ -296,7 +296,7 @@ const docTemplate = `{
             }
         },
         "/api/v1/bitbuckets/webhooks": {
-            "put": {
+            "patch": {
                 "description": "Update Webhook",
                 "produces": [
                     "application/json"
@@ -748,7 +748,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "github"
+                    "Github"
                 ],
                 "summary": "Get Commit By Branch",
                 "parameters": [
@@ -798,13 +798,13 @@ const docTemplate = `{
             }
         },
         "/api/v1/githubs/webhooks": {
-            "put": {
+            "patch": {
                 "description": "Update Webhook",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Bitbucket"
+                    "Github"
                 ],
                 "summary": "Update Webhook to Enable or Disable",
                 "parameters": [

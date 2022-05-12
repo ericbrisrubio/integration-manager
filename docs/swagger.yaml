@@ -1246,7 +1246,7 @@ paths:
       tags:
       - Bitbucket
   /api/v1/bitbuckets/webhooks:
-    put:
+    patch:
       description: Update Webhook
       parameters:
       - description: action type [enable/disable]
@@ -1565,9 +1565,9 @@ paths:
             $ref: '#/definitions/common.ResponseDTO'
       summary: Get Commit By Branch
       tags:
-      - github
+      - Github
   /api/v1/githubs/webhooks:
-    put:
+    patch:
       description: Update Webhook
       parameters:
       - description: action type [enable/disable]
@@ -1608,7 +1608,7 @@ paths:
             $ref: '#/definitions/common.ResponseDTO'
       summary: Update Webhook to Enable or Disable
       tags:
-      - Bitbucket
+      - Github
   /api/v1/repositories/{id}:
     get:
       description: Gets Repository by id
