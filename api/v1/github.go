@@ -25,7 +25,7 @@ type v1GithubApi struct {
 // UpdateWebhook... Update Webhook
 // @Summary Update Webhook to Enable or Disable
 // @Description Update Webhook
-// @Tags Bitbucket
+// @Tags Github
 // @Produce json
 // @Param action query string true "action type [enable/disable]"
 // @Param companyId query string true "Company Id"
@@ -105,7 +105,7 @@ func (g v1GithubApi) EnableWebhook(context echo.Context) error {
 // GetCommitByBranch... Get Commit By Branch
 // @Summary Get Commit By Branch
 // @Description Get Commit By Branch
-// @Tags github
+// @Tags Github
 // @Produce json
 // @Param companyId query string true "Company Id"
 // @Param repoId query string true "Repository Id"
