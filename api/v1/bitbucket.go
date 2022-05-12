@@ -154,10 +154,9 @@ func (b v1BitbucketApi) GetCommitByBranch(context echo.Context) error {
 // @Description Gets Branches
 // @Tags Bitbucket
 // @Produce json
-// @Param userName query string true "User Name"
 // @Param repoId query string true "Repository Id"
 // @Param companyId query string true "company Id"
-// @Param repoName query string true "Repository Name"
+// @Param url query string true "Url"
 // @Param loadApplications query bool false "Loads ApplicationsDto"
 // @Param loadToken query bool true "Loads Token"
 // @Success 200 {object} common.ResponseDTO
@@ -173,15 +172,8 @@ func (b v1BitbucketApi) GetBranches(context echo.Context) error {
 	}
 	id := context.QueryParam("companyId")
 	repo := b.companyService.GetRepositoryByRepositoryId(id, repoId, option)
-	userName := context.QueryParam("userName")
-	if userName == "" {
-		return errors.New("userName is required")
-	}
-	repoName := context.QueryParam("repoName")
-	if repoName == "" {
-		return errors.New("repoName is required")
-	}
-	branches, err := b.gitService.GetBranches(userName, repoName, repo.Token)
+	url := context.QueryParam("url")
+	branches, err := b.gitService.GetBranches(url, repo.Token)
 	if err != nil {
 		return common.GenerateErrorResponse(context, err, err.Error())
 	}

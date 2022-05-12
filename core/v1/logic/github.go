@@ -38,14 +38,15 @@ func (githubService githubService) GetCommitByBranch(username, repositoryName, b
 	return gitCommits, nil
 }
 
-func (githubService githubService) GetBranches(username, repositoryName, token string) (v1.GitBranches, error) {
-	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repositoryName + "/branches"
+func (githubService githubService) GetBranches(url, token string) (v1.GitBranches, error) {
+	userName, repositoryName := v1.GetUserNameAndRepoNameFromGithubRepositoryUrl(url)
+	githubUrl := enums.GITHUB_API_BASE_URL + "repos/" + userName + "/" + repositoryName + "/branches"
 	header := make(map[string]string)
 	header["Authorization"] = "token " + token
 	header["Accept"] = "application/vnd.github.v3+json"
 	header["cache-control"] = "no-cache"
 
-	response, err := githubService.client.Get(url, header)
+	response, err := githubService.client.Get(githubUrl, header)
 	if err != nil {
 		return nil, err
 	}

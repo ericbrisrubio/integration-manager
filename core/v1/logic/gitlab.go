@@ -17,7 +17,7 @@ func (g gitlabService) GetCommitByBranch(username, repositoryName, branch, token
 	panic("implement me")
 }
 
-func (g gitlabService) GetBranches(username, repositoryName, token string) (v1.GitBranches, error) {
+func (g gitlabService) GetBranches(url, token string) (v1.GitBranches, error) {
 	//TODO implement me
 	panic("implement me")
 }

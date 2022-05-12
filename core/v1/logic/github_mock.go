@@ -22,7 +22,7 @@ func (g githubMockService) GetCommitByBranch(username, repositoryName, branch, t
 	panic("implement me")
 }
 
-func (g githubMockService) GetBranches(username, repositoryName, token string) (v1.GitBranches, error) {
+func (g githubMockService) GetBranches(url, token string) (v1.GitBranches, error) {
 	//TODO implement me
 	panic("implement me")
 }

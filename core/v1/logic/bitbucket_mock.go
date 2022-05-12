@@ -22,7 +22,7 @@ func (b bitbucketMockService) GetCommitByBranch(username, repositoryName, branch
 	panic("implement me")
 }
 
-func (b bitbucketMockService) GetBranches(username, repositoryName, token string) (v1.GitBranches, error) {
+func (b bitbucketMockService) GetBranches(url, token string) (v1.GitBranches, error) {
 	//TODO implement me
 	panic("implement me")
 }

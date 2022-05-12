@@ -154,10 +154,9 @@ func (g v1GithubApi) GetCommitByBranch(context echo.Context) error {
 // @Description Gets Branches
 // @Tags Github
 // @Produce json
-// @Param userName query string true "User Name"
 // @Param repoId query string true "Repository Id"
 // @Param companyId query string true "company Id"
-// @Param repoName query string true "Repository Name"
+// @Param url query string true "Url"
 // @Success 200 {object} common.ResponseDTO
 // @Failure 400 {object} common.ResponseDTO
 // @Router /api/v1/githubs/branches [GET]
@@ -171,15 +170,8 @@ func (g v1GithubApi) GetBranches(context echo.Context) error {
 	}
 	id := context.QueryParam("companyId")
 	repo := g.companyService.GetRepositoryByRepositoryId(id, repoId, option)
-	userName := context.QueryParam("userName")
-	if userName == "" {
-		return errors.New("userName is required")
-	}
-	repoName := context.QueryParam("repoName")
-	if repoName == "" {
-		return errors.New("repoName is required")
-	}
-	branches, err := g.gitService.GetBranches(userName, repoName, repo.Token)
+	url := context.QueryParam("url")
+	branches, err := g.gitService.GetBranches(url, repo.Token)
 	if err != nil {
 		return err
 	}
