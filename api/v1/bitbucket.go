@@ -173,7 +173,8 @@ func (b v1BitbucketApi) GetBranches(context echo.Context) error {
 	id := context.QueryParam("companyId")
 	repo := b.companyService.GetRepositoryByRepositoryId(id, repoId, option)
 	url := context.QueryParam("url")
-	branches, err := b.gitService.GetBranches(url, repo.Token)
+	username, repositoryName := getUsernameAndRepoNameFromBitbucketRepositoryUrl(url)
+	branches, err := b.gitService.GetBranches(username, repositoryName, repo.Token)
 	if err != nil {
 		return common.GenerateErrorResponse(context, err, err.Error())
 	}

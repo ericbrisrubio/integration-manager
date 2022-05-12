@@ -171,7 +171,8 @@ func (g v1GithubApi) GetBranches(context echo.Context) error {
 	id := context.QueryParam("companyId")
 	repo := g.companyService.GetRepositoryByRepositoryId(id, repoId, option)
 	url := context.QueryParam("url")
-	branches, err := g.gitService.GetBranches(url, repo.Token)
+	username, repositoryName := getUsernameAndRepoNameFromGithubRepositoryUrl(url)
+	branches, err := g.gitService.GetBranches(username, repositoryName, repo.Token)
 	if err != nil {
 		return err
 	}

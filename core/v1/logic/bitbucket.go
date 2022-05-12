@@ -52,16 +52,15 @@ func (b bitbucketService) GetCommitByBranch(username, repositoryName, branch, to
 	return gitCommit, nil
 }
 
-func (b bitbucketService) GetBranches(url, token string) (v1.GitBranches, error) {
-	userName, repositoryName := v1.GetUserNameAndRepoNameFromBitbucketRepositoryUrl(url)
-	bitbucketUrl := enums.BITBUCKET_API_BASE_URL + "repositories/" + userName + "/" + repositoryName + "/refs/branches?pagelen=100"
-	base64ConvertedToken := base64.StdEncoding.EncodeToString([]byte(userName + ":" + token))
+func (b bitbucketService) GetBranches(username, repositoryName, token string) (v1.GitBranches, error) {
+	url := enums.BITBUCKET_API_BASE_URL + "repositories/" + username + "/" + repositoryName + "/refs/branches?pagelen=100"
+	base64ConvertedToken := base64.StdEncoding.EncodeToString([]byte(username + ":" + token))
 	header := make(map[string]string)
 	header["Authorization"] = "Basic " + base64ConvertedToken
 	header["Content-Type"] = "application/json"
 
 	var branches v1.BitBucketBranches
-	data, err := b.client.Get(bitbucketUrl, header)
+	data, err := b.client.Get(url, header)
 	if err != nil {
 		return nil, err
 	}
