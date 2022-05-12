@@ -33,7 +33,7 @@ type v1GithubApi struct {
 // @Param webhookId query string true "Webhook Id"
 // @Success 200 {object} common.ResponseDTO
 // @Failure 400 {object} common.ResponseDTO
-// @Route /api/v1/github/webhooks [DELETE]
+// @Router /api/v1/githubs/webhooks [PUT]
 func (g v1GithubApi) DisableWebhook(context echo.Context) error {
 	companyId := context.QueryParam("companyId")
 	if companyId == "" {
@@ -73,7 +73,7 @@ func (g v1GithubApi) DisableWebhook(context echo.Context) error {
 // @Param url query string true "Url"
 // @Success 200 {object} common.ResponseDTO
 // @Failure 400 {object} common.ResponseDTO
-// @Route /api/v1/github/webhooks [PUT]
+// @Router /api/v1/githubs/webhooks [PUT]
 func (g v1GithubApi) EnableWebhook(context echo.Context) error {
 	companyId := context.QueryParam("companyId")
 	if companyId == "" {
@@ -113,7 +113,7 @@ func (g v1GithubApi) EnableWebhook(context echo.Context) error {
 // @Param branch query string true "Branch"
 // @Success 200 {object} common.ResponseDTO
 // @Failure 400 {object} common.ResponseDTO
-// @Route /api/v1/github/commits [GET]
+// @Router /api/v1/githubs/commits [GET]
 func (g v1GithubApi) GetCommitByBranch(context echo.Context) error {
 	repoId := context.QueryParam("repoId")
 	option := v1.CompanyQueryOption{

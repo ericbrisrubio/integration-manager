@@ -33,7 +33,7 @@ type v1BitbucketApi struct {
 // @Param webhookId query string true "Webhook Id"
 // @Success 200 {object} common.ResponseDTO
 // @Failure 400 {object} common.ResponseDTO
-// @Router /api/v1/bitbuckets/webhook [DELETE]
+// @Router /api/v1/bitbuckets/webhooks [PUT]
 func (b v1BitbucketApi) DisableWebhook(context echo.Context) error {
 	companyId := context.QueryParam("companyId")
 	if companyId == "" {
@@ -73,7 +73,7 @@ func (b v1BitbucketApi) DisableWebhook(context echo.Context) error {
 // @Param url query string true "Url"
 // @Success 200 {object} common.ResponseDTO
 // @Failure 400 {object} common.ResponseDTO
-// @Router /api/v1/bitbuckets/webhook [PUT]
+// @Router /api/v1/bitbuckets/webhooks [PUT]
 func (b v1BitbucketApi) EnableWebhook(context echo.Context) error {
 	companyId := context.QueryParam("companyId")
 	if companyId == "" {

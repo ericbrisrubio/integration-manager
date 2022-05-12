@@ -34,7 +34,7 @@ func BitbucketEventRouter(g *echo.Group) {
 	g.PUT("/webhooks", bitbucketApi.DisableWebhook)
 }
 
-// GithubEventRouter api/v1/githubs/* router
+// GithubEventRouter api/v1/githubs event router
 func GithubEventRouter(g *echo.Group) {
 	var githubApi api.Git
 	if config.Environment == string(enums.PRODUCTION) {
