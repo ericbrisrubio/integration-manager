@@ -27,31 +27,27 @@ type v1GithubApi struct {
 // @Description Disable Webhook
 // @Tags github
 // @Produce json
-// @Param userName query string true "User Name"
-// @Param repoName query string true "Repository Name"
 // @Param companyId query string true "Company Id"
 // @Param repoId query string true "Repository Id"
+// @Param url query string true "Url"
 // @Param webhookId query string true "Webhook Id"
 // @Success 200 {object} common.ResponseDTO
 // @Failure 400 {object} common.ResponseDTO
 // @Route /api/v1/github/webhooks [DELETE]
 func (g v1GithubApi) DisableWebhook(context echo.Context) error {
-	username := context.QueryParam("userName")
-	if username == "" {
-		return errors.New("userName is required")
-	}
-	repoName := context.QueryParam("repoName")
-	if repoName == "" {
-		return errors.New("repository name is required")
-	}
 	companyId := context.QueryParam("companyId")
 	if companyId == "" {
 		return errors.New("companyId is required")
 	}
 	repoId := context.QueryParam("repoId")
 	if repoId == "" {
-		return errors.New("repoId is required")
+		return errors.New("repositoryId is required")
 	}
+	url := context.QueryParam("url")
+	if url == "" {
+		return errors.New("repository url is required")
+	}
+	username, repositoryName := getUsernameAndRepoNameFromGithubRepositoryUrl(url)
 	webhookId := context.QueryParam("webhookId")
 	option := v1.CompanyQueryOption{
 		Pagination:       v1.Pagination{},
@@ -60,7 +56,7 @@ func (g v1GithubApi) DisableWebhook(context echo.Context) error {
 		LoadToken:        true,
 	}
 	repo := g.companyService.GetRepositoryByRepositoryId(companyId, repoId, option)
-	err := g.gitService.DeleteRepositoryWebhookById(username, repoName, webhookId, repo.Token)
+	err := g.gitService.DeleteRepositoryWebhookById(username, repositoryName, webhookId, repo.Token)
 	if err != nil {
 		return common.GenerateErrorResponse(context, err, err.Error())
 	}
@@ -72,22 +68,13 @@ func (g v1GithubApi) DisableWebhook(context echo.Context) error {
 // @Description Enable Webhook
 // @Tags github
 // @Produce json
-// @Param userName query string true "User Name"
-// @Param repoName query string true "Repository Name"
 // @Param companyId query string true "Company Id"
 // @Param repoId query string true "Repository Id"
+// @Param url query string true "Url"
 // @Success 200 {object} common.ResponseDTO
 // @Failure 400 {object} common.ResponseDTO
 // @Route /api/v1/github/webhooks [PUT]
 func (g v1GithubApi) EnableWebhook(context echo.Context) error {
-	username := context.QueryParam("userName")
-	if username == "" {
-		return errors.New("userName is required")
-	}
-	repoName := context.QueryParam("repoName")
-	if repoName == "" {
-		return errors.New("repository name is required")
-	}
 	companyId := context.QueryParam("companyId")
 	if companyId == "" {
 		return errors.New("companyId is required")
@@ -96,6 +83,11 @@ func (g v1GithubApi) EnableWebhook(context echo.Context) error {
 	if repoId == "" {
 		return errors.New("repoId is required")
 	}
+	url := context.QueryParam("url")
+	if url == "" {
+		return errors.New("repository url is required")
+	}
+	username, repositoryName := getUsernameAndRepoNameFromGithubRepositoryUrl(url)
 	option := v1.CompanyQueryOption{
 		Pagination:       v1.Pagination{},
 		LoadRepositories: true,
@@ -103,7 +95,7 @@ func (g v1GithubApi) EnableWebhook(context echo.Context) error {
 		LoadToken:        true,
 	}
 	repo := g.companyService.GetRepositoryByRepositoryId(companyId, repoId, option)
-	_, err := g.gitService.CreateRepositoryWebhook(username, repoName, repo.Token, companyId)
+	_, err := g.gitService.CreateRepositoryWebhook(username, repositoryName, repo.Token, companyId)
 	if err != nil {
 		return common.GenerateErrorResponse(context, err, err.Error())
 	}
@@ -115,10 +107,9 @@ func (g v1GithubApi) EnableWebhook(context echo.Context) error {
 // @Description Get Commit By Branch
 // @Tags github
 // @Produce json
-// @Param userName query string true "User Name"
-// @Param repoName query string true "Repository Name"
 // @Param companyId query string true "Company Id"
 // @Param repoId query string true "Repository Id"
+// @Param url query string true "Url"
 // @Param branch query string true "Branch"
 // @Success 200 {object} common.ResponseDTO
 // @Failure 400 {object} common.ResponseDTO
@@ -133,16 +124,13 @@ func (g v1GithubApi) GetCommitByBranch(context echo.Context) error {
 	}
 	id := context.QueryParam("companyId")
 	repo := g.companyService.GetRepositoryByRepositoryId(id, repoId, option)
-	userName := context.QueryParam("userName")
-	if userName == "" {
-		return errors.New("userName is required")
+	url := context.QueryParam("url")
+	if url == "" {
+		return errors.New("repository url is required")
 	}
-	repoName := context.QueryParam("repoName")
-	if repoName == "" {
-		return errors.New("repoName is required")
-	}
+	username, repositoryName := getUsernameAndRepoNameFromGithubRepositoryUrl(url)
 	branch := context.QueryParam("branch")
-	commits, err := g.gitService.GetCommitByBranch(userName, repoName, branch, repo.Token)
+	commits, err := g.gitService.GetCommitByBranch(username, repositoryName, branch, repo.Token)
 	if err != nil {
 		return err
 	}
@@ -171,6 +159,9 @@ func (g v1GithubApi) GetBranches(context echo.Context) error {
 	id := context.QueryParam("companyId")
 	repo := g.companyService.GetRepositoryByRepositoryId(id, repoId, option)
 	url := context.QueryParam("url")
+	if url == "" {
+		return errors.New("repository url is required")
+	}
 	username, repositoryName := getUsernameAndRepoNameFromGithubRepositoryUrl(url)
 	branches, err := g.gitService.GetBranches(username, repositoryName, repo.Token)
 	if err != nil {
