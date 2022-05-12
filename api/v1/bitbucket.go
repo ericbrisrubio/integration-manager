@@ -34,7 +34,7 @@ type v1BitbucketApi struct {
 // @Param webhookId query string true "Webhook Id"
 // @Success 200 {object} common.ResponseDTO
 // @Failure 400 {object} common.ResponseDTO
-// @Router /api/v1/bitbuckets/webhooks [PUT]
+// @Router /api/v1/bitbuckets/webhooks [PATCH]
 func (b v1BitbucketApi) UpdateWebhook(context echo.Context) error {
 	action := context.QueryParam("action")
 	if action == "enable" {

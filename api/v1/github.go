@@ -34,7 +34,7 @@ type v1GithubApi struct {
 // @Param webhookId query string true "Webhook Id"
 // @Success 200 {object} common.ResponseDTO
 // @Failure 400 {object} common.ResponseDTO
-// @Router /api/v1/githubs/webhooks [PUT]
+// @Router /api/v1/githubs/webhooks [PATCH]
 func (g v1GithubApi) UpdateWebhook(context echo.Context) error {
 	action := context.QueryParam("action")
 	if action == "enable" {
