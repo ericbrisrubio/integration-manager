@@ -138,20 +138,6 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Name",
-                        "name": "userName",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Repository Name",
-                        "name": "repoName",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
                         "description": "Company Id",
                         "name": "companyId",
                         "in": "query",
@@ -161,6 +147,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Repository Id",
                         "name": "repoId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Url",
+                        "name": "url",
                         "in": "query",
                         "required": true
                     },
@@ -253,13 +246,6 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Name",
-                        "name": "userName",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
                         "description": "Repository Id",
                         "name": "repoId",
                         "in": "query",
@@ -274,8 +260,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Repository Name",
-                        "name": "repoName",
+                        "description": "Url",
+                        "name": "url",
                         "in": "query",
                         "required": true
                     },
@@ -309,28 +295,21 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/bitbuckets/webhook": {
+        "/api/v1/bitbuckets/webhooks": {
             "put": {
-                "description": "Enable Webhook",
+                "description": "Update Webhook",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Bitbucket"
                 ],
-                "summary": "Enable Webhook",
+                "summary": "Update Webhook to Enable or Disable",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Name",
-                        "name": "userName",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Repository Name",
-                        "name": "repoName",
+                        "description": "action type [enable/disable]",
+                        "name": "action",
                         "in": "query",
                         "required": true
                     },
@@ -347,58 +326,11 @@ const docTemplate = `{
                         "name": "repoId",
                         "in": "query",
                         "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Disable Webhook",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Bitbucket"
-                ],
-                "summary": "Disable Webhook",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User Name",
-                        "name": "userName",
-                        "in": "query",
-                        "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Repository Name",
-                        "name": "repoName",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Company Id",
-                        "name": "companyId",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Repository Id",
-                        "name": "repoId",
+                        "description": "Url",
+                        "name": "url",
                         "in": "query",
                         "required": true
                     },
@@ -773,13 +705,6 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Name",
-                        "name": "userName",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
                         "description": "Repository Id",
                         "name": "repoId",
                         "in": "query",
@@ -794,8 +719,127 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Repository Name",
-                        "name": "repoName",
+                        "description": "Url",
+                        "name": "url",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/githubs/commits": {
+            "get": {
+                "description": "Get Commit By Branch",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "github"
+                ],
+                "summary": "Get Commit By Branch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company Id",
+                        "name": "companyId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Repository Id",
+                        "name": "repoId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Url",
+                        "name": "url",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Branch",
+                        "name": "branch",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/githubs/webhooks": {
+            "put": {
+                "description": "Update Webhook",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bitbucket"
+                ],
+                "summary": "Update Webhook to Enable or Disable",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "action type [enable/disable]",
+                        "name": "action",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Company Id",
+                        "name": "companyId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Repository Id",
+                        "name": "repoId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Url",
+                        "name": "url",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Webhook Id",
+                        "name": "webhookId",
                         "in": "query",
                         "required": true
                     }

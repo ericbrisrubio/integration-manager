@@ -1137,16 +1137,6 @@ paths:
     get:
       description: Get Commit By Branch
       parameters:
-      - description: User Name
-        in: query
-        name: userName
-        required: true
-        type: string
-      - description: Repository Name
-        in: query
-        name: repoName
-        required: true
-        type: string
       - description: Company Id
         in: query
         name: companyId
@@ -1155,6 +1145,11 @@ paths:
       - description: Repository Id
         in: query
         name: repoId
+        required: true
+        type: string
+      - description: Url
+        in: query
+        name: url
         required: true
         type: string
       - description: Branch
@@ -1212,11 +1207,6 @@ paths:
     get:
       description: Gets Branches
       parameters:
-      - description: User Name
-        in: query
-        name: userName
-        required: true
-        type: string
       - description: Repository Id
         in: query
         name: repoId
@@ -1227,9 +1217,9 @@ paths:
         name: companyId
         required: true
         type: string
-      - description: Repository Name
+      - description: Url
         in: query
-        name: repoName
+        name: url
         required: true
         type: string
       - description: Loads ApplicationsDto
@@ -1255,18 +1245,13 @@ paths:
       summary: Get Branches
       tags:
       - Bitbucket
-  /api/v1/bitbuckets/webhook:
-    delete:
-      description: Disable Webhook
+  /api/v1/bitbuckets/webhooks:
+    put:
+      description: Update Webhook
       parameters:
-      - description: User Name
+      - description: action type [enable/disable]
         in: query
-        name: userName
-        required: true
-        type: string
-      - description: Repository Name
-        in: query
-        name: repoName
+        name: action
         required: true
         type: string
       - description: Company Id
@@ -1277,6 +1262,11 @@ paths:
       - description: Repository Id
         in: query
         name: repoId
+        required: true
+        type: string
+      - description: Url
+        in: query
+        name: url
         required: true
         type: string
       - description: Webhook Id
@@ -1295,44 +1285,7 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/common.ResponseDTO'
-      summary: Disable Webhook
-      tags:
-      - Bitbucket
-    put:
-      description: Enable Webhook
-      parameters:
-      - description: User Name
-        in: query
-        name: userName
-        required: true
-        type: string
-      - description: Repository Name
-        in: query
-        name: repoName
-        required: true
-        type: string
-      - description: Company Id
-        in: query
-        name: companyId
-        required: true
-        type: string
-      - description: Repository Id
-        in: query
-        name: repoId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/common.ResponseDTO'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/common.ResponseDTO'
-      summary: Enable Webhook
+      summary: Update Webhook to Enable or Disable
       tags:
       - Bitbucket
   /api/v1/companies:
@@ -1546,11 +1499,6 @@ paths:
     get:
       description: Gets Branches
       parameters:
-      - description: User Name
-        in: query
-        name: userName
-        required: true
-        type: string
       - description: Repository Id
         in: query
         name: repoId
@@ -1561,9 +1509,9 @@ paths:
         name: companyId
         required: true
         type: string
-      - description: Repository Name
+      - description: Url
         in: query
-        name: repoName
+        name: url
         required: true
         type: string
       produces:
@@ -1580,6 +1528,87 @@ paths:
       summary: Get Branches
       tags:
       - Github
+  /api/v1/githubs/commits:
+    get:
+      description: Get Commit By Branch
+      parameters:
+      - description: Company Id
+        in: query
+        name: companyId
+        required: true
+        type: string
+      - description: Repository Id
+        in: query
+        name: repoId
+        required: true
+        type: string
+      - description: Url
+        in: query
+        name: url
+        required: true
+        type: string
+      - description: Branch
+        in: query
+        name: branch
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Get Commit By Branch
+      tags:
+      - github
+  /api/v1/githubs/webhooks:
+    put:
+      description: Update Webhook
+      parameters:
+      - description: action type [enable/disable]
+        in: query
+        name: action
+        required: true
+        type: string
+      - description: Company Id
+        in: query
+        name: companyId
+        required: true
+        type: string
+      - description: Repository Id
+        in: query
+        name: repoId
+        required: true
+        type: string
+      - description: Url
+        in: query
+        name: url
+        required: true
+        type: string
+      - description: Webhook Id
+        in: query
+        name: webhookId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Update Webhook to Enable or Disable
+      tags:
+      - Bitbucket
   /api/v1/repositories/{id}:
     get:
       description: Gets Repository by id
