@@ -186,7 +186,7 @@ func (g v1GithubApi) GetBranches(context echo.Context) error {
 	return common.GenerateSuccessResponse(context, branches, nil, "success")
 }
 
-// Listen ... Listen Github Web hook event
+// ListenEvent... Listen Github Web hook event
 // @Summary  Listen Github Web hook event
 // @Description Listens Github Web hook events. Register this endpoint as github web hook endpoint
 // @Tags Github
