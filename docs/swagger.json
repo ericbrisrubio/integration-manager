@@ -286,23 +286,63 @@
             }
         },
         "/api/v1/bitbuckets/webhooks": {
-            "patch": {
-                "description": "Update Webhook",
+            "put": {
+                "description": "Enable Webhook",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Bitbucket"
                 ],
-                "summary": "Update Webhook to Enable or Disable",
+                "summary": "Enable Webhook",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "action type [enable/disable]",
-                        "name": "action",
+                        "description": "Company Id",
+                        "name": "companyId",
                         "in": "query",
                         "required": true
                     },
+                    {
+                        "type": "string",
+                        "description": "Repository Id",
+                        "name": "repoId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Url",
+                        "name": "url",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Disable Webhook",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bitbucket"
+                ],
+                "summary": "Disable Webhook",
+                "parameters": [
                     {
                         "type": "string",
                         "description": "Company Id",
@@ -788,23 +828,63 @@
             }
         },
         "/api/v1/githubs/webhooks": {
-            "patch": {
-                "description": "Update Webhook",
+            "put": {
+                "description": "Enable Webhook",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Github"
                 ],
-                "summary": "Update Webhook to Enable or Disable",
+                "summary": "Enable Webhook",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "action type [enable/disable]",
-                        "name": "action",
+                        "description": "Company Id",
+                        "name": "companyId",
                         "in": "query",
                         "required": true
                     },
+                    {
+                        "type": "string",
+                        "description": "Repository Id",
+                        "name": "repoId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Url",
+                        "name": "url",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Disable Webhook",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Github"
+                ],
+                "summary": "Disable Webhook",
+                "parameters": [
                     {
                         "type": "string",
                         "description": "Company Id",

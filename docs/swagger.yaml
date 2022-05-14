@@ -1246,14 +1246,9 @@ paths:
       tags:
       - Bitbucket
   /api/v1/bitbuckets/webhooks:
-    patch:
-      description: Update Webhook
+    delete:
+      description: Disable Webhook
       parameters:
-      - description: action type [enable/disable]
-        in: query
-        name: action
-        required: true
-        type: string
       - description: Company Id
         in: query
         name: companyId
@@ -1285,7 +1280,39 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/common.ResponseDTO'
-      summary: Update Webhook to Enable or Disable
+      summary: Disable Webhook
+      tags:
+      - Bitbucket
+    put:
+      description: Enable Webhook
+      parameters:
+      - description: Company Id
+        in: query
+        name: companyId
+        required: true
+        type: string
+      - description: Repository Id
+        in: query
+        name: repoId
+        required: true
+        type: string
+      - description: Url
+        in: query
+        name: url
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Enable Webhook
       tags:
       - Bitbucket
   /api/v1/companies:
@@ -1567,14 +1594,9 @@ paths:
       tags:
       - Github
   /api/v1/githubs/webhooks:
-    patch:
-      description: Update Webhook
+    delete:
+      description: Disable Webhook
       parameters:
-      - description: action type [enable/disable]
-        in: query
-        name: action
-        required: true
-        type: string
       - description: Company Id
         in: query
         name: companyId
@@ -1606,7 +1628,39 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/common.ResponseDTO'
-      summary: Update Webhook to Enable or Disable
+      summary: Disable Webhook
+      tags:
+      - Github
+    put:
+      description: Enable Webhook
+      parameters:
+      - description: Company Id
+        in: query
+        name: companyId
+        required: true
+        type: string
+      - description: Repository Id
+        in: query
+        name: repoId
+        required: true
+        type: string
+      - description: Url
+        in: query
+        name: url
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Enable Webhook
       tags:
       - Github
   /api/v1/repositories/{id}:
