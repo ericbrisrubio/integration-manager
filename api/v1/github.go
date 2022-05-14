@@ -22,29 +22,57 @@ type v1GithubApi struct {
 	observerList                 []service.Observer
 }
 
-// UpdateWebhook... Update Webhook
-// @Summary Update Webhook to Enable or Disable
-// @Description Update Webhook
+// EnableWebhook... Enable Webhook
+// @Summary Enable Webhook
+// @Description Enable Webhook
 // @Tags Github
 // @Produce json
-// @Param action query string true "action type [enable/disable]"
+// @Param companyId query string true "Company Id"
+// @Param repoId query string true "Repository Id"
+// @Param url query string true "Url"
+// @Success 200 {object} common.ResponseDTO
+// @Failure 400 {object} common.ResponseDTO
+// @Router /api/v1/githubs/webhooks [PUT]
+func (g v1GithubApi) EnableWebhook(context echo.Context) error {
+	companyId := context.QueryParam("companyId")
+	if companyId == "" {
+		return errors.New("companyId is required")
+	}
+	repoId := context.QueryParam("repoId")
+	if repoId == "" {
+		return errors.New("repoId is required")
+	}
+	url := context.QueryParam("url")
+	if url == "" {
+		return errors.New("repository url is required")
+	}
+	username, repositoryName := getUsernameAndRepoNameFromGithubRepositoryUrl(url)
+	option := v1.CompanyQueryOption{
+		Pagination:       v1.Pagination{},
+		LoadRepositories: true,
+		LoadApplications: true,
+		LoadToken:        true,
+	}
+	repo := g.companyService.GetRepositoryByRepositoryId(companyId, repoId, option)
+	_, err := g.gitService.CreateRepositoryWebhook(username, repositoryName, repo.Token, companyId)
+	if err != nil {
+		return common.GenerateErrorResponse(context, err, err.Error())
+	}
+	return common.GenerateSuccessResponse(context, nil, nil, "successfully enable webhook")
+}
+
+// DisableWebhook... Disable Webhook
+// @Summary Disable Webhook
+// @Description Disable Webhook
+// @Tags Github
+// @Produce json
 // @Param companyId query string true "Company Id"
 // @Param repoId query string true "Repository Id"
 // @Param url query string true "Url"
 // @Param webhookId query string true "Webhook Id"
 // @Success 200 {object} common.ResponseDTO
 // @Failure 400 {object} common.ResponseDTO
-// @Router /api/v1/githubs/webhooks [PATCH]
-func (g v1GithubApi) UpdateWebhook(context echo.Context) error {
-	action := context.QueryParam("action")
-	if action == "enable" {
-		return g.EnableWebhook(context)
-	} else if action == "disable" {
-		return g.DisableWebhook(context)
-	}
-	return common.GenerateErrorResponse(context, nil, "Provide valid action. [enable/disable]")
-}
-
+// @Router /api/v1/githubs/webhooks [DELETE]
 func (g v1GithubApi) DisableWebhook(context echo.Context) error {
 	companyId := context.QueryParam("companyId")
 	if companyId == "" {
@@ -72,34 +100,6 @@ func (g v1GithubApi) DisableWebhook(context echo.Context) error {
 		return common.GenerateErrorResponse(context, err, err.Error())
 	}
 	return common.GenerateSuccessResponse(context, nil, nil, "successfully disable webhook")
-}
-
-func (g v1GithubApi) EnableWebhook(context echo.Context) error {
-	companyId := context.QueryParam("companyId")
-	if companyId == "" {
-		return errors.New("companyId is required")
-	}
-	repoId := context.QueryParam("repoId")
-	if repoId == "" {
-		return errors.New("repoId is required")
-	}
-	url := context.QueryParam("url")
-	if url == "" {
-		return errors.New("repository url is required")
-	}
-	username, repositoryName := getUsernameAndRepoNameFromGithubRepositoryUrl(url)
-	option := v1.CompanyQueryOption{
-		Pagination:       v1.Pagination{},
-		LoadRepositories: true,
-		LoadApplications: true,
-		LoadToken:        true,
-	}
-	repo := g.companyService.GetRepositoryByRepositoryId(companyId, repoId, option)
-	_, err := g.gitService.CreateRepositoryWebhook(username, repositoryName, repo.Token, companyId)
-	if err != nil {
-		return common.GenerateErrorResponse(context, err, err.Error())
-	}
-	return common.GenerateSuccessResponse(context, nil, nil, "successfully enable webhook")
 }
 
 // GetCommitByBranch... Get Commit By Branch
