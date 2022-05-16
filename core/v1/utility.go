@@ -35,3 +35,25 @@ func GetUserNameAndRepoNameFromBitbucketRepositoryUrl(url string) (username stri
 	usernameOrorgName := urlArray[len(urlArray)-5]
 	return usernameOrorgName, repositoryName
 }
+
+func GetUsernameAndRepoNameFromGithubRepositoryUrl(url string) (username string, repoName string) {
+	trim := strings.TrimSuffix(url, ".git")
+	urlArray := strings.Split(trim, "/")
+	if len(urlArray) < 3 {
+		return "", ""
+	}
+	repositoryName := urlArray[len(urlArray)-1]
+	usernameOrorgName := urlArray[len(urlArray)-2]
+	return usernameOrorgName, repositoryName
+}
+
+func GetUsernameAndRepoNameFromBitbucketRepositoryUrl(url string) (username string, repoName string) {
+	trim := strings.TrimSuffix(url, ".git")
+	urlArray := strings.Split(trim, "/")
+	if len(urlArray) < 3 {
+		return "", ""
+	}
+	repositoryName := urlArray[len(urlArray)-4]
+	usernameOrorgName := urlArray[len(urlArray)-5]
+	return usernameOrorgName, repositoryName
+}

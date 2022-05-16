@@ -12,4 +12,5 @@ type Company interface {
 	GetRepositoriesById(context echo.Context) error
 	UpdateRepositories(context echo.Context) error
 	GetApplicationsByCompanyIdAndRepositoryType(context echo.Context) error
+	UpdateWebhook(context echo.Context) error
 }

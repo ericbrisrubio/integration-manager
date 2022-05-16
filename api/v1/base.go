@@ -30,8 +30,6 @@ func BitbucketEventRouter(g *echo.Group) {
 	g.POST("", bitbucketApi.ListenEvent)
 	g.GET("/branches", bitbucketApi.GetBranches)
 	g.GET("/commits", bitbucketApi.GetCommitByBranch)
-	g.PUT("/webhooks", bitbucketApi.EnableWebhook)
-	g.DELETE("/webhooks", bitbucketApi.DisableWebhook)
 }
 
 // GithubEventRouter api/v1/githubs event router
@@ -45,19 +43,18 @@ func GithubEventRouter(g *echo.Group) {
 	g.POST("", githubApi.ListenEvent)
 	g.GET("/branches", githubApi.GetBranches)
 	g.GET("/commits", githubApi.GetCommitByBranch)
-	g.PUT("/webhooks", githubApi.EnableWebhook)
-	g.DELETE("/webhooks", githubApi.DisableWebhook)
 }
 
 // CompanyRouter api/v1/companies/* router
 func CompanyRouter(g *echo.Group) {
-	companyApi := NewCompanyApi(dependency.GetV1CompanyService(), nil)
+	companyApi := NewCompanyApi(dependency.GetV1CompanyService(), dependency.GetV1BitbucketService(), dependency.GetV1GithubService(), nil)
 	g.POST("", companyApi.Save, AuthenticationAndAuthorizationHandler)
 	g.GET("", companyApi.Get, AuthenticationAndAuthorizationHandler)
 	g.GET("/:id", companyApi.GetById, AuthenticationAndAuthorizationHandler)
 	g.GET("/:id/repositories", companyApi.GetRepositoriesById, AuthenticationAndAuthorizationHandler)
 	g.PUT("/:id/repositories", companyApi.UpdateRepositories, AuthenticationAndAuthorizationHandler)
 	g.GET("/:id/applications", companyApi.GetApplicationsByCompanyIdAndRepositoryType, AuthenticationAndAuthorizationHandler)
+	g.PATCH("/:id/repositories/:repoId/webhooks", companyApi.UpdateWebhook, AuthenticationAndAuthorizationHandler)
 }
 
 // RepositoryRouter api/v1/repositories/* router

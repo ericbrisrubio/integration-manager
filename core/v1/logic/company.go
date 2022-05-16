@@ -98,6 +98,141 @@ func (c companyService) CreateBitbucketWebHookAndUpdateApplication(companyId str
 	}
 }
 
+func (c companyService) EnableBitbucketWebhookAndUpdateApplication(companyId, repoId, url string) error {
+	username, repositoryName := v1.GetUsernameAndRepoNameFromBitbucketRepositoryUrl(url)
+	option := v1.CompanyQueryOption{
+		Pagination:       v1.Pagination{},
+		LoadRepositories: true,
+		LoadApplications: true,
+		LoadToken:        true,
+	}
+	repo := c.repo.GetRepositoryByRepositoryId(companyId, repoId, option)
+	webhook, err := NewBitBucketService(c, nil, c.client).CreateRepositoryWebhook(username, repositoryName, repo.Token, companyId)
+	if err != nil {
+		return err
+	}
+	var app v1.Application
+	company, _ := c.repo.GetByCompanyId(companyId, v1.CompanyQueryOption{LoadRepositories: true, LoadApplications: true})
+	for _, eachRepo := range company.Repositories {
+		if eachRepo.Id == repoId {
+			for _, eachApp := range eachRepo.Applications {
+				if eachApp.Url == url {
+					app = eachApp
+				}
+			}
+		}
+	}
+	app.Webhook = webhook
+	app.MetaData.IsWebhookEnabled = true
+	err = c.repo.UpdateApplication(companyId, repoId, app.MetaData.Id, app)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c companyService) DisableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, webhookId string) error {
+	username, repositoryName := v1.GetUsernameAndRepoNameFromBitbucketRepositoryUrl(url)
+	option := v1.CompanyQueryOption{
+		Pagination:       v1.Pagination{},
+		LoadRepositories: true,
+		LoadApplications: true,
+		LoadToken:        true,
+	}
+	repo := c.repo.GetRepositoryByRepositoryId(companyId, repoId, option)
+	err := NewBitBucketService(c, nil, c.client).DeleteRepositoryWebhookById(username, repositoryName, webhookId, repo.Token)
+	if err != nil {
+		return err
+	}
+	var app v1.Application
+	company, _ := c.repo.GetByCompanyId(companyId, v1.CompanyQueryOption{LoadRepositories: true, LoadApplications: true})
+	for _, eachRepo := range company.Repositories {
+		if eachRepo.Id == repoId {
+			for _, eachApp := range eachRepo.Applications {
+				if eachApp.Url == url {
+					app = eachApp
+				}
+			}
+		}
+	}
+	app.Webhook = v1.GitWebhook{}
+	app.MetaData.IsWebhookEnabled = false
+	err = c.repo.UpdateApplication(companyId, repoId, app.MetaData.Id, app)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c companyService) EnableGithubWebhookAndUpdateApplication(companyId, repoId, url string) error {
+	username, repositoryName := getUsernameAndRepoNameFromGithubRepositoryUrl(url)
+	option := v1.CompanyQueryOption{
+		Pagination:       v1.Pagination{},
+		LoadRepositories: true,
+		LoadApplications: true,
+		LoadToken:        true,
+	}
+	repo := c.repo.GetRepositoryByRepositoryId(companyId, repoId, option)
+	if repo.Id == "" {
+		return errors.New("repository not found")
+	}
+	webhook, err := NewGithubService(c, nil, c.client).CreateRepositoryWebhook(username, repositoryName, repo.Token, companyId)
+	if err != nil {
+		return err
+	}
+	var app v1.Application
+	company, _ := c.repo.GetByCompanyId(companyId, v1.CompanyQueryOption{LoadRepositories: true, LoadApplications: true})
+	for _, eachRepo := range company.Repositories {
+		if eachRepo.Id == repoId {
+			for _, eachApp := range eachRepo.Applications {
+				if eachApp.Url == url {
+					app = eachApp
+				}
+			}
+		}
+	}
+	app.Webhook = webhook
+	app.MetaData.IsWebhookEnabled = true
+	err = c.repo.UpdateApplication(companyId, repoId, app.MetaData.Id, app)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c companyService) DisableGithubWebhookAndUpdateApplication(companyId, repoId, url, webhookId string) error {
+	username, repositoryName := getUsernameAndRepoNameFromGithubRepositoryUrl(url)
+	option := v1.CompanyQueryOption{
+		Pagination:       v1.Pagination{},
+		LoadRepositories: true,
+		LoadApplications: true,
+		LoadToken:        true,
+	}
+	repo := c.repo.GetRepositoryByRepositoryId(companyId, repoId, option)
+	err := NewGithubService(c, nil, c.client).DeleteRepositoryWebhookById(username, repositoryName, webhookId, repo.Token)
+	if err != nil {
+		return err
+	}
+	var app v1.Application
+	company, _ := c.repo.GetByCompanyId(companyId, v1.CompanyQueryOption{LoadRepositories: true, LoadApplications: true})
+	for _, eachRepo := range company.Repositories {
+		if eachRepo.Id == repoId {
+			for _, eachApp := range eachRepo.Applications {
+				if eachApp.Url == url {
+					app = eachApp
+				}
+			}
+		}
+	}
+	app.Webhook = v1.GitWebhook{}
+	app.MetaData.IsWebhookEnabled = false
+	err = c.repo.UpdateApplication(companyId, repoId, app.MetaData.Id, app)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c companyService) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
 	return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl)
 }
@@ -269,6 +404,11 @@ func (c companyService) UpdateApplications(companyId string, repositoryId string
 		return errors.New("invalid application update option")
 	}
 }
+
+func (c companyService) UpdateApplication(companyId string, repositoryId string, app v1.Application) error {
+	return c.repo.UpdateApplication(companyId, repositoryId, app.MetaData.Id, app)
+}
+
 func (c companyService) AppendApplications(companyId, repositoryId string, apps []v1.Application, option v1.CompanyQueryOption) error {
 	for i := range apps {
 		apps[i].MetaData.Id = uuid.New().String()

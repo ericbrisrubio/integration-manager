@@ -15,8 +15,10 @@ import (
 )
 
 type companyApi struct {
-	companyService service.Company
-	observerList   []service.Observer
+	companyService   service.Company
+	githubService    service.Git
+	bitbucketService service.Git
+	observerList     []service.Observer
 }
 
 // Get.. Get applications
@@ -191,6 +193,131 @@ func (c companyApi) GetRepositoriesById(context echo.Context) error {
 	return common.GenerateSuccessResponse(context, data, &metadata, "")
 }
 
+// UpdateWebhook... Update Webhook
+// @Summary Update Webhook to Enable or Disable
+// @Description Update Webhook
+// @Tags Github
+// @Produce json
+// @Param action query string true "action type [enable/disable]"
+// @Param repoType query string true "Repository type [github/bitbucket]"
+// @Param id path string true "Company id"
+// @Param repoId path string true "Repository id"
+// @Param url query string true "Url"
+// @Param webhookId query string false "Webhook Id to disable webhook"
+// @Success 200 {object} common.ResponseDTO
+// @Failure 400 {object} common.ResponseDTO
+// @Router /api/v1/companies/{id}/repositories/{repoId}/webhooks [PATCH]
+func (c companyApi) UpdateWebhook(context echo.Context) error {
+	action := context.QueryParam("action")
+	repoType := context.QueryParam("repoType")
+	if action == "enable" {
+		if repoType == "bitbucket" {
+			return c.EnableBitbucketWebhook(context)
+		} else if repoType == "github" {
+			return c.EnableGithubWebhook(context)
+		} else {
+			return common.GenerateErrorResponse(context, nil, "Provide valid repository type.")
+		}
+	} else if action == "disable" {
+		if repoType == "bitbucket" {
+			return c.DisableBitbucketWebhook(context)
+		} else if repoType == "github" {
+			return c.DisableGithubWebhook(context)
+		} else {
+			return common.GenerateErrorResponse(context, nil, "Provide valid repository type.")
+		}
+	}
+	return common.GenerateErrorResponse(context, nil, "Provide valid action. [enable/disable]")
+}
+
+func (c companyApi) EnableBitbucketWebhook(context echo.Context) error {
+	id := context.Param("id")
+	if id == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: no company id is not provided", "Please provide company id")
+	}
+	repoId := context.Param("repoId")
+	if repoId == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: repository id is not provided", "Please provide repository id")
+	}
+	url := context.QueryParam("url")
+	if url == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: application url is not provided", "Please provide application url")
+	}
+	err := c.companyService.EnableBitbucketWebhookAndUpdateApplication(id, repoId, url)
+	if err != nil {
+		return common.GenerateErrorResponse(context, err, err.Error())
+	}
+	return common.GenerateSuccessResponse(context, nil, nil, "Webhook updated sucessfully")
+}
+
+func (c companyApi) DisableBitbucketWebhook(context echo.Context) error {
+	id := context.Param("id")
+	if id == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: no company id is not provided", "Please provide company id")
+	}
+	repoId := context.Param("repoId")
+	if repoId == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: repository id is not provided", "Please provide repository id")
+	}
+	url := context.QueryParam("url")
+	if url == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: application url is not provided", "Please provide application url")
+	}
+	webhookId := context.QueryParam("webhookId")
+	if webhookId == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: webhook id is not provided", "Please provide webook id")
+	}
+	err := c.companyService.DisableBitbucketWebhookAndUpdateApplication(id, repoId, url, webhookId)
+	if err != nil {
+		return common.GenerateErrorResponse(context, err, err.Error())
+	}
+	return common.GenerateSuccessResponse(context, nil, nil, "Webhook updated sucessfully")
+}
+
+func (c companyApi) EnableGithubWebhook(context echo.Context) error {
+	id := context.Param("id")
+	if id == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: no company id is not provided", "Please provide company id")
+	}
+	repoId := context.Param("repoId")
+	if repoId == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: repository id is not provided", "Please provide repository id")
+	}
+	url := context.QueryParam("url")
+	if url == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: application url is not provided", "Please provide application url")
+	}
+	err := c.companyService.EnableGithubWebhookAndUpdateApplication(id, repoId, url)
+	if err != nil {
+		return common.GenerateErrorResponse(context, err, err.Error())
+	}
+	return common.GenerateSuccessResponse(context, nil, nil, "Webhook updated sucessfully")
+}
+
+func (c companyApi) DisableGithubWebhook(context echo.Context) error {
+	id := context.Param("id")
+	if id == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: no company id is not provided", "Please provide company id")
+	}
+	repoId := context.Param("repoId")
+	if repoId == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: repository id is not provided", "Please provide repository id")
+	}
+	url := context.QueryParam("url")
+	if url == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: application url is not provided", "Please provide application url")
+	}
+	webhookId := context.QueryParam("webhookId")
+	if webhookId == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: webhook id is not provided", "Please provide webook id")
+	}
+	err := c.companyService.DisableGithubWebhookAndUpdateApplication(id, repoId, url, webhookId)
+	if err != nil {
+		return common.GenerateErrorResponse(context, err, err.Error())
+	}
+	return common.GenerateSuccessResponse(context, nil, nil, "Webhook updated sucessfully")
+}
+
 func generateRepositoryAndApplicationId(payload v1.Company) v1.Company {
 	for i, each := range payload.Repositories {
 		payload.Repositories[i].Id = guuid.New().String()
@@ -234,9 +361,11 @@ func getQueryOption(context echo.Context) v1.CompanyQueryOption {
 }
 
 // NewCompanyApi returns Company type api
-func NewCompanyApi(companyService service.Company, observerList []service.Observer) api.Company {
+func NewCompanyApi(companyService service.Company, githubService service.Git, bitbucketService service.Git, observerList []service.Observer) api.Company {
 	return &companyApi{
-		companyService: companyService,
-		observerList:   observerList,
+		companyService:   companyService,
+		githubService:    githubService,
+		bitbucketService: bitbucketService,
+		observerList:     observerList,
 	}
 }

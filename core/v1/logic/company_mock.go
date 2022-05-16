@@ -12,6 +12,41 @@ type mockCompanyService struct {
 	client service.HttpClient
 }
 
+func (m mockCompanyService) UpdateApplication(companyId string, repositoryId string, app v1.Application) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m mockCompanyService) CreateGithubWebHookAndUpdateApplication(companyId string, repoId string, token string, app v1.Application) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m mockCompanyService) CreateBitbucketWebHookAndUpdateApplication(companyId string, repoId string, token string, app v1.Application) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m mockCompanyService) EnableBitbucketWebhookAndUpdateApplication(companyId, repoId, url string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m mockCompanyService) EnableGithubWebhookAndUpdateApplication(companyId, repoId, url string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m mockCompanyService) DisableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, webhookId string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m mockCompanyService) DisableGithubWebhookAndUpdateApplication(companyId, repoId, url, webhookId string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (m mockCompanyService) AppendRepositories(companyId string, repositories []v1.Repository) error {
 	panic("implement me")
 }
