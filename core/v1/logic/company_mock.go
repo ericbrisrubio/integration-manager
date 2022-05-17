@@ -12,6 +12,31 @@ type mockCompanyService struct {
 	client service.HttpClient
 }
 
+func (m mockCompanyService) UpdateWebhook(companyId, repoId, url, webhookId, action string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m mockCompanyService) EnableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, token string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m mockCompanyService) EnableGithubWebhookAndUpdateApplication(companyId, repoId, url, token string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m mockCompanyService) DisableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, webhookId, token string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m mockCompanyService) DisableGithubWebhookAndUpdateApplication(companyId, repoId, url, webhookId, token string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (m mockCompanyService) UpdateApplication(companyId string, repositoryId string, app v1.Application) error {
 	//TODO implement me
 	panic("implement me")
@@ -23,26 +48,6 @@ func (m mockCompanyService) CreateGithubWebHookAndUpdateApplication(companyId st
 }
 
 func (m mockCompanyService) CreateBitbucketWebHookAndUpdateApplication(companyId string, repoId string, token string, app v1.Application) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (m mockCompanyService) EnableBitbucketWebhookAndUpdateApplication(companyId, repoId, url string) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (m mockCompanyService) EnableGithubWebhookAndUpdateApplication(companyId, repoId, url string) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (m mockCompanyService) DisableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, webhookId string) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (m mockCompanyService) DisableGithubWebhookAndUpdateApplication(companyId, repoId, url, webhookId string) error {
 	//TODO implement me
 	panic("implement me")
 }

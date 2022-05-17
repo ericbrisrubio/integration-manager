@@ -14,28 +14,6 @@ func RemoveApplication(s []Application, i int) []Application {
 	return s[:len(s)-1]
 }
 
-func GetUserNameAndRepoNameFromGithubRepositoryUrl(url string) (username string, repoName string) {
-	trim := strings.TrimSuffix(url, ".git")
-	urlArray := strings.Split(trim, "/")
-	if len(urlArray) < 3 {
-		return "", ""
-	}
-	repositoryName := urlArray[len(urlArray)-1]
-	usernameOrorgName := urlArray[len(urlArray)-2]
-	return usernameOrorgName, repositoryName
-}
-
-func GetUserNameAndRepoNameFromBitbucketRepositoryUrl(url string) (username string, repoName string) {
-	trim := strings.TrimSuffix(url, ".git")
-	urlArray := strings.Split(trim, "/")
-	if len(urlArray) < 3 {
-		return "", ""
-	}
-	repositoryName := urlArray[len(urlArray)-4]
-	usernameOrorgName := urlArray[len(urlArray)-5]
-	return usernameOrorgName, repositoryName
-}
-
 func GetUsernameAndRepoNameFromGithubRepositoryUrl(url string) (username string, repoName string) {
 	trim := strings.TrimSuffix(url, ".git")
 	urlArray := strings.Split(trim, "/")

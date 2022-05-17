@@ -9,7 +9,6 @@ import (
 	"github.com/klovercloud-ci-cd/integration-manager/enums"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"log"
-	"strings"
 )
 
 type companyService struct {
@@ -53,7 +52,7 @@ func (c companyService) CreateWebHookAndUpdateApplications(companyId string, rep
 }
 
 func (c companyService) CreateGithubWebHookAndUpdateApplication(companyId string, repoId string, token string, app v1.Application) {
-	usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(app.Url)
+	usernameOrorgName, repoName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(app.Url)
 	gitWebhook, err := NewGithubService(c, nil, c.client).CreateRepositoryWebhook(usernameOrorgName, repoName, token, companyId)
 	if err != nil {
 		log.Println("ERROR while creating webhook for application: ", err.Error())
@@ -76,7 +75,7 @@ func (c companyService) CreateGithubWebHookAndUpdateApplication(companyId string
 }
 
 func (c companyService) CreateBitbucketWebHookAndUpdateApplication(companyId string, repoId string, token string, app v1.Application) {
-	usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(app.Url)
+	usernameOrorgName, repoName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(app.Url)
 	gitWebhook, err := NewBitBucketService(c, nil, c.client).CreateRepositoryWebhook(usernameOrorgName, repoName, token, companyId)
 	if err != nil {
 		log.Println("ERROR while creating webhook for application: ", err.Error())
@@ -98,8 +97,7 @@ func (c companyService) CreateBitbucketWebHookAndUpdateApplication(companyId str
 	}
 }
 
-func (c companyService) EnableBitbucketWebhookAndUpdateApplication(companyId, repoId, url string) error {
-	username, repositoryName := v1.GetUsernameAndRepoNameFromBitbucketRepositoryUrl(url)
+func (c companyService) UpdateWebhook(companyId, repoId, url, webhookId, action string) error {
 	option := v1.CompanyQueryOption{
 		Pagination:       v1.Pagination{},
 		LoadRepositories: true,
@@ -107,7 +105,28 @@ func (c companyService) EnableBitbucketWebhookAndUpdateApplication(companyId, re
 		LoadToken:        true,
 	}
 	repo := c.repo.GetRepositoryByRepositoryId(companyId, repoId, option)
-	webhook, err := NewBitBucketService(c, nil, c.client).CreateRepositoryWebhook(username, repositoryName, repo.Token, companyId)
+	if repo.Id == "" {
+		return errors.New("repository not found")
+	}
+	if action == string(enums.WEBHOOK_EANBLE) {
+		if repo.Type == enums.GITHUB {
+			return c.EnableGithubWebhookAndUpdateApplication(companyId, repoId, url, repo.Token)
+		} else if repo.Type == enums.BIT_BUCKET {
+			return c.EnableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, repo.Token)
+		}
+	} else if action == string(enums.WEBHOOK_DISABLE) {
+		if repo.Type == enums.GITHUB {
+			return c.DisableGithubWebhookAndUpdateApplication(companyId, repoId, url, webhookId, repo.Token)
+		} else if repo.Type == enums.BIT_BUCKET {
+			return c.DisableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, webhookId, repo.Token)
+		}
+	}
+	return errors.New("provice valid action")
+}
+
+func (c companyService) EnableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, token string) error {
+	username, repositoryName := v1.GetUsernameAndRepoNameFromBitbucketRepositoryUrl(url)
+	webhook, err := NewBitBucketService(c, nil, c.client).CreateRepositoryWebhook(username, repositoryName, token, companyId)
 	if err != nil {
 		return err
 	}
@@ -131,16 +150,9 @@ func (c companyService) EnableBitbucketWebhookAndUpdateApplication(companyId, re
 	return nil
 }
 
-func (c companyService) DisableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, webhookId string) error {
+func (c companyService) DisableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, webhookId, token string) error {
 	username, repositoryName := v1.GetUsernameAndRepoNameFromBitbucketRepositoryUrl(url)
-	option := v1.CompanyQueryOption{
-		Pagination:       v1.Pagination{},
-		LoadRepositories: true,
-		LoadApplications: true,
-		LoadToken:        true,
-	}
-	repo := c.repo.GetRepositoryByRepositoryId(companyId, repoId, option)
-	err := NewBitBucketService(c, nil, c.client).DeleteRepositoryWebhookById(username, repositoryName, webhookId, repo.Token)
+	err := NewBitBucketService(c, nil, c.client).DeleteRepositoryWebhookById(username, repositoryName, webhookId, token)
 	if err != nil {
 		return err
 	}
@@ -164,19 +176,9 @@ func (c companyService) DisableBitbucketWebhookAndUpdateApplication(companyId, r
 	return nil
 }
 
-func (c companyService) EnableGithubWebhookAndUpdateApplication(companyId, repoId, url string) error {
-	username, repositoryName := getUsernameAndRepoNameFromGithubRepositoryUrl(url)
-	option := v1.CompanyQueryOption{
-		Pagination:       v1.Pagination{},
-		LoadRepositories: true,
-		LoadApplications: true,
-		LoadToken:        true,
-	}
-	repo := c.repo.GetRepositoryByRepositoryId(companyId, repoId, option)
-	if repo.Id == "" {
-		return errors.New("repository not found")
-	}
-	webhook, err := NewGithubService(c, nil, c.client).CreateRepositoryWebhook(username, repositoryName, repo.Token, companyId)
+func (c companyService) EnableGithubWebhookAndUpdateApplication(companyId, repoId, url, token string) error {
+	username, repositoryName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(url)
+	webhook, err := NewGithubService(c, nil, c.client).CreateRepositoryWebhook(username, repositoryName, token, companyId)
 	if err != nil {
 		return err
 	}
@@ -200,16 +202,9 @@ func (c companyService) EnableGithubWebhookAndUpdateApplication(companyId, repoI
 	return nil
 }
 
-func (c companyService) DisableGithubWebhookAndUpdateApplication(companyId, repoId, url, webhookId string) error {
-	username, repositoryName := getUsernameAndRepoNameFromGithubRepositoryUrl(url)
-	option := v1.CompanyQueryOption{
-		Pagination:       v1.Pagination{},
-		LoadRepositories: true,
-		LoadApplications: true,
-		LoadToken:        true,
-	}
-	repo := c.repo.GetRepositoryByRepositoryId(companyId, repoId, option)
-	err := NewGithubService(c, nil, c.client).DeleteRepositoryWebhookById(username, repositoryName, webhookId, repo.Token)
+func (c companyService) DisableGithubWebhookAndUpdateApplication(companyId, repoId, url, webhookId, token string) error {
+	username, repositoryName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(url)
+	err := NewGithubService(c, nil, c.client).DeleteRepositoryWebhookById(username, repositoryName, webhookId, token)
 	if err != nil {
 		return err
 	}
@@ -329,20 +324,9 @@ func (c companyService) DeleteRepositories(companyId string, company v1.Company,
 	return nil
 }
 
-func getUsernameAndRepoNameFromGithubRepositoryUrl(url string) (username string, repoName string) {
-	trim := strings.TrimSuffix(url, ".git")
-	urlArray := strings.Split(trim, "/")
-	if len(urlArray) < 3 {
-		return "", ""
-	}
-	repositoryName := urlArray[len(urlArray)-1]
-	usernameOrorgName := urlArray[len(urlArray)-2]
-	return usernameOrorgName, repositoryName
-}
-
 func (c companyService) webHookForGithub(apps []v1.Application, companyId string, token string) {
 	for i := range apps {
-		usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
+		usernameOrorgName, repoName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
 		gitWebhook, err := NewGithubService(c, nil, c.client).CreateRepositoryWebhook(usernameOrorgName, repoName, token, companyId)
 		if err != nil {
 			log.Println("[ERROR] Failed to create webhook ", err.Error())
@@ -363,7 +347,7 @@ func (c companyService) webHookForGithub(apps []v1.Application, companyId string
 
 func (c companyService) webHookForBitbucket(apps []v1.Application, companyId string, token string) {
 	for i := range apps {
-		usernameOrOrgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
+		usernameOrOrgName, repoName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
 		b, err := c.client.Get(enums.BITBUCKET_API_BASE_URL+"repositories/"+usernameOrOrgName+"/"+repoName, nil)
 		var repositoryDetails v1.BitbucketRepository
 		err = yaml.Unmarshal(b, &repositoryDetails)
@@ -460,7 +444,7 @@ func (c companyService) DeleteApplications(companyId, repositoryId string, compa
 	repo := c.GetRepositoryByRepositoryId(companyId, repositoryId, option)
 	if repo.Type == enums.GITHUB {
 		for i := range apps {
-			usernameOrorgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
+			usernameOrorgName, repoName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
 			err := NewGithubService(c, nil, c.client).DeleteRepositoryWebhookById(usernameOrorgName, repoName, apps[i].Webhook.ID, repo.Token)
 			if err != nil {
 				return err
@@ -473,7 +457,7 @@ func (c companyService) DeleteApplications(companyId, repositoryId string, compa
 		}
 	} else if repo.Type == enums.BIT_BUCKET {
 		for i := range apps {
-			usernameOrOrgName, repoName := getUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
+			usernameOrOrgName, repoName := v1.GetUsernameAndRepoNameFromBitbucketRepositoryUrl(apps[i].Url)
 			err := NewBitBucketService(c, nil, c.client).DeleteRepositoryWebhookById(usernameOrOrgName, repoName, apps[i].Webhook.ID, repo.Token)
 			if err != nil {
 				return err

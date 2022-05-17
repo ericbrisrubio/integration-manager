@@ -31,8 +31,9 @@ type Company interface {
 	DeleteApplications(companyId, repositoryId string, company v1.Company, apps []v1.Application, option v1.CompanyQueryOption) error
 	CreateGithubWebHookAndUpdateApplication(companyId string, repoId string, token string, app v1.Application)
 	CreateBitbucketWebHookAndUpdateApplication(companyId string, repoId string, token string, app v1.Application)
-	EnableBitbucketWebhookAndUpdateApplication(companyId, repoId, url string) error
-	EnableGithubWebhookAndUpdateApplication(companyId, repoId, url string) error
-	DisableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, webhookId string) error
-	DisableGithubWebhookAndUpdateApplication(companyId, repoId, url, webhookId string) error
+	UpdateWebhook(companyId, repoId, url, webhookId, action string) error
+	EnableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, token string) error
+	EnableGithubWebhookAndUpdateApplication(companyId, repoId, url, token string) error
+	DisableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, webhookId, token string) error
+	DisableGithubWebhookAndUpdateApplication(companyId, repoId, url, webhookId, token string) error
 }
