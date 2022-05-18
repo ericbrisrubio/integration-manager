@@ -14,7 +14,7 @@ func main() {
 	e := config.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
-		AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
+		AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete, http.MethodPatch},
 	}))
 	api.Routes(e)
 	e.Logger.Fatal(e.Start(":" + config.ServerPort))
