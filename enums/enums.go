@@ -53,6 +53,14 @@ const (
 	DELETE_APPLICATION = APPLICATION_UPDATE_OPTION("DELETE_APPLICATION")
 )
 
+// PIPELINE_GET_OPTION pipeline get options
+type PIPELINE_GET_OPTION string
+
+const (
+	// GET_PIPELINE_FOR_VALIDATION pipeline get option for validation
+	GET_PIPELINE_FOR_VALIDATION = PIPELINE_GET_OPTION("GET_PIPELINE_FOR_VALIDATION")
+)
+
 // COMPANY_STATUS company status options
 type COMPANY_STATUS string
 
@@ -73,6 +81,8 @@ const (
 	DEPLOY = STEP_TYPE("DEPLOY")
 	// INTERMEDIARY step that runs custom jobs
 	INTERMEDIARY = STEP_TYPE("INTERMEDIARY")
+	// JENKINS_JOB step that runs jenkins jobs
+	JENKINS_JOB = STEP_TYPE("JENKINS_JOB")
 )
 
 // GITHUB_URL gitbhub url for different operations
@@ -132,6 +142,9 @@ const (
 
 	// BUILD_TYPE resource build type key for  pipeline step param
 	BUILD_TYPE = PARAMS("build_type")
+
+	// REPOSITORY_TYPE_PARAM resource repository type
+	REPOSITORY_TYPE_PARAM = PARAMS("repository_type")
 )
 
 type ACCESS_MODE string

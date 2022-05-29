@@ -13,6 +13,12 @@ type Pipeline struct {
 	Steps      []Step           `json:"steps" yaml:"steps"`
 }
 
+// Pipeline contains pipeline data for validation
+type PipelineForValidation struct {
+	Name  string              `json:"name"  yaml:"name"`
+	Steps []StepForValidation `json:"steps" yaml:"steps"`
+}
+
 // Validate validates pipeline data
 func (pipeline Pipeline) Validate() error {
 	if pipeline.ApiVersion == "" {
@@ -32,4 +38,26 @@ func (pipeline Pipeline) Validate() error {
 	}
 
 	return nil
+}
+
+func (pipeline Pipeline) GetStepNameMap() map[string]bool {
+	stepNameMap := make(map[string]bool)
+	for _, each := range pipeline.Steps {
+		stepNameMap[each.Name] = true
+	}
+	return stepNameMap
+}
+
+func (pipeline Pipeline) GetPipelineForValidationFromPipeline() PipelineForValidation {
+	var pipelineForValidation PipelineForValidation
+	pipelineForValidation.Name = pipeline.Name
+	var stepsForValidations []StepForValidation
+	stepNameMap := pipeline.GetStepNameMap()
+	for _, each := range pipeline.Steps {
+		stepForValidation := each.GetStepForValidationFromStep()
+		stepForValidation.Next = each.GetNextWithValidation(stepNameMap)
+		stepsForValidations = append(stepsForValidations, stepForValidation)
+	}
+	pipelineForValidation.Steps = stepsForValidations
+	return pipelineForValidation
 }

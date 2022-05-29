@@ -78,3 +78,9 @@ func GetV1SearchService() service.Search {
 	search = logic.NewSearchService(mongo.NewApplicationMetadataRepository(3000))
 	return search
 }
+
+// GetV1PipelineService returns Pipeline service
+func GetV1PipelineService() service.Pipeline {
+	pipeline := logic.NewPipelineService(GetV1GithubService(), GetV1BitbucketService(), GetV1CompanyService())
+	return pipeline
+}
