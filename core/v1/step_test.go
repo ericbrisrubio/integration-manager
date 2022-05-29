@@ -206,8 +206,102 @@ func TestStep_GetStepForValidationFromStep(t *testing.T) {
 	}
 	for i := 0; i < len(name); i++ {
 		testdata[i].actual = testdata[i].data.GetStepForValidationFromStep(stepNameMap)
-		if !reflect.DeepEqual(testdata[i].expected, testdata[i].actual) {
-			fmt.Println(testdata[i].actual)
+
+		err := true
+		for key1, val1 := range testdata[i].actual.Name {
+			err = true
+			for key2, val2 := range testdata[i].expected.Name {
+				if key1 == key2 && val1 == val2 {
+					err = false
+					break
+				}
+			}
+			if err {
+				assert.ElementsMatch(t, testdata[i].expected, testdata[i].actual)
+			}
+		}
+
+		err = true
+		for key1, val1 := range testdata[i].actual.Type {
+			err = true
+			for key2, val2 := range testdata[i].expected.Type {
+				if key1 == key2 && val1 == val2 {
+					err = false
+					break
+				}
+			}
+			if err {
+				assert.ElementsMatch(t, testdata[i].expected, testdata[i].actual)
+			}
+		}
+		if err {
+			assert.ElementsMatch(t, testdata[i].expected, testdata[i].actual)
+		}
+
+		err = true
+		for key1, val1 := range testdata[i].actual.Trigger {
+			err = true
+			for key2, val2 := range testdata[i].expected.Trigger {
+				if key1 == key2 && val1 == val2 {
+					err = false
+					break
+				}
+			}
+			if err {
+				assert.ElementsMatch(t, testdata[i].expected, testdata[i].actual)
+			}
+		}
+		if err {
+			assert.ElementsMatch(t, testdata[i].expected, testdata[i].actual)
+		}
+
+		err = true
+		for _, eachActualMap := range testdata[i].actual.Params {
+			err = true
+			for key1, val1 := range eachActualMap {
+				err = true
+				for _, eachExpectedMap := range testdata[i].expected.Params {
+					for key2, val2 := range eachExpectedMap {
+						if key1 == key2 && val1 == val2 {
+							err = false
+							break
+						}
+					}
+				}
+				if err {
+					assert.ElementsMatch(t, testdata[i].expected, testdata[i].actual)
+				}
+			}
+			if err {
+				assert.ElementsMatch(t, testdata[i].expected, testdata[i].actual)
+			}
+		}
+		if err {
+			assert.ElementsMatch(t, testdata[i].expected, testdata[i].actual)
+		}
+
+		err = true
+		for _, eachActualMap := range testdata[i].actual.Next {
+			err = true
+			for key1, val1 := range eachActualMap {
+				err = true
+				for _, eachExpectedMap := range testdata[i].expected.Next {
+					for key2, val2 := range eachExpectedMap {
+						if key1 == key2 && val1 == val2 {
+							err = false
+							break
+						}
+					}
+				}
+				if err {
+					assert.ElementsMatch(t, testdata[i].expected, testdata[i].actual)
+				}
+			}
+			if err {
+				assert.ElementsMatch(t, testdata[i].expected, testdata[i].actual)
+			}
+		}
+		if err {
 			assert.ElementsMatch(t, testdata[i].expected, testdata[i].actual)
 		}
 	}
