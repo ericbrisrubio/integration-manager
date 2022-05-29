@@ -5,6 +5,7 @@ import (
 	"github.com/klovercloud-ci-cd/integration-manager/enums"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"reflect"
+	"strings"
 )
 
 // Step contains pipeline step info
@@ -61,12 +62,13 @@ func (step Step) Validate() error {
 }
 
 // GetStepForValidationFromStep gets StepForValidation object from Step object
-func (step Step) GetStepForValidationFromStep() StepForValidation {
+func (step Step) GetStepForValidationFromStep(stepNameMap map[string]bool) StepForValidation {
 	var stepForValidation StepForValidation
 	stepForValidation.Name = step.GetNameWithValidation()
 	stepForValidation.Type = step.GetTypeWithValidation()
 	stepForValidation.Trigger = step.GetTriggerWithValidation()
 	stepForValidation.Params = step.GetParamsWithValidation()
+	stepForValidation.Next = step.GetNextWithValidation(stepNameMap)
 	return stepForValidation
 }
 
@@ -128,11 +130,16 @@ func (step Step) GetParamsWithValidation() []map[string]string {
 
 func (step Step) GetNextWithValidation(stepNameMap map[string]bool) []map[string]string {
 	var nextMaps []map[string]string
+	var accept string
+	for key, _ := range stepNameMap {
+		accept = accept + key + "/"
+	}
+	accept = strings.TrimSuffix(accept, "/")
 	for _, each := range step.Next {
 		nextMap := make(map[string]string)
 		nextMap["name"] = "next"
 		nextMap["value"] = each
-		nextMap["accept"] = string(enums.BUILD + "/" + enums.DEPLOY + "/" + enums.INTERMEDIARY + "/" + enums.JENKINS_JOB)
+		nextMap["accept"] = accept
 		if _, ok := stepNameMap[each]; ok {
 			nextMap["validate"] = "true"
 		} else {

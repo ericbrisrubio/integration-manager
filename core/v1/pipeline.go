@@ -54,8 +54,7 @@ func (pipeline Pipeline) GetPipelineForValidationFromPipeline() PipelineForValid
 	var stepsForValidations []StepForValidation
 	stepNameMap := pipeline.GetStepNameMap()
 	for _, each := range pipeline.Steps {
-		stepForValidation := each.GetStepForValidationFromStep()
-		stepForValidation.Next = each.GetNextWithValidation(stepNameMap)
+		stepForValidation := each.GetStepForValidationFromStep(stepNameMap)
 		stepsForValidations = append(stepsForValidations, stepForValidation)
 	}
 	pipelineForValidation.Steps = stepsForValidations
