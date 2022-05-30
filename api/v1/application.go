@@ -18,6 +18,82 @@ type applicationApi struct {
 	pipelineService service.Pipeline
 }
 
+// CreateApplicationPipeLine.. Create Application Pipeline
+// @Summary Create Application Pipeline
+// @Description Create Application Pipeline
+// @Tags Application
+// @Accept  json
+// @Produce  json
+// @Param companyId query string true "Company Id"
+// @Param repositoryId query string true "Repository Id"
+// @Param applicationId path string true "Application Id"
+// @Param body body v1.DirectoryContentCreatePayload true "Create Application Pipeline"
+// @Success 200 {object} common.ResponseDTO{data=v1.DirectoryContentCreateAndUpdateResponse}
+// @Failure 400 {object} common.ResponseDTO
+// @Router /api/v1/applications/{applicationId}/pipeline [POST]
+func (a applicationApi) CreateApplicationPipeLine(context echo.Context) error {
+	var payload v1.DirectoryContentCreatePayload
+	companyId := context.QueryParam("companyId")
+	if companyId == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: Company id is required", "Operation failed")
+	}
+	repoId := context.QueryParam("repositoryId")
+	if repoId == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: Repository id is required", "Operation failed")
+	}
+	appId := context.Param("applicationId")
+	if appId == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: Url is required", "Operation failed")
+	}
+	if err := context.Bind(&payload); err != nil {
+		return common.GenerateErrorResponse(context, err.Error(), "Operation failed")
+	}
+	application := a.companyService.GetApplicationByApplicationId(companyId, repoId, appId)
+	res, err := a.pipelineService.Create(companyId, repoId, application.Url, payload)
+	if err != nil {
+		return common.GenerateErrorResponse(context, err.Error(), "Operation failed")
+	}
+	return common.GenerateSuccessResponse(context, res, nil, "Successful")
+}
+
+// UpdateApplicationPipeLine.. Update Application Pipeline
+// @Summary Update Application Pipeline
+// @Description Update Application Pipeline
+// @Tags Application
+// @Accept  json
+// @Produce  json
+// @Param companyId query string true "Company Id"
+// @Param repositoryId query string true "Repository Id"
+// @Param applicationId path string true "Application Id"
+// @Param body body v1.DirectoryContentUpdatePayload true "Update Application Pipeline"
+// @Success 200 {object} common.ResponseDTO{data=v1.DirectoryContentCreateAndUpdateResponse}
+// @Failure 400 {object} common.ResponseDTO
+// @Router /api/v1/applications/{applicationId}/pipeline [PUT]
+func (a applicationApi) UpdateApplicationPipeLine(context echo.Context) error {
+	var payload v1.DirectoryContentUpdatePayload
+	companyId := context.QueryParam("companyId")
+	if companyId == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: Company id is required", "Operation failed")
+	}
+	repoId := context.QueryParam("repositoryId")
+	if repoId == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: Repository id is required", "Operation failed")
+	}
+	appId := context.Param("applicationId")
+	if appId == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: Url is required", "Operation failed")
+	}
+	application := a.companyService.GetApplicationByApplicationId(companyId, repoId, appId)
+	if err := context.Bind(&payload); err != nil {
+		return common.GenerateErrorResponse(context, err.Error(), "Operation failed")
+	}
+	res, err := a.pipelineService.Update(companyId, repoId, application.Url, payload)
+	if err != nil {
+		return common.GenerateErrorResponse(context, err.Error(), "Operation failed")
+	}
+	return common.GenerateSuccessResponse(context, res, nil, "Successful")
+}
+
 // GetAll.. Get All Applications
 // @Summary Get All Applications
 // @Description Get All Applications
@@ -26,7 +102,6 @@ type applicationApi struct {
 // @Param companyId query string true "company id"
 // @Success 200 {object} common.ResponseDTO{data=[]v1.Application}
 // @Router /api/v1/applications [GET]
-
 func (a applicationApi) GetAll(context echo.Context) error {
 	companyId := context.QueryParam("companyId")
 	if companyId == "" {

@@ -17,6 +17,21 @@ type githubMockService struct {
 	client         service.HttpClient
 }
 
+func (g githubMockService) GetContent(repositoryName, username, token, path string) (v1.GitContent, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (g githubMockService) CreateDirectoryContent(repositoryName, username, token, path string, content v1.DirectoryContentCreatePayload) (v1.DirectoryContentCreateAndUpdateResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (g githubMockService) UpdateDirectoryContent(repositoryName, username, token, path string, content v1.DirectoryContentUpdatePayload) (v1.DirectoryContentCreateAndUpdateResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (g githubMockService) GetCommitByBranch(username, repositoryName, branch, token string) (v1.GitCommit, error) {
 	//TODO implement me
 	panic("implement me")

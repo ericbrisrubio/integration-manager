@@ -660,6 +660,113 @@ definitions:
       total_process_per_day:
         type: integer
     type: object
+  v1.DirectoryContentCreateAndUpdateResponse:
+    properties:
+      commit:
+        properties:
+          author:
+            properties:
+              date:
+                type: string
+              email:
+                type: string
+              name:
+                type: string
+            type: object
+          committer:
+            properties:
+              date:
+                type: string
+              email:
+                type: string
+              name:
+                type: string
+            type: object
+          html_url:
+            type: string
+          message:
+            type: string
+          node_id:
+            type: string
+          parents:
+            items:
+              properties:
+                html_url:
+                  type: string
+                sha:
+                  type: string
+                url:
+                  type: string
+              type: object
+            type: array
+          sha:
+            type: string
+          tree:
+            properties:
+              sha:
+                type: string
+              url:
+                type: string
+            type: object
+          url:
+            type: string
+          verification:
+            properties:
+              payload: {}
+              reason:
+                type: string
+              signature: {}
+              verified:
+                type: boolean
+            type: object
+        type: object
+      content:
+        properties:
+          _links:
+            properties:
+              git:
+                type: string
+              html:
+                type: string
+              self:
+                type: string
+            type: object
+          download_url:
+            type: string
+          git_url:
+            type: string
+          html_url:
+            type: string
+          name:
+            type: string
+          path:
+            type: string
+          sha:
+            type: string
+          size:
+            type: integer
+          type:
+            type: string
+          url:
+            type: string
+        type: object
+    type: object
+  v1.DirectoryContentCreatePayload:
+    properties:
+      content:
+        type: string
+      message:
+        type: string
+    type: object
+  v1.DirectoryContentUpdatePayload:
+    properties:
+      content:
+        type: string
+      message:
+        type: string
+      sha:
+        type: string
+    type: object
   v1.GitWebhook:
     properties:
       active:
@@ -1038,6 +1145,15 @@ definitions:
             type: string
         type: object
     type: object
+  v1.PipelineForValidation:
+    properties:
+      name:
+        type: string
+      steps:
+        items:
+          $ref: '#/definitions/v1.StepForValidation'
+        type: array
+    type: object
   v1.RepositoriesDto:
     properties:
       repositories:
@@ -1058,12 +1174,64 @@ definitions:
       type:
         type: string
     type: object
+  v1.StepForValidation:
+    properties:
+      name:
+        additionalProperties:
+          type: string
+        type: object
+      next:
+        items:
+          additionalProperties:
+            type: string
+          type: object
+        type: array
+      params:
+        items:
+          additionalProperties:
+            type: string
+          type: object
+        type: array
+      trigger:
+        additionalProperties:
+          type: string
+        type: object
+      type:
+        additionalProperties:
+          type: string
+        type: object
+    type: object
 info:
   contact: {}
   description: integration-manager API
   title: integration-manager API
 paths:
   /api/v1/applications:
+    get:
+      description: Get All Applications
+      parameters:
+      - description: company id
+        in: query
+        name: companyId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.ResponseDTO'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/v1.Application'
+                  type: array
+              type: object
+      summary: Get All Applications
+      tags:
+      - Application
     post:
       consumes:
       - application/json
@@ -1099,6 +1267,97 @@ paths:
       summary: Update Application
       tags:
       - Application
+  /api/v1/applications/{applicationId}/pipeline:
+    post:
+      consumes:
+      - application/json
+      description: Create Application Pipeline
+      parameters:
+      - description: Company Id
+        in: query
+        name: companyId
+        required: true
+        type: string
+      - description: Repository Id
+        in: query
+        name: repositoryId
+        required: true
+        type: string
+      - description: Application Id
+        in: path
+        name: applicationId
+        required: true
+        type: string
+      - description: Create Application Pipeline
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/v1.DirectoryContentCreatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.ResponseDTO'
+            - properties:
+                data:
+                  $ref: '#/definitions/v1.DirectoryContentCreateAndUpdateResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Create Application Pipeline
+      tags:
+      - Application
+    put:
+      consumes:
+      - application/json
+      description: Update Application Pipeline
+      parameters:
+      - description: Company Id
+        in: query
+        name: companyId
+        required: true
+        type: string
+      - description: Repository Id
+        in: query
+        name: repositoryId
+        required: true
+        type: string
+      - description: Application Id
+        in: path
+        name: applicationId
+        required: true
+        type: string
+      - description: Update Application Pipeline
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/v1.DirectoryContentUpdatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.ResponseDTO'
+            - properties:
+                data:
+                  $ref: '#/definitions/v1.DirectoryContentCreateAndUpdateResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Update Application Pipeline
+      tags:
+      - Application
   /api/v1/applications/{id}:
     get:
       description: Gets Application by Application id
@@ -1131,6 +1390,52 @@ paths:
                   $ref: '#/definitions/v1.Application'
               type: object
       summary: Get Application by Application id
+      tags:
+      - Application
+  /api/v1/applications/{id}/pipelines:
+    get:
+      consumes:
+      - application/json
+      description: Get Pipeline for validation by company id, repository id, application
+        url and revision
+      parameters:
+      - description: company id
+        in: query
+        name: companyId
+        required: true
+        type: string
+      - description: repository id
+        in: query
+        name: repositoryId
+        required: true
+        type: string
+      - description: application url
+        in: query
+        name: url
+        required: true
+        type: string
+      - description: commit id or branch name
+        in: query
+        name: revision
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.ResponseDTO'
+            - properties:
+                data:
+                  $ref: '#/definitions/v1.PipelineForValidation'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Get Pipeline for validation
       tags:
       - Application
   /api/v1/bitbucket/commits:
@@ -1243,76 +1548,6 @@ paths:
           schema:
             $ref: '#/definitions/common.ResponseDTO'
       summary: Get Branches
-      tags:
-      - Bitbucket
-  /api/v1/bitbuckets/webhooks:
-    delete:
-      description: Disable Webhook
-      parameters:
-      - description: Company Id
-        in: query
-        name: companyId
-        required: true
-        type: string
-      - description: Repository Id
-        in: query
-        name: repoId
-        required: true
-        type: string
-      - description: Url
-        in: query
-        name: url
-        required: true
-        type: string
-      - description: Webhook Id
-        in: query
-        name: webhookId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/common.ResponseDTO'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/common.ResponseDTO'
-      summary: Disable Webhook
-      tags:
-      - Bitbucket
-    put:
-      description: Enable Webhook
-      parameters:
-      - description: Company Id
-        in: query
-        name: companyId
-        required: true
-        type: string
-      - description: Repository Id
-        in: query
-        name: repoId
-        required: true
-        type: string
-      - description: Url
-        in: query
-        name: url
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/common.ResponseDTO'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/common.ResponseDTO'
-      summary: Enable Webhook
       tags:
       - Bitbucket
   /api/v1/companies:
@@ -1490,6 +1725,48 @@ paths:
       summary: Update repositories by company id
       tags:
       - Company
+  /api/v1/companies/{id}/repositories/{repoId}/webhooks:
+    patch:
+      description: Update Webhook
+      parameters:
+      - description: Company id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Repository id
+        in: path
+        name: repoId
+        required: true
+        type: string
+      - description: Url
+        in: query
+        name: url
+        required: true
+        type: string
+      - description: Webhook Id to disable webhook
+        in: query
+        name: webhookId
+        type: string
+      - description: action type [enable/disable]
+        in: query
+        name: action
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Update Webhook to Enable or Disable
+      tags:
+      - Github
   /api/v1/githubs:
     post:
       consumes:
@@ -1593,28 +1870,36 @@ paths:
       summary: Get Commit By Branch
       tags:
       - Github
-  /api/v1/githubs/webhooks:
-    delete:
-      description: Disable Webhook
+  /api/v1/pipelines:
+    get:
+      consumes:
+      - application/json
+      description: Get Pipeline for validation by company id, repository id, application
+        url and revision
       parameters:
-      - description: Company Id
+      - description: action [GET_PIPELINE_FOR_VALIDATION]
+        in: query
+        name: action
+        required: true
+        type: string
+      - description: company id
         in: query
         name: companyId
         required: true
         type: string
-      - description: Repository Id
+      - description: repository id
         in: query
-        name: repoId
+        name: repositoryId
         required: true
         type: string
-      - description: Url
+      - description: application url
         in: query
         name: url
         required: true
         type: string
-      - description: Webhook Id
+      - description: commit id or branch name
         in: query
-        name: webhookId
+        name: revision
         required: true
         type: string
       produces:
@@ -1623,28 +1908,74 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/common.ResponseDTO'
-        "400":
-          description: Bad Request
+            allOf:
+            - $ref: '#/definitions/common.ResponseDTO'
+            - properties:
+                data:
+                  $ref: '#/definitions/v1.PipelineForValidation'
+              type: object
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/common.ResponseDTO'
-      summary: Disable Webhook
+      summary: Get Pipeline for validation
       tags:
-      - Github
+      - Pipeline
+    post:
+      consumes:
+      - application/json
+      description: Create Pipeline by company id, repository id, application url
+      parameters:
+      - description: Company id
+        in: query
+        name: companyId
+        required: true
+        type: string
+      - description: Repository id
+        in: query
+        name: repositoryId
+        required: true
+        type: string
+      - description: Application url
+        in: query
+        name: url
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.ResponseDTO'
+            - properties:
+                data:
+                  $ref: '#/definitions/v1.DirectoryContentCreateAndUpdateResponse'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Create Pipeline
+      tags:
+      - Pipeline
     put:
-      description: Enable Webhook
+      consumes:
+      - application/json
+      description: Update Pipeline by company id, repository id, application url
       parameters:
-      - description: Company Id
+      - description: Company id
         in: query
         name: companyId
         required: true
         type: string
-      - description: Repository Id
+      - description: Repository id
         in: query
-        name: repoId
+        name: repositoryId
         required: true
         type: string
-      - description: Url
+      - description: Application url
         in: query
         name: url
         required: true
@@ -1655,14 +1986,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/common.ResponseDTO'
-        "400":
-          description: Bad Request
+            allOf:
+            - $ref: '#/definitions/common.ResponseDTO'
+            - properties:
+                data:
+                  $ref: '#/definitions/v1.DirectoryContentCreateAndUpdateResponse'
+              type: object
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/common.ResponseDTO'
-      summary: Enable Webhook
+      summary: Update Pipeline
       tags:
-      - Github
+      - Pipeline
   /api/v1/repositories/{id}:
     get:
       description: Gets Repository by id

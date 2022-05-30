@@ -12,6 +12,21 @@ type gitlabService struct {
 	client         service.HttpClient
 }
 
+func (g gitlabService) GetContent(repositoryName, username, token, path string) (v1.GitContent, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (g gitlabService) CreateDirectoryContent(repositoryName, username, token, path string, content v1.DirectoryContentCreatePayload) (v1.DirectoryContentCreateAndUpdateResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (g gitlabService) UpdateDirectoryContent(repositoryName, username, token, path string, content v1.DirectoryContentUpdatePayload) (v1.DirectoryContentCreateAndUpdateResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (g gitlabService) GetCommitByBranch(username, repositoryName, branch, token string) (v1.GitCommit, error) {
 	//TODO implement me
 	panic("implement me")

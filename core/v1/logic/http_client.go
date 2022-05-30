@@ -13,6 +13,28 @@ import (
 type httpClientService struct {
 }
 
+func (h httpClientService) Put(url string, header map[string]string, body []byte) ([]byte, error) {
+	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(body))
+	for k, v := range header {
+		req.Header.Set(k, v)
+	}
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("[ERROR] Failed communicate :", err.Error())
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 && resp.StatusCode != 201 {
+		return nil, errors.New("Status: " + resp.Status + ", code: " + strconv.Itoa(resp.StatusCode))
+	}
+	body, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return body, nil
+}
+
 func (h httpClientService) Delete(url string, header map[string]string) error {
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {

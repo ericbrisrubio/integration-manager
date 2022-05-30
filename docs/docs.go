@@ -17,6 +17,48 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/api/v1/applications": {
+            "get": {
+                "description": "Get All Applications",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Application"
+                ],
+                "summary": "Get All Applications",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "company id",
+                        "name": "companyId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common.ResponseDTO"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/v1.Application"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Update Application by company id and  repository id",
                 "consumes": [
@@ -63,6 +105,150 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/applications/{applicationId}/pipeline": {
+            "put": {
+                "description": "Update Application Pipeline",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Application"
+                ],
+                "summary": "Update Application Pipeline",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company Id",
+                        "name": "companyId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Repository Id",
+                        "name": "repositoryId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Application Id",
+                        "name": "applicationId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update Application Pipeline",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.DirectoryContentUpdatePayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common.ResponseDTO"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/v1.DirectoryContentCreateAndUpdateResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create Application Pipeline",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Application"
+                ],
+                "summary": "Create Application Pipeline",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company Id",
+                        "name": "companyId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Repository Id",
+                        "name": "repositoryId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Application Id",
+                        "name": "applicationId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Create Application Pipeline",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.DirectoryContentCreatePayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common.ResponseDTO"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/v1.DirectoryContentCreateAndUpdateResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/common.ResponseDTO"
                         }
@@ -120,6 +306,77 @@ const docTemplate = `{
                                     }
                                 }
                             ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/applications/{id}/pipelines": {
+            "get": {
+                "description": "Get Pipeline for validation by company id, repository id, application url and revision",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Application"
+                ],
+                "summary": "Get Pipeline for validation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "company id",
+                        "name": "companyId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "repository id",
+                        "name": "repositoryId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "application url",
+                        "name": "url",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "commit id or branch name",
+                        "name": "revision",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common.ResponseDTO"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/v1.PipelineForValidation"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
                         }
                     }
                 }
@@ -275,109 +532,6 @@ const docTemplate = `{
                         "type": "boolean",
                         "description": "Loads Token",
                         "name": "loadToken",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/bitbuckets/webhooks": {
-            "put": {
-                "description": "Enable Webhook",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Bitbucket"
-                ],
-                "summary": "Enable Webhook",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Company Id",
-                        "name": "companyId",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Repository Id",
-                        "name": "repoId",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Url",
-                        "name": "url",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Disable Webhook",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Bitbucket"
-                ],
-                "summary": "Disable Webhook",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Company Id",
-                        "name": "companyId",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Repository Id",
-                        "name": "repoId",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Url",
-                        "name": "url",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Webhook Id",
-                        "name": "webhookId",
                         "in": "query",
                         "required": true
                     }
@@ -680,6 +834,68 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/companies/{id}/repositories/{repoId}/webhooks": {
+            "patch": {
+                "description": "Update Webhook",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Github"
+                ],
+                "summary": "Update Webhook to Enable or Disable",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Repository id",
+                        "name": "repoId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Url",
+                        "name": "url",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Webhook Id to disable webhook",
+                        "name": "webhookId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "action type [enable/disable]",
+                        "name": "action",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/githubs": {
             "post": {
                 "description": "Listens Github Web hook events. Register this endpoint as github web hook endpoint",
@@ -837,35 +1053,52 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/githubs/webhooks": {
-            "put": {
-                "description": "Enable Webhook",
+        "/api/v1/pipelines": {
+            "get": {
+                "description": "Get Pipeline for validation by company id, repository id, application url and revision",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Github"
+                    "Pipeline"
                 ],
-                "summary": "Enable Webhook",
+                "summary": "Get Pipeline for validation",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Company Id",
+                        "description": "action [GET_PIPELINE_FOR_VALIDATION]",
+                        "name": "action",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "company id",
                         "name": "companyId",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Repository Id",
-                        "name": "repoId",
+                        "description": "repository id",
+                        "name": "repositoryId",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Url",
+                        "description": "application url",
                         "name": "url",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "commit id or branch name",
+                        "name": "revision",
                         "in": "query",
                         "required": true
                     }
@@ -874,52 +1107,60 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common.ResponseDTO"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/v1.PipelineForValidation"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/common.ResponseDTO"
                         }
                     }
                 }
             },
-            "delete": {
-                "description": "Disable Webhook",
+            "put": {
+                "description": "Update Pipeline by company id, repository id, application url",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Github"
+                    "Pipeline"
                 ],
-                "summary": "Disable Webhook",
+                "summary": "Update Pipeline",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Company Id",
+                        "description": "Company id",
                         "name": "companyId",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Repository Id",
-                        "name": "repoId",
+                        "description": "Repository id",
+                        "name": "repositoryId",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Url",
+                        "description": "Application url",
                         "name": "url",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Webhook Id",
-                        "name": "webhookId",
                         "in": "query",
                         "required": true
                     }
@@ -928,11 +1169,85 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/common.ResponseDTO"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common.ResponseDTO"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/v1.DirectoryContentCreateAndUpdateResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create Pipeline by company id, repository id, application url",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pipeline"
+                ],
+                "summary": "Create Pipeline",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company id",
+                        "name": "companyId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Repository id",
+                        "name": "repositoryId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Application url",
+                        "name": "url",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common.ResponseDTO"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/v1.DirectoryContentCreateAndUpdateResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/common.ResponseDTO"
                         }
@@ -2074,6 +2389,171 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.DirectoryContentCreateAndUpdateResponse": {
+            "type": "object",
+            "properties": {
+                "commit": {
+                    "type": "object",
+                    "properties": {
+                        "author": {
+                            "type": "object",
+                            "properties": {
+                                "date": {
+                                    "type": "string"
+                                },
+                                "email": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "committer": {
+                            "type": "object",
+                            "properties": {
+                                "date": {
+                                    "type": "string"
+                                },
+                                "email": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "html_url": {
+                            "type": "string"
+                        },
+                        "message": {
+                            "type": "string"
+                        },
+                        "node_id": {
+                            "type": "string"
+                        },
+                        "parents": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "html_url": {
+                                        "type": "string"
+                                    },
+                                    "sha": {
+                                        "type": "string"
+                                    },
+                                    "url": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        },
+                        "sha": {
+                            "type": "string"
+                        },
+                        "tree": {
+                            "type": "object",
+                            "properties": {
+                                "sha": {
+                                    "type": "string"
+                                },
+                                "url": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "url": {
+                            "type": "string"
+                        },
+                        "verification": {
+                            "type": "object",
+                            "properties": {
+                                "payload": {},
+                                "reason": {
+                                    "type": "string"
+                                },
+                                "signature": {},
+                                "verified": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                },
+                "content": {
+                    "type": "object",
+                    "properties": {
+                        "_links": {
+                            "type": "object",
+                            "properties": {
+                                "git": {
+                                    "type": "string"
+                                },
+                                "html": {
+                                    "type": "string"
+                                },
+                                "self": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "download_url": {
+                            "type": "string"
+                        },
+                        "git_url": {
+                            "type": "string"
+                        },
+                        "html_url": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "path": {
+                            "type": "string"
+                        },
+                        "sha": {
+                            "type": "string"
+                        },
+                        "size": {
+                            "type": "integer"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "url": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "v1.DirectoryContentCreatePayload": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.DirectoryContentUpdatePayload": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "sha": {
+                    "type": "string"
+                }
+            }
+        },
         "v1.GitWebhook": {
             "type": "object",
             "properties": {
@@ -2643,6 +3123,20 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.PipelineForValidation": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "steps": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.StepForValidation"
+                    }
+                }
+            }
+        },
         "v1.RepositoriesDto": {
             "type": "object",
             "properties": {
@@ -2671,6 +3165,47 @@ const docTemplate = `{
                 },
                 "type": {
                     "type": "string"
+                }
+            }
+        },
+        "v1.StepForValidation": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "next": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "params": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "trigger": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "type": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
                 }
             }
         }

@@ -73,12 +73,16 @@ func ApplicationRouter(g *echo.Group) {
 	g.GET("/:id", applicationApi.GetById, AuthenticationAndAuthorizationHandler)
 	g.GET("", applicationApi.GetAll, AuthenticationAndAuthorizationHandler)
 	g.GET("/:id/pipelines", applicationApi.GetPipelineForValidation, AuthenticationAndAuthorizationHandler)
+	g.PUT("/:id/pipelines", applicationApi.UpdateApplicationPipeLine, AuthenticationAndAuthorizationHandler)
+	g.POST("/:id/pipelines", applicationApi.CreateApplicationPipeLine, AuthenticationAndAuthorizationHandler)
 }
 
 // PipelineRouter api/v1/pipelines/* router
 func PipelineRouter(g *echo.Group) {
 	pipelineApi := NewPipelineApi(dependency.GetV1PipelineService())
 	g.GET("", pipelineApi.Get, AuthenticationAndAuthorizationHandler)
+	g.POST("", pipelineApi.Create, AuthenticationAndAuthorizationHandler)
+	g.PUT("", pipelineApi.Update, AuthenticationAndAuthorizationHandler)
 }
 
 // SearchRouter api/v1/search/* router

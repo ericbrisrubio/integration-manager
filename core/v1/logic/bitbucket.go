@@ -20,6 +20,21 @@ type bitbucketService struct {
 	client         service.HttpClient
 }
 
+func (b bitbucketService) GetContent(repositoryName, username, token, path string) (v1.GitContent, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (b bitbucketService) CreateDirectoryContent(repositoryName, username, token, path string, content v1.DirectoryContentCreatePayload) (v1.DirectoryContentCreateAndUpdateResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (b bitbucketService) UpdateDirectoryContent(repositoryName, username, token, path string, content v1.DirectoryContentUpdatePayload) (v1.DirectoryContentCreateAndUpdateResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (b bitbucketService) GetCommitByBranch(username, repositoryName, branch, token string) (v1.GitCommit, error) {
 	url := enums.BITBUCKET_API_BASE_URL + "repositories/" + username + "/" + repositoryName + "/commits?include=" + branch
 	base64ConvertedToken := base64.StdEncoding.EncodeToString([]byte(username + ":" + token))

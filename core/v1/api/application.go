@@ -8,4 +8,6 @@ type Application interface {
 	GetById(context echo.Context) error
 	GetAll(context echo.Context) error
 	GetPipelineForValidation(context echo.Context) error
+	CreateApplicationPipeLine(context echo.Context) error
+	UpdateApplicationPipeLine(context echo.Context) error
 }

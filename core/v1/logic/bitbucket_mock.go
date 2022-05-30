@@ -17,6 +17,21 @@ type bitbucketMockService struct {
 	client         service.HttpClient
 }
 
+func (b bitbucketMockService) GetContent(repositoryName, username, token, path string) (v1.GitContent, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (b bitbucketMockService) CreateDirectoryContent(repositoryName, username, token, path string, content v1.DirectoryContentCreatePayload) (v1.DirectoryContentCreateAndUpdateResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (b bitbucketMockService) UpdateDirectoryContent(repositoryName, username, token, path string, content v1.DirectoryContentUpdatePayload) (v1.DirectoryContentCreateAndUpdateResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (b bitbucketMockService) GetCommitByBranch(username, repositoryName, branch, token string) (v1.GitCommit, error) {
 	//TODO implement me
 	panic("implement me")

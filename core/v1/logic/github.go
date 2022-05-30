@@ -19,6 +19,76 @@ type githubService struct {
 	client         service.HttpClient
 }
 
+func (githubService githubService) GetContent(repositoryName, username, token, path string) (v1.GitContent, error) {
+	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repositoryName + "/contents" + path
+	header := make(map[string]string)
+	header["Authorization"] = "token " + token
+	header["Accept"] = "application/vnd.github.v3+json"
+	header["cache-control"] = "no-cache"
+	response, err := githubService.client.Get(url, header)
+	if err != nil {
+		return v1.GitContent{}, err
+	}
+	var gitContent v1.GitContent
+	err = json.Unmarshal(response, &gitContent)
+
+	if err != nil {
+		return v1.GitContent{}, err
+	}
+	return gitContent, nil
+}
+
+func (githubService githubService) CreateDirectoryContent(repositoryName, username, token, path string, content v1.DirectoryContentCreatePayload) (v1.DirectoryContentCreateAndUpdateResponse, error) {
+	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repositoryName + "/contents/" + path
+	header := make(map[string]string)
+	header["Authorization"] = "token " + token
+	header["Accept"] = "application/vnd.github.v3+json"
+	header["cache-control"] = "no-cache"
+	b, err := json.Marshal(content)
+	if err != nil {
+		log.Println(err.Error())
+		return v1.DirectoryContentCreateAndUpdateResponse{}, err
+	}
+	data, err := githubService.client.Put(url, header, b)
+	if err != nil {
+		log.Println(err.Error())
+		return v1.DirectoryContentCreateAndUpdateResponse{}, err
+	}
+	directoryContentCreateAndUpdateResponse := v1.DirectoryContentCreateAndUpdateResponse{}
+	err = json.Unmarshal(data, &directoryContentCreateAndUpdateResponse)
+	if err != nil {
+		log.Println(err.Error())
+		return v1.DirectoryContentCreateAndUpdateResponse{}, err
+	}
+	return directoryContentCreateAndUpdateResponse, nil
+
+}
+
+func (githubService githubService) UpdateDirectoryContent(repositoryName, username, token, path string, content v1.DirectoryContentUpdatePayload) (v1.DirectoryContentCreateAndUpdateResponse, error) {
+	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repositoryName + "/contents/" + path
+	header := make(map[string]string)
+	header["Authorization"] = "token " + token
+	header["Accept"] = "application/vnd.github.v3+json"
+	header["cache-control"] = "no-cache"
+	b, err := json.Marshal(content)
+	if err != nil {
+		log.Println(err.Error())
+		return v1.DirectoryContentCreateAndUpdateResponse{}, err
+	}
+	data, err := githubService.client.Put(url, header, b)
+	if err != nil {
+		log.Println(err.Error())
+		return v1.DirectoryContentCreateAndUpdateResponse{}, err
+	}
+	directoryContentCreateAndUpdateResponse := v1.DirectoryContentCreateAndUpdateResponse{}
+	err = json.Unmarshal(data, &directoryContentCreateAndUpdateResponse)
+	if err != nil {
+		log.Println(err.Error())
+		return v1.DirectoryContentCreateAndUpdateResponse{}, err
+	}
+	return directoryContentCreateAndUpdateResponse, nil
+}
+
 func (githubService githubService) GetCommitByBranch(username, repositoryName, branch, token string) (v1.GitCommit, error) {
 	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repositoryName + "/commits?sha=" + branch + "&per_page=5&page=0"
 	header := make(map[string]string)
