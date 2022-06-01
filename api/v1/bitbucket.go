@@ -112,6 +112,7 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 	if companyId == "" {
 		return common.GenerateErrorResponse(context, "[ERROR] no companyId is provided", "Please provide companyId")
 	}
+	branch := resource.Push.Changes[len(resource.Push.Changes)-1].New.Name
 	repoName := resource.Repository.Name
 	owner := resource.Repository.Workspace.Slug
 	revision := resource.Push.Changes[len(resource.Push.Changes)-1].New.Target.Hash
@@ -199,10 +200,12 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 			CompanyId    string
 			AppId        string
 			RepositoryId string
+			Branch       string
 		}{
 			CompanyId:    companyId,
 			AppId:        application.MetaData.Id,
 			RepositoryId: repository.Id,
+			Branch:       branch,
 		},
 	}
 	if todaysRanProcess >= company.MetaData.TotalProcessPerDay {

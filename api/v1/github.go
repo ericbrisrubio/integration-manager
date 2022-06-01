@@ -106,6 +106,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		log.Println(err.Error())
 		return common.GenerateErrorResponse(context, err.Error(), "Operation Failed!")
 	}
+	branch := strings.Split(resource.Ref, "/")[2]
 	companyId := context.QueryParam("companyId")
 	if companyId == "" {
 		return common.GenerateErrorResponse(context, "[ERROR] no companyId is provided", "Please provide companyId")
@@ -199,10 +200,12 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 			CompanyId    string
 			AppId        string
 			RepositoryId string
+			Branch       string
 		}{
 			CompanyId:    companyId,
 			AppId:        application.MetaData.Id,
 			RepositoryId: repository.Id,
+			Branch:       branch,
 		},
 	}
 	if todaysRanProcess >= company.MetaData.TotalProcessPerDay {

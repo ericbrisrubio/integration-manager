@@ -8,7 +8,7 @@ import (
 
 // SearchData contains repositories and applications info
 type SearchData struct {
-	Repositories []Repository  `json:"repositories" bson:"repositories"`
+	Repositories []Repository                    `json:"repositories" bson:"repositories"`
 	Applications []ApplicationMetadataCollection `json:"applications" bson:"applications"`
 }
 
@@ -24,6 +24,7 @@ type Subject struct {
 		CompanyId    string
 		AppId        string
 		RepositoryId string
+		Branch       string
 	}
 }
 
@@ -95,13 +96,13 @@ type ApplicationMetadata struct {
 
 // ApplicationMetadataCollection contains application metadata collection info
 type ApplicationMetadataCollection struct {
-	MetaData 	ApplicationMetadata  		`bson:"_metadata" json:"_metadata"`
-	Status   	enums.COMPANY_STATUS 		`bson:"status" json:"status"`
+	MetaData ApplicationMetadata  `bson:"_metadata" json:"_metadata"`
+	Status   enums.COMPANY_STATUS `bson:"status" json:"status"`
 }
 
 // ApplicationMetadataCollectionsDto contains application metadata collections list
 type ApplicationMetadataCollections struct {
-	ApplicationMetadataCollection	[]ApplicationMetadataCollection	`bson:"application_metadata_collection" json:"application_metadata_collection"`
+	ApplicationMetadataCollection []ApplicationMetadataCollection `bson:"application_metadata_collection" json:"application_metadata_collection"`
 }
 
 // Validate validates application metadata
@@ -174,15 +175,16 @@ type Process struct {
 	CompanyId    string                 `bson:"company_id" json:"company_id"`
 	AppId        string                 `bson:"app_id" json:"app_id"`
 	RepositoryId string                 `bson:"repository_id" json:"repository_id"`
-	CommitId	 string					`bson:"commit_id" json:"commit_id"`
+	CommitId     string                 `bson:"commit_id" json:"commit_id"`
 	Data         map[string]interface{} `bson:"data" json:"data"`
+	Branch       string                 `bson:"branch" json:"branch"`
 }
 
 // PipelineMetadata contains pipeline metadata event options
 type PipelineMetadata struct {
 	CompanyId       string          `json:"company_id" yaml:"company_id"`
 	CompanyMetadata CompanyMetadata `json:"company_metadata" yaml:"company_metadata"`
-	CommitId		string			`json:"commit_id" yaml:"commit_id"`
+	CommitId        string          `json:"commit_id" yaml:"commit_id"`
 }
 
 // OnlyCompanyDto contains only company info

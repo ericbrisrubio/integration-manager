@@ -58,7 +58,8 @@ func (p processInventoryEventService) Listen(subject v1.Subject) {
 		CompanyId:    subject.App.CompanyId,
 		AppId:        subject.App.AppId,
 		RepositoryId: subject.App.RepositoryId,
-		CommitId: 	  subject.Pipeline.MetaData.CommitId,
+		CommitId:     subject.Pipeline.MetaData.CommitId,
+		Branch:       subject.App.Branch,
 		Data:         nil,
 	}
 	b, err := json.Marshal(process)
