@@ -16,4 +16,4 @@
 - Create ``.env`` file in project base directory
     - Find environment variables from ```.examle_env``` file
     - Create ```.env.mongo.test file``` in project base directory
-      - Find environment variables from  ```..examle_env.mongo.test``` file
+      - Find environment variables from  ```.examle_env.mongo.test``` file
