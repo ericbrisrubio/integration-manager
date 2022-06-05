@@ -69,18 +69,21 @@ func TestStep_GetStepForValidationFromStep(t *testing.T) {
 				"name":     "name",
 				"validate": "true",
 				"value":    "interstep",
+				"message":  "",
 			},
 			Type: map[string]string{
 				"accept":   "BUILD/DEPLOY/INTERMEDIARY/JENKINS_JOB",
 				"name":     "type",
 				"validate": "false",
 				"value":    "build",
+				"message":  "invalid step type is given",
 			},
 			Trigger: map[string]string{
 				"accept":   "AUTO/MANUAL",
 				"name":     "trigger",
 				"validate": "true",
 				"value":    "AUTO",
+				"message":  "",
 			},
 			Params: []map[string]string{
 				{
@@ -88,12 +91,14 @@ func TestStep_GetStepForValidationFromStep(t *testing.T) {
 					"name":     "repository_type",
 					"validate": "true",
 					"value":    "git",
+					"message":  "",
 				},
 				{
 					"accept":   "*",
 					"name":     "revision",
 					"validate": "true",
 					"value":    "myBranch",
+					"message":  "",
 				},
 			},
 			Next: []map[string]string{
@@ -102,12 +107,14 @@ func TestStep_GetStepForValidationFromStep(t *testing.T) {
 					"name":     "next",
 					"validate": "true",
 					"value":    "interstep",
+					"message":  "",
 				},
 				{
 					"accept":   "interstep/deployDev/build",
 					"name":     "next",
 					"validate": "true",
 					"value":    "deployDev",
+					"message":  "",
 				},
 			},
 		},
@@ -117,18 +124,21 @@ func TestStep_GetStepForValidationFromStep(t *testing.T) {
 				"name":     "name",
 				"validate": "true",
 				"value":    "test2",
+				"message":  "",
 			},
 			Type: map[string]string{
 				"accept":   "BUILD/DEPLOY/INTERMEDIARY/JENKINS_JOB",
 				"name":     "type",
 				"validate": "true",
 				"value":    "DEPLOY",
+				"message":  "",
 			},
 			Trigger: map[string]string{
 				"accept":   "AUTO/MANUAL",
 				"name":     "trigger",
 				"validate": "true",
 				"value":    "MANUAL",
+				"message":  "",
 			},
 			Params: []map[string]string{
 				{
@@ -136,6 +146,7 @@ func TestStep_GetStepForValidationFromStep(t *testing.T) {
 					"name":     "repository_type",
 					"validate": "false",
 					"value":    "anyType",
+					"message":  "invalid step param is given",
 				},
 			},
 			Next: []map[string]string{
@@ -144,12 +155,14 @@ func TestStep_GetStepForValidationFromStep(t *testing.T) {
 					"name":     "next",
 					"validate": "true",
 					"value":    "build",
+					"message":  "",
 				},
 				{
 					"accept":   "interstep/deployDev/build",
 					"name":     "next",
 					"validate": "false",
 					"value":    "stop",
+					"message":  "invalid step next is given",
 				},
 			},
 		},
@@ -159,18 +172,21 @@ func TestStep_GetStepForValidationFromStep(t *testing.T) {
 				"name":     "name",
 				"validate": "true",
 				"value":    "test3",
+				"message":  "",
 			},
 			Type: map[string]string{
 				"accept":   "BUILD/DEPLOY/INTERMEDIARY/JENKINS_JOB",
 				"name":     "type",
 				"validate": "true",
 				"value":    "BUILD",
+				"message":  "",
 			},
 			Trigger: map[string]string{
 				"accept":   "AUTO/MANUAL",
 				"name":     "trigger",
 				"validate": "false",
 				"value":    "ssss",
+				"message":  "invalid step trigger is given",
 			},
 			Params: []map[string]string{
 				{
@@ -178,6 +194,7 @@ func TestStep_GetStepForValidationFromStep(t *testing.T) {
 					"name":     "service_account",
 					"validate": "true",
 					"value":    "sa",
+					"message":  "",
 				},
 			},
 			Next: []map[string]string{
@@ -186,6 +203,7 @@ func TestStep_GetStepForValidationFromStep(t *testing.T) {
 					"name":     "next",
 					"validate": "false",
 					"value":    "stop",
+					"message":  "invalid step next is given",
 				},
 			},
 		},
