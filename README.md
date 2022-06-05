@@ -11,3 +11,23 @@
   | |  | |\  |   | |   | |___  | |_| | |  _ <   / ___ \    | |    | |  | |_| | | |\  | |_____| | |  | |  / ___ \  | |\  |  / ___ \  | |_| | | |___  |  _ < 
  |___| |_| \_|   |_|   |_____|  \____| |_| \_\ /_/   \_\   |_|   |___|  \___/  |_| \_|         |_|  |_| /_/   \_\ |_| \_| /_/   \_\  \____| |_____| |_| \_\
 ```
+
+
+## Responsibility
+- Manages companies, repositories and applications.
+- Creates git web hook and listens web hook events.
+- Serializes pipeline file attached with repository.
+- Notifies observers.
+
+
+| Versions | 
+|----------|
+| 0.0.1    |
+
+## Want to contribute
+
+- See [CONTRIBUTING.md](markdownfiles/CONTRIBUTING.md)
+- See [DEVELOPMENT.md](markdownfiles/DEVELOPMENT.md) to get start
+- See [architecture](https://github.com/klovercloud-ci-cd/architecture)
+- Look at our
+  [our issues](https://github.com/klovercloud-ci-cd/integration-manager/issues)
