@@ -76,21 +76,21 @@ func (step Step) GetNameWithValidation() map[string]string {
 	nameMap := make(map[string]string)
 	nameMap["name"] = "name"
 	nameMap["value"] = step.Name
-	nameMap["accept"] = "*"
+	nameMap["accepts"] = "*"
 	for i := 0; i < len(step.Name); i++ {
 		if (step.Name[i] < 97 || step.Name[i] > 122) && (step.Name[i] < 48 || step.Name[i] > 57) {
-			nameMap["validate"] = "false"
+			nameMap["valid"] = "false"
 			nameMap["message"] = "step name can only contain lower case characters or digits"
 		}
 	}
 	if step.Name == "" {
-		nameMap["validate"] = "false"
+		nameMap["valid"] = "false"
 		nameMap["message"] = "step name is missing"
 	} else if len(step.Name) > 16 {
-		nameMap["validate"] = "false"
+		nameMap["valid"] = "false"
 		nameMap["message"] = "step name length cannot be more than 16 character"
 	} else {
-		nameMap["validate"] = "true"
+		nameMap["valid"] = "true"
 		nameMap["message"] = ""
 	}
 	return nameMap
@@ -100,15 +100,15 @@ func (step Step) GetTypeWithValidation() map[string]string {
 	typeMap := make(map[string]string)
 	typeMap["name"] = "type"
 	typeMap["value"] = string(step.Type)
-	typeMap["accept"] = string(enums.BUILD + "/" + enums.DEPLOY + "/" + enums.INTERMEDIARY + "/" + enums.JENKINS_JOB)
+	typeMap["accepts"] = string(enums.BUILD + ", " + enums.DEPLOY + ", " + enums.INTERMEDIARY + ", " + enums.JENKINS_JOB)
 	if step.Type == "" {
-		typeMap["validate"] = "false"
+		typeMap["valid"] = "false"
 		typeMap["message"] = "step type is missing"
 	} else if val, _ := typeMap["value"]; val == string(enums.BUILD) || val == string(enums.DEPLOY) || val == string(enums.INTERMEDIARY) || val == string(enums.JENKINS_JOB) {
-		typeMap["validate"] = "true"
+		typeMap["valid"] = "true"
 		typeMap["message"] = ""
 	} else {
-		typeMap["validate"] = "false"
+		typeMap["valid"] = "false"
 		typeMap["message"] = "invalid step type is given"
 	}
 	return typeMap
@@ -118,15 +118,15 @@ func (step Step) GetTriggerWithValidation() map[string]string {
 	triggerMap := make(map[string]string)
 	triggerMap["name"] = "trigger"
 	triggerMap["value"] = string(step.Trigger)
-	triggerMap["accept"] = string(enums.AUTO + "/" + enums.MANUAL)
+	triggerMap["accepts"] = string(enums.AUTO + ", " + enums.MANUAL)
 	if step.Trigger == "" {
-		triggerMap["validate"] = "false"
+		triggerMap["valid"] = "false"
 		triggerMap["message"] = "step trigger is missing"
 	} else if val, _ := triggerMap["value"]; val == string(enums.AUTO) || val == string(enums.MANUAL) {
-		triggerMap["validate"] = "true"
+		triggerMap["valid"] = "true"
 		triggerMap["message"] = ""
 	} else {
-		triggerMap["validate"] = "false"
+		triggerMap["valid"] = "false"
 		triggerMap["message"] = "invalid step trigger is given"
 	}
 	return triggerMap
@@ -139,18 +139,18 @@ func (step Step) GetParamsWithValidation() []map[string]string {
 		paramMap["name"] = string(key)
 		paramMap["value"] = val
 		if key == enums.REPOSITORY_TYPE_PARAM {
-			paramMap["accept"] = "git"
+			paramMap["accepts"] = "git"
 		} else {
-			paramMap["accept"] = "*"
+			paramMap["accepts"] = "*"
 		}
 		if val == "" {
-			paramMap["validate"] = "false"
+			paramMap["valid"] = "false"
 			paramMap["message"] = "step param is missing"
-		} else if acceptValue, _ := paramMap["accept"]; acceptValue == "*" || val == acceptValue {
-			paramMap["validate"] = "true"
+		} else if acceptValue, _ := paramMap["accepts"]; acceptValue == "*" || val == acceptValue {
+			paramMap["valid"] = "true"
 			paramMap["message"] = ""
 		} else {
-			paramMap["validate"] = "false"
+			paramMap["valid"] = "false"
 			paramMap["message"] = "invalid step param is given"
 		}
 		paramsMap = append(paramsMap, paramMap)
@@ -162,19 +162,19 @@ func (step Step) GetNextWithValidation(stepNameMap map[string]bool) []map[string
 	var nextMaps []map[string]string
 	var accept string
 	for key, _ := range stepNameMap {
-		accept = accept + key + "/"
+		accept = accept + key + ", "
 	}
-	accept = strings.TrimSuffix(accept, "/")
+	accept = strings.TrimSuffix(accept, ", ")
 	for _, each := range step.Next {
 		nextMap := make(map[string]string)
 		nextMap["name"] = "next"
 		nextMap["value"] = each
-		nextMap["accept"] = accept
+		nextMap["accepts"] = accept
 		if _, ok := stepNameMap[each]; ok {
-			nextMap["validate"] = "true"
+			nextMap["valid"] = "true"
 			nextMap["message"] = ""
 		} else {
-			nextMap["validate"] = "false"
+			nextMap["valid"] = "false"
 			nextMap["message"] = "invalid step next is given"
 		}
 		nextMaps = append(nextMaps, nextMap)
