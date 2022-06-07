@@ -17,6 +17,7 @@ func Router(g *echo.Group) {
 	BitbucketEventRouter(g.Group("/bitbuckets"))
 	SearchRouter(g.Group("/search"))
 	PipelineRouter(g.Group("/pipelines"))
+	AgentRouter(g.Group("/agents"))
 }
 
 // BitbucketEventRouter api/v1/bitbuckets event router
@@ -89,4 +90,10 @@ func PipelineRouter(g *echo.Group) {
 func SearchRouter(g *echo.Group) {
 	searchApi := NewSearchApi(dependency.GetV1SearchService())
 	g.GET("", searchApi.SearchReposAndAppsByCompanyIdAndName, AuthenticationAndAuthorizationHandler)
+}
+
+// AgentRouter api/v1/agents/* router
+func AgentRouter(g *echo.Group) {
+	agentApi := NewAgentApi(dependency.GetV1AgentService())
+	g.POST("", agentApi.Store)
 }

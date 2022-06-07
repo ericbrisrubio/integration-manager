@@ -84,3 +84,9 @@ func GetV1PipelineService() service.Pipeline {
 	pipeline := logic.NewPipelineService(GetV1GithubService(), GetV1BitbucketService(), GetV1CompanyService())
 	return pipeline
 }
+
+// GetV1AgentService returns Search service
+func GetV1AgentService() service.Agent {
+	agent := logic.NewAgentsService(mongo.NewAgentsRepository(3000))
+	return agent
+}
