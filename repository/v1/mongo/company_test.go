@@ -1,8 +1,11 @@
 package mongo
 
 import (
+	v1 "github.com/klovercloud-ci-cd/integration-manager/core/v1"
+	"github.com/klovercloud-ci-cd/integration-manager/enums"
 	"github.com/stretchr/testify/assert"
 	"log"
+	"reflect"
 	"testing"
 )
 
@@ -794,4 +797,27 @@ func TestGetPagination(t *testing.T) {
 		}
 	}
 
+}
+
+func TestCompanyRepository_Store(t *testing.T) {
+	type TestCase struct {
+		expected int64
+		actual   int64
+	}
+	testCase := TestCase{
+		expected: 7,
+	}
+	repo := NewMockCompanyRepository()
+	data := InitCompanyData()
+	for _, each := range data {
+		err := repo.Store(each)
+		if err != nil {
+			return
+		}
+	}
+	_, testCase.actual = repo.GetCompanies(v1.CompanyQueryOption{}, v1.StatusQueryOption{Option: enums.ACTIVE})
+	if !reflect.DeepEqual(testCase.expected, testCase.actual) {
+		log.Println("ERROR:", "expected:", testCase.expected, "actual:", testCase.actual)
+		assert.ElementsMatch(t, testCase.expected, testCase.actual)
+	}
 }

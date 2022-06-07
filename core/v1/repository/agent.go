@@ -7,4 +7,6 @@ import (
 // Agent Repository  related operations
 type AgentRepository interface {
 	Store(agent v1.Agent) error
+	GetByName(name string) (v1.Agent, error)
+	Update(oldAgent v1.Agent) error
 }

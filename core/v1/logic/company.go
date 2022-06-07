@@ -507,11 +507,15 @@ func (c companyService) GetCompanyByApplicationUrl(url string) v1.Company {
 
 func (c companyService) Store(company v1.Company) error {
 	option := v1.CompanyQueryOption{}
+	statusOption := v1.StatusQueryOption{Option: enums.ACTIVE}
 	if company.Id == "" {
 		return errors.New("[ERROR]: No company id given")
 	}
-	if data, _ := c.GetByCompanyId(company.Id, option); data.Id == company.Id {
-		return errors.New("[ERROR]: Company with id: " + company.Id + " already exists.")
+	data := c.GetCompanies(option, statusOption)
+	for _, each := range data {
+		if each.Name == company.Name {
+			return errors.New("[ERROR]: Company name already exists")
+		}
 	}
 	for _, eachRepo := range company.Repositories {
 		go c.CreateWebHookAndUpdateApplications(company.Id, eachRepo.Type, eachRepo.Id, eachRepo.Token, eachRepo.Applications)

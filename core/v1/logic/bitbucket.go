@@ -12,6 +12,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"log"
 	"strings"
+	"time"
 )
 
 type bitbucketService struct {
@@ -60,7 +61,23 @@ func (b bitbucketService) GetCommitByBranch(username, repositoryName, branch, to
 			HTMLURL: each.Links.HTML.Href,
 			Commit: struct {
 				Message string `json:"message"`
-			}(struct{ Message string }{Message: each.Message}),
+				Author  struct {
+					Name  string    `json:"name"`
+					Email string    `json:"email"`
+					Date  time.Time `json:"date"`
+				} `json:"author"`
+			}{
+				Message: each.Message,
+				Author: struct {
+					Name  string    `json:"name"`
+					Email string    `json:"email"`
+					Date  time.Time `json:"date"`
+				}{
+					Name:  each.Author.User.DisplayName,
+					Email: "",
+					Date:  each.Date,
+				},
+			},
 		}
 		gitCommit = append(gitCommit, commit)
 	}

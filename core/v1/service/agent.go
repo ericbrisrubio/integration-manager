@@ -7,4 +7,5 @@ import (
 // Agent related operations.
 type Agent interface {
 	Store(agents v1.Agent) error
+	GetByName(name string) (v1.Agent, error)
 }

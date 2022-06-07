@@ -7,4 +7,5 @@ import (
 // Agents api operations
 type Agent interface {
 	Store(context echo.Context) error
+	GetByName(context echo.Context) error
 }

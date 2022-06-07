@@ -132,6 +132,11 @@ type Commit struct {
 	HTMLURL string `json:"html_url"`
 	Commit  struct {
 		Message string `json:"message"`
+		Author  struct {
+			Name  string    `json:"name"`
+			Email string    `json:"email"`
+			Date  time.Time `json:"date"`
+		} `json:"author"`
 	} `json:"commit"`
 }
 
@@ -143,5 +148,10 @@ type GitCommit []struct {
 	HTMLURL string `json:"html_url"`
 	Commit  struct {
 		Message string `json:"message"`
+		Author  struct {
+			Name  string    `json:"name"`
+			Email string    `json:"email"`
+			Date  time.Time `json:"date"`
+		} `json:"author"`
 	} `json:"commit"`
 }

@@ -96,4 +96,5 @@ func SearchRouter(g *echo.Group) {
 func AgentRouter(g *echo.Group) {
 	agentApi := NewAgentApi(dependency.GetV1AgentService())
 	g.POST("", agentApi.Store)
+	g.GET("/:name", agentApi.GetByName)
 }
