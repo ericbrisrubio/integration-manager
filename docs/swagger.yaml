@@ -26,6 +26,15 @@ definitions:
       status:
         type: string
     type: object
+  v1.Agent:
+    properties:
+      api_version:
+        type: string
+      name:
+        type: string
+      terminal_base_url:
+        type: string
+    type: object
   v1.Application:
     properties:
       _metadata:
@@ -1206,6 +1215,51 @@ info:
   description: integration-manager API
   title: integration-manager API
 paths:
+  /api/v1/agent:
+    get:
+      consumes:
+      - application/json
+      description: Get agent by name
+      parameters:
+      - description: Agent Name
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Get agent by name
+      tags:
+      - Agent
+    post:
+      description: Stores agent
+      parameters:
+      - description: Agent Name
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.Agent'
+      - description: Agent Name
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseDTO'
+      summary: Store agent
+      tags:
+      - Agent
   /api/v1/applications:
     get:
       description: Get All Applications

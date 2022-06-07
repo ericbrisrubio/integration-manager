@@ -16,6 +16,74 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/agent": {
+            "get": {
+                "description": "Get agent by name",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Agent"
+                ],
+                "summary": "Get agent by name",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Agent Name",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Stores agent",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Agent"
+                ],
+                "summary": "Store agent",
+                "parameters": [
+                    {
+                        "description": "Agent Name",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.Agent"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Agent Name",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.ResponseDTO"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/applications": {
             "get": {
                 "description": "Get All Applications",
@@ -1386,6 +1454,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.Agent": {
+            "type": "object",
+            "properties": {
+                "api_version": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "terminal_base_url": {
                     "type": "string"
                 }
             }
