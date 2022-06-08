@@ -58,7 +58,7 @@ func (a agentApi) Store(context echo.Context) error {
 		nil, "Operation Successful")
 }
 
-// NewCompanyApi returns Agent type api
+// NewAgentApi returns Agent type api
 func NewAgentApi(agentService service.Agent) api.Agent {
 	return &agentApi{
 		agentService: agentService,

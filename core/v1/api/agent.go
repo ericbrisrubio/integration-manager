@@ -4,7 +4,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// Agents api operations
+// Agent api operations
 type Agent interface {
 	Store(context echo.Context) error
 	GetByName(context echo.Context) error

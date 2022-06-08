@@ -86,7 +86,7 @@ func (a agentRepository) Store(agent v1.Agent) error {
 	}
 }
 
-// NewAgentsRepository returns AgentsRepository type object
+// NewAgentsRepository returns AgentRepository type object
 func NewAgentsRepository(timeout int) repository.AgentRepository {
 	return &agentRepository{
 		manager: GetDmManager(),
