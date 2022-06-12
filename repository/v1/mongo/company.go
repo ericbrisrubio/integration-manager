@@ -21,6 +21,69 @@ type companyRepository struct {
 	timeout time.Duration
 }
 
+func (c companyRepository) GetWebhookCount(companyId string) v1.ApplicationWebhookCount {
+	var enabled int64
+	var disabled int64
+	query := bson.M{
+		"$and": []bson.M{
+			{"id": companyId},
+		},
+	}
+	coll := c.manager.Db.Collection(CompanyCollection)
+	result, err := coll.Find(c.manager.Ctx, query, nil)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	company := new(v1.Company)
+	for result.Next(context.TODO()) {
+		err := result.Decode(&company)
+		if err != nil {
+			log.Println("[ERROR]", err)
+			break
+		}
+	}
+	for _, eachRepo := range company.Repositories {
+		for _, eachApp := range eachRepo.Applications {
+			if eachApp.Webhook.Active {
+				enabled++
+			} else {
+				disabled++
+			}
+		}
+	}
+	return v1.ApplicationWebhookCount{Data: struct {
+		Application struct {
+			Webhook struct {
+				Enabled  int64 `json:"enabled"`
+				Disabled int64 `json:"disabled"`
+			} `json:"webhook"`
+		} `json:"application"`
+	}(struct {
+		Application struct {
+			Webhook struct {
+				Enabled  int64 `json:"enabled"`
+				Disabled int64 `json:"disabled"`
+			} `json:"webhook"`
+		}
+	}{Application: struct {
+		Webhook struct {
+			Enabled  int64 `json:"enabled"`
+			Disabled int64 `json:"disabled"`
+		} `json:"webhook"`
+	}(struct {
+		Webhook struct {
+			Enabled  int64 `json:"enabled"`
+			Disabled int64 `json:"disabled"`
+		}
+	}{Webhook: struct {
+		Enabled  int64 `json:"enabled"`
+		Disabled int64 `json:"disabled"`
+	}(struct {
+		Enabled  int64
+		Disabled int64
+	}{Enabled: enabled, Disabled: disabled})})})}
+}
+
 func (c companyRepository) GetApplicationsByRepositoryId(repoId string, companyId string, option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Application, int64) {
 	var results []v1.Application
 	var repository v1.Repository

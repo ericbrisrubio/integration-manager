@@ -74,6 +74,18 @@ type Application struct {
 	Status   enums.COMPANY_STATUS `bson:"status" json:"status"`
 }
 
+// ApplicationWebhookCount contains application webhook count info
+type ApplicationWebhookCount struct {
+	Data struct {
+		Application struct {
+			Webhook struct {
+				Enabled  int64 `json:"enabled"`
+				Disabled int64 `json:"disabled"`
+			} `json:"webhook"`
+		} `json:"application"`
+	} `json:"data"`
+}
+
 // Validate validates application info
 func (application Application) Validate() error {
 	if application.Url == "" {

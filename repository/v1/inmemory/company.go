@@ -9,6 +9,11 @@ import (
 type companyRepository struct {
 }
 
+func (c companyRepository) GetWebhookCount(companyId string) v1.ApplicationWebhookCount {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (c companyRepository) GetRepositoryByRepositoryId(id, repoId string, option v1.CompanyQueryOption) v1.Repository {
 	var repo v1.Repository
 	for _, each := range IndexedCompanies {

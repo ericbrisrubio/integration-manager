@@ -12,6 +12,11 @@ type mockCompanyService struct {
 	client service.HttpClient
 }
 
+func (m mockCompanyService) GetWebhookCount(companyId string) v1.ApplicationWebhookCount {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (m mockCompanyService) UpdateWebhook(companyId, repoId, url, webhookId, action string) error {
 	//TODO implement me
 	panic("implement me")

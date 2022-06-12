@@ -72,7 +72,7 @@ func ApplicationRouter(g *echo.Group) {
 	//companyId, repositoryId via query param
 	g.POST("", applicationApi.Update, AuthenticationAndAuthorizationHandler)
 	g.GET("/:id", applicationApi.GetById, AuthenticationAndAuthorizationHandler)
-	g.GET("", applicationApi.GetAll, AuthenticationAndAuthorizationHandler)
+	g.GET("", applicationApi.Get, AuthenticationAndAuthorizationHandler)
 	g.GET("/:id/pipelines", applicationApi.GetPipelineForValidation, AuthenticationAndAuthorizationHandler)
 	g.PUT("/:id/pipelines", applicationApi.UpdateApplicationPipeLine, AuthenticationAndAuthorizationHandler)
 	g.POST("/:id/pipelines", applicationApi.CreateApplicationPipeLine, AuthenticationAndAuthorizationHandler)

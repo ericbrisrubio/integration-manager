@@ -35,6 +35,10 @@ func (c companyService) GetApplicationByApplicationId(companyId string, repoId s
 	return c.repo.GetApplicationByApplicationId(companyId, repoId, applicationId)
 }
 
+func (c companyService) GetWebhookCount(companyId string) v1.ApplicationWebhookCount {
+	return c.repo.GetWebhookCount(companyId)
+}
+
 func (c companyService) GetRepositoryByRepositoryId(id, repoId string, option v1.CompanyQueryOption) v1.Repository {
 	return c.repo.GetRepositoryByRepositoryId(id, repoId, option)
 }
