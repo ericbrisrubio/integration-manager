@@ -100,7 +100,11 @@ func (a applicationApi) UpdateApplicationPipeLine(context echo.Context) error {
 // @Tags Application
 // @Produce json
 // @Param companyId query string true "company id"
-// @Param action query string false "webhook-count"
+// @Param action query string false "webhook_count"
+// @Param page query int64 false "Page number"
+// @Param limit query int64 false "Record count"
+// @Param loadRepositories query bool false "Loads Repositories"
+// @Param loadApplications query bool false "Loads Applications"
 // @Success 200 {object} common.ResponseDTO{data=[]v1.Application}
 // @Router /api/v1/applications [GET]
 func (a applicationApi) Get(context echo.Context) error {
@@ -109,7 +113,7 @@ func (a applicationApi) Get(context echo.Context) error {
 		return common.GenerateErrorResponse(context, "[ERROR]: Company id is required", "Operation failed")
 	}
 	action := context.QueryParam("action")
-	if action == "webhook-count" {
+	if action == "webhook_count" {
 		return a.GetWebhookCount(context, companyId)
 	}
 	return a.GetAll(context, companyId)
