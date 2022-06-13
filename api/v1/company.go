@@ -150,6 +150,7 @@ func (c companyApi) Save(context echo.Context) error {
 // @Description Gets company by id
 // @Tags Company
 // @Produce json
+// @Param action query string false "action [dashboard_data]"
 // @Param id path string true "Company id"
 // @Success 200 {object} common.ResponseDTO{data=v1.Company}
 // @Router /api/v1/companies/{id} [GET]
@@ -158,8 +159,12 @@ func (c companyApi) GetById(context echo.Context) error {
 	if id == "" {
 		return common.GenerateErrorResponse(context, nil, "Company Id is required!")
 	}
+	action := context.QueryParam("action")
+	if action == "dashboard_data" {
+		data := c.companyService.GetDashboardData(id)
+		return common.GenerateSuccessResponse(context, data, nil, "Operation Successful")
+	}
 	option := getQueryOption(context)
-
 	data, _ := c.companyService.GetByCompanyId(id, option)
 	return common.GenerateSuccessResponse(context, data, nil, "Success!")
 }

@@ -74,9 +74,12 @@ type Application struct {
 	Status   enums.COMPANY_STATUS `bson:"status" json:"status"`
 }
 
-// ApplicationWebhookCount contains application webhook count info
-type ApplicationWebhookCount struct {
+// DashboardData contains company resources count info
+type DashboardData struct {
 	Data struct {
+		Repository struct {
+			Count int64 `json:"count"`
+		} `json:"repository"`
 		Application struct {
 			Webhook struct {
 				Enabled  int64 `json:"enabled"`

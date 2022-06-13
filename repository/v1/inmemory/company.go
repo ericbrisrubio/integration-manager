@@ -9,7 +9,7 @@ import (
 type companyRepository struct {
 }
 
-func (c companyRepository) GetWebhookCount(companyId string) v1.ApplicationWebhookCount {
+func (c companyRepository) GetDashboardData(companyId string) v1.DashboardData {
 	//TODO implement me
 	panic("implement me")
 }

@@ -21,7 +21,7 @@ type companyRepository struct {
 	timeout time.Duration
 }
 
-func (c companyRepository) GetWebhookCount(companyId string) v1.ApplicationWebhookCount {
+func (c companyRepository) GetDashboardData(companyId string) v1.DashboardData {
 	var enabled int64
 	var disabled int64
 	query := bson.M{
@@ -51,7 +51,10 @@ func (c companyRepository) GetWebhookCount(companyId string) v1.ApplicationWebho
 			}
 		}
 	}
-	return v1.ApplicationWebhookCount{Data: struct {
+	return v1.DashboardData{Data: struct {
+		Repository struct {
+			Count int64 `json:"count"`
+		} `json:"repository"`
 		Application struct {
 			Webhook struct {
 				Enabled  int64 `json:"enabled"`
@@ -59,13 +62,18 @@ func (c companyRepository) GetWebhookCount(companyId string) v1.ApplicationWebho
 			} `json:"webhook"`
 		} `json:"application"`
 	}(struct {
+		Repository struct {
+			Count int64 `json:"count"`
+		}
 		Application struct {
 			Webhook struct {
 				Enabled  int64 `json:"enabled"`
 				Disabled int64 `json:"disabled"`
 			} `json:"webhook"`
 		}
-	}{Application: struct {
+	}{Repository: struct {
+		Count int64 `json:"count"`
+	}(struct{ Count int64 }{Count: int64(len(company.Repositories))}), Application: struct {
 		Webhook struct {
 			Enabled  int64 `json:"enabled"`
 			Disabled int64 `json:"disabled"`

@@ -12,7 +12,7 @@ type mockCompanyService struct {
 	client service.HttpClient
 }
 
-func (m mockCompanyService) GetWebhookCount(companyId string) v1.ApplicationWebhookCount {
+func (m mockCompanyService) GetDashboardData(companyId string) v1.DashboardData {
 	//TODO implement me
 	panic("implement me")
 }
