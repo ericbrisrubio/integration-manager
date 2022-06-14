@@ -51,45 +51,26 @@ func (c companyRepository) GetDashboardData(companyId string) v1.DashboardData {
 			}
 		}
 	}
-	return v1.DashboardData{Data: struct {
-		Repository struct {
+	return v1.DashboardData{
+		Repository: struct {
 			Count int64 `json:"count"`
-		} `json:"repository"`
-		Application struct {
+		}(struct{ Count int64 }{Count: int64(len(company.Repositories))}), Application: struct {
 			Webhook struct {
 				Enabled  int64 `json:"enabled"`
 				Disabled int64 `json:"disabled"`
 			} `json:"webhook"`
-		} `json:"application"`
-	}(struct {
-		Repository struct {
-			Count int64 `json:"count"`
-		}
-		Application struct {
+		}(struct {
 			Webhook struct {
 				Enabled  int64 `json:"enabled"`
 				Disabled int64 `json:"disabled"`
-			} `json:"webhook"`
-		}
-	}{Repository: struct {
-		Count int64 `json:"count"`
-	}(struct{ Count int64 }{Count: int64(len(company.Repositories))}), Application: struct {
-		Webhook struct {
+			}
+		}{Webhook: struct {
 			Enabled  int64 `json:"enabled"`
 			Disabled int64 `json:"disabled"`
-		} `json:"webhook"`
-	}(struct {
-		Webhook struct {
-			Enabled  int64 `json:"enabled"`
-			Disabled int64 `json:"disabled"`
-		}
-	}{Webhook: struct {
-		Enabled  int64 `json:"enabled"`
-		Disabled int64 `json:"disabled"`
-	}(struct {
-		Enabled  int64
-		Disabled int64
-	}{Enabled: enabled, Disabled: disabled})})})}
+		}(struct {
+			Enabled  int64
+			Disabled int64
+		}{Enabled: enabled, Disabled: disabled})})}
 }
 
 func (c companyRepository) GetApplicationsByRepositoryId(repoId string, companyId string, option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Application, int64) {

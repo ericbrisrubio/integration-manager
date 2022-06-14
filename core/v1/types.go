@@ -76,17 +76,15 @@ type Application struct {
 
 // DashboardData contains company resources count info
 type DashboardData struct {
-	Data struct {
-		Repository struct {
-			Count int64 `json:"count"`
-		} `json:"repository"`
-		Application struct {
-			Webhook struct {
-				Enabled  int64 `json:"enabled"`
-				Disabled int64 `json:"disabled"`
-			} `json:"webhook"`
-		} `json:"application"`
-	} `json:"data"`
+	Repository struct {
+		Count int64 `json:"count"`
+	} `json:"repository"`
+	Application struct {
+		Webhook struct {
+			Enabled  int64 `json:"enabled"`
+			Disabled int64 `json:"disabled"`
+		} `json:"webhook"`
+	} `json:"application"`
 }
 
 // Validate validates application info
