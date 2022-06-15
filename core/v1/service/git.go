@@ -16,5 +16,5 @@ type Git interface {
 	CreateRepositoryWebhook(username, repositoryName, token string, companyId string) (v1.GitWebhook, error)
 	DeleteRepositoryWebhookById(username, repositoryName, webhookId, token string) error
 	GetBranches(username, repositoryName, token string) (v1.GitBranches, error)
-	GetCommitByBranch(username, repositoryName, branch, token string) (v1.GitCommit, error)
+	GetCommitsByBranch(username, repositoryName, branch, token string, option v1.Pagination) ([]v1.GitCommit, int64, error)
 }

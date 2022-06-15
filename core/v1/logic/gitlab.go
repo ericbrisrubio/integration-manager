@@ -12,6 +12,11 @@ type gitlabService struct {
 	client         service.HttpClient
 }
 
+func (g gitlabService) GetCommitsByBranch(username, repositoryName, branch, token string, option v1.Pagination) ([]v1.GitCommit, int64, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (g gitlabService) GetContent(repositoryName, username, token, path string) (v1.GitContent, error) {
 	//TODO implement me
 	panic("implement me")

@@ -141,7 +141,7 @@ type Commit struct {
 }
 
 // GitCommit contains github commit data
-type GitCommit []struct {
+type GitCommit struct {
 	URL     string `json:"url"`
 	Sha     string `json:"sha"`
 	NodeID  string `json:"node_id"`

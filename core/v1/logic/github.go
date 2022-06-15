@@ -10,6 +10,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"log"
+	"strconv"
 	"strings"
 )
 
@@ -89,23 +90,23 @@ func (githubService githubService) UpdateDirectoryContent(repositoryName, userna
 	return directoryContentCreateAndUpdateResponse, nil
 }
 
-func (githubService githubService) GetCommitByBranch(username, repositoryName, branch, token string) (v1.GitCommit, error) {
-	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repositoryName + "/commits?sha=" + branch + "&per_page=5&page=0"
+func (githubService githubService) GetCommitsByBranch(username, repositoryName, branch, token string, option v1.Pagination) ([]v1.GitCommit, int64, error) {
+	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repositoryName + "/commits?sha=" + branch + "&per_page=" + strconv.Itoa(int(option.Limit)) + "&page=" + strconv.Itoa(int(option.Page))
 	header := make(map[string]string)
 	header["Authorization"] = "token " + token
 	header["Accept"] = "application/vnd.github.v3+json"
 	header["cache-control"] = "no-cache"
 	response, err := githubService.client.Get(url, header)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	var gitCommits v1.GitCommit
+	var gitCommits []v1.GitCommit
 	err = json.Unmarshal(response, &gitCommits)
 
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return gitCommits, nil
+	return gitCommits, 0, nil
 }
 
 func (githubService githubService) GetBranches(username, repositoryName, token string) (v1.GitBranches, error) {

@@ -31,7 +31,7 @@ func BitbucketEventRouter(g *echo.Group) {
 	}
 	g.POST("", bitbucketApi.ListenEvent)
 	g.GET("/branches", bitbucketApi.GetBranches)
-	g.GET("/commits", bitbucketApi.GetCommitByBranch)
+	g.GET("/commits", bitbucketApi.GetCommitsByBranch)
 }
 
 // GithubEventRouter api/v1/githubs event router
@@ -44,7 +44,7 @@ func GithubEventRouter(g *echo.Group) {
 	}
 	g.POST("", githubApi.ListenEvent)
 	g.GET("/branches", githubApi.GetBranches)
-	g.GET("/commits", githubApi.GetCommitByBranch)
+	g.GET("/commits", githubApi.GetCommitsByBranch)
 }
 
 // CompanyRouter api/v1/companies/* router

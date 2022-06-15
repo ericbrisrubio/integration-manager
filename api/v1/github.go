@@ -12,6 +12,7 @@ import (
 	"github.com/twinj/uuid"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"log"
+	"strconv"
 	"strings"
 )
 
@@ -34,7 +35,7 @@ type v1GithubApi struct {
 // @Success 200 {object} common.ResponseDTO
 // @Failure 400 {object} common.ResponseDTO
 // @Router /api/v1/githubs/commits [GET]
-func (g v1GithubApi) GetCommitByBranch(context echo.Context) error {
+func (g v1GithubApi) GetCommitsByBranch(context echo.Context) error {
 	repoId := context.QueryParam("repoId")
 	option := v1.CompanyQueryOption{
 		Pagination:       v1.Pagination{},
@@ -50,11 +51,33 @@ func (g v1GithubApi) GetCommitByBranch(context echo.Context) error {
 	}
 	username, repositoryName := getUsernameAndRepoNameFromGithubRepositoryUrl(url)
 	branch := context.QueryParam("branch")
-	commits, err := g.gitService.GetCommitByBranch(username, repositoryName, branch, repo.Token)
+	pagination := getCommitsPaginationOption(context)
+	commits, total, err := g.gitService.GetCommitsByBranch(username, repositoryName, branch, repo.Token, pagination)
 	if err != nil {
 		return err
 	}
-	return common.GenerateSuccessResponse(context, commits, nil, "success")
+	metadata := common.GetPaginationMetadata(option.Pagination.Page, option.Pagination.Limit, total, int64(len(commits)))
+	uri := strings.Split(context.Request().RequestURI, "?")[0]
+	if pagination.Page > 0 {
+		metadata.Links = append(metadata.Links, map[string]string{"prev": uri + "?order=" + context.QueryParam("order") + "&page=" + strconv.FormatInt(pagination.Page-1, 10) + "&limit=" + strconv.FormatInt(pagination.Limit, 10)})
+	}
+	metadata.Links = append(metadata.Links, map[string]string{"self": uri + "?order=" + context.QueryParam("order") + "&page=" + strconv.FormatInt(pagination.Page, 10) + "&limit=" + strconv.FormatInt(pagination.Limit, 10)})
+	metadata.Links = append(metadata.Links, map[string]string{"next": uri + "?order=" + context.QueryParam("order") + "&page=" + strconv.FormatInt(pagination.Page+1, 10) + "&limit=" + strconv.FormatInt(pagination.Limit, 10)})
+	return common.GenerateSuccessResponse(context, commits, &metadata, "success")
+}
+
+func getCommitsPaginationOption(context echo.Context) v1.Pagination {
+	var option v1.Pagination
+	page := context.QueryParam("page")
+	limit := context.QueryParam("limit")
+	if page == "" {
+		option.Page = 0
+		option.Limit = 5
+	} else {
+		option.Page, _ = strconv.ParseInt(page, 10, 64)
+		option.Limit, _ = strconv.ParseInt(limit, 10, 64)
+	}
+	return option
 }
 
 // GetBranches... Get Branches

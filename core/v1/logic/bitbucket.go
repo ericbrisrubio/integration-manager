@@ -11,6 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -36,8 +37,8 @@ func (b bitbucketService) UpdateDirectoryContent(repositoryName, username, token
 	panic("implement me")
 }
 
-func (b bitbucketService) GetCommitByBranch(username, repositoryName, branch, token string) (v1.GitCommit, error) {
-	url := enums.BITBUCKET_API_BASE_URL + "repositories/" + username + "/" + repositoryName + "/commits?include=" + branch
+func (b bitbucketService) GetCommitsByBranch(username, repositoryName, branch, token string, option v1.Pagination) ([]v1.GitCommit, int64, error) {
+	url := enums.BITBUCKET_API_BASE_URL + "repositories/" + username + "/" + repositoryName + "/commits?include=" + branch + "&page=" + strconv.Itoa(int(option.Page)) + "&pagelen=" + strconv.Itoa(int(option.Limit))
 	base64ConvertedToken := base64.StdEncoding.EncodeToString([]byte(username + ":" + token))
 	header := make(map[string]string)
 	header["Authorization"] = "Basic " + base64ConvertedToken
@@ -46,15 +47,15 @@ func (b bitbucketService) GetCommitByBranch(username, repositoryName, branch, to
 	var commits v1.BitBucketCommits
 	data, err := b.client.Get(url, header)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	err = json.Unmarshal(data, &commits)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	var gitCommit v1.GitCommit
+	var gitCommits []v1.GitCommit
 	for _, each := range commits.Values {
-		commit := v1.Commit{
+		gitCommit := v1.GitCommit{
 			URL:     each.Links.Self.Href,
 			Sha:     each.Hash,
 			NodeID:  each.Hash,
@@ -79,9 +80,9 @@ func (b bitbucketService) GetCommitByBranch(username, repositoryName, branch, to
 				},
 			},
 		}
-		gitCommit = append(gitCommit, commit)
+		gitCommits = append(gitCommits, gitCommit)
 	}
-	return gitCommit, nil
+	return gitCommits, 0, nil
 }
 
 func (b bitbucketService) GetBranches(username, repositoryName, token string) (v1.GitBranches, error) {
