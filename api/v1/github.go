@@ -147,9 +147,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		log.Println("[ERROR]:Failed to trigger pipeline process! ", err.Error())
 		return common.GenerateErrorResponse(context, err.Error(), "Failed to trigger pipeline process!")
 	}
-	if err := data.Validate(); err != nil {
-		return common.GenerateErrorResponse(context, err, err.Error())
-	}
+
 	checkingFlag := BranchExists(data.Steps, resource.Ref, "GITHUB")
 	if !checkingFlag {
 		return common.GenerateErrorResponse(context, "Branch does not exist!", "Operation Failed!")
@@ -217,6 +215,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		CompanyMetadata: company.MetaData,
 		CommitId:        revision,
 	}
+	err = data.Validate()
 	subject := v1.Subject{
 		Log:                   "Pipeline triggered",
 		CoreRequestQueryParam: map[string]string{"url": resource.Repository.URL, "revision": revision, "purging": config.PipelinePurging},
@@ -233,6 +232,9 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 			RepositoryId: repository.Id,
 			Branch:       branch,
 		},
+	}
+	if err != nil {
+		subject.Log = err.Error()
 	}
 	if todaysRanProcess >= company.MetaData.TotalProcessPerDay {
 		subject.Log = "No More process today, you've touched today's limit!"
