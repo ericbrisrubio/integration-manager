@@ -26,9 +26,9 @@ func UrlFormatter(url string) string {
 func BranchExists(steps []v1.Step, resourceRef string, gitType enums.REPOSITORY_TYPE) bool {
 	if gitType == enums.GITHUB {
 		for _, step := range steps {
-			if step.Type == enums.BUILD && step.Params[enums.REVISION] != "" {
+			if step.Type == enums.BUILD && step.Params[enums.ALLOWED_BRANCHES] != "" {
 				branch := strings.Split(resourceRef, "/")[2]
-				branches := strings.Split(step.Params[enums.REVISION], ",")
+				branches := strings.Split(step.Params[enums.ALLOWED_BRANCHES], ",")
 				for _, each := range branches {
 					if branch == each {
 						return true
@@ -41,8 +41,8 @@ func BranchExists(steps []v1.Step, resourceRef string, gitType enums.REPOSITORY_
 		return true
 	} else {
 		for _, step := range steps {
-			if step.Type == enums.BUILD && step.Params[enums.REVISION] != "" {
-				branches := strings.Split(step.Params[enums.REVISION], ",")
+			if step.Type == enums.BUILD && step.Params[enums.ALLOWED_BRANCHES] != "" {
+				branches := strings.Split(step.Params[enums.ALLOWED_BRANCHES], ",")
 				for _, each := range branches {
 					if resourceRef == each {
 						return true

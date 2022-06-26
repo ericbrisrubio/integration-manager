@@ -13,6 +13,9 @@ type processEventService struct {
 }
 
 func (e processEventService) Listen(subject v1.Subject) {
+	if subject.Pipeline.ProcessId==""{
+		return
+	}
 	event := v1.ProcessEvent{
 		ProcessId: subject.Pipeline.ProcessId,
 		Data:      subject.EventData,

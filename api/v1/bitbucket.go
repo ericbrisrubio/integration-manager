@@ -144,7 +144,7 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 		for i := 0; i < stepsCount; i++ {
 			if data.Steps[i].Type == enums.BUILD {
 				if images, ok := data.Steps[i].Params["images"]; ok {
-					data.Steps[i].Params["images"] = setImageVersionForBuild(data.Steps[i], revision, images)
+					data.Steps[i].Params["images"] = setImageVersionForBuild(data.Steps[i],branch, revision, images)
 				}
 				if storage, ok := data.Steps[i].Params[enums.STORAGE]; ok {
 					data.Steps[i].Params[enums.STORAGE] = storage

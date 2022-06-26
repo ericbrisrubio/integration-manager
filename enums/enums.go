@@ -131,6 +131,9 @@ const (
 	// REVISION resource revision key for  pipeline step param
 	REVISION = PARAMS("revision")
 
+	// ALLOWED_BRANCHES allowed branches for this pipeline
+	ALLOWED_BRANCHES= PARAMS("allowed_branches")
+
 	// IMAGE resource image key for  pipeline step param
 	IMAGE = PARAMS("images")
 
@@ -146,6 +149,14 @@ const (
 	// REPOSITORY_TYPE_PARAM resource repository type
 	REPOSITORY_TYPE_PARAM = PARAMS("repository_type")
 )
+
+// VARIABLES pipeline parameters variables
+type VARIABLES string
+
+const  (
+    BRANCH= VARIABLES("$BRANCH")
+)
+
 
 type ACCESS_MODE string
 

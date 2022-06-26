@@ -159,7 +159,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		for i := 0; i < stepsCount; i++ {
 			if data.Steps[i].Type == enums.BUILD {
 				if images, ok := data.Steps[i].Params[enums.IMAGE]; ok {
-					data.Steps[i].Params[enums.IMAGE] = setImageVersionForBuild(data.Steps[i], revision, images)
+					data.Steps[i].Params[enums.IMAGE] = setImageVersionForBuild(data.Steps[i],branch, revision, images)
 				}
 				if storage, ok := data.Steps[i].Params[enums.STORAGE]; ok {
 					data.Steps[i].Params[enums.STORAGE] = storage
@@ -250,11 +250,16 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 }
 
 // setImageVersionForBuild returns image version for build step
-func setImageVersionForBuild(step v1.Step, revision string, images string) string {
+func setImageVersionForBuild(step v1.Step,branch, revision string, images string) string {
 	imageRevision := revision
 	if step.Params[enums.REVISION] != "" {
-		imageRevision = step.Params[enums.REVISION]
+		if step.Params[enums.REVISION]==string(enums.BRANCH){
+			imageRevision=branch
+		}else{
+			imageRevision = step.Params[enums.REVISION]
+		}
 	}
+
 	listOfImages := strings.Split(images, ",")
 	for i, image := range listOfImages {
 		strs := strings.Split(image, ":")
