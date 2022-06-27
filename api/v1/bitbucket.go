@@ -59,10 +59,10 @@ func (b v1BitbucketApi) GetCommitsByBranch(context echo.Context) error {
 	metadata := common.GetPaginationMetadata(option.Pagination.Page, option.Pagination.Limit, total, int64(len(commits)))
 	uri := strings.Split(context.Request().RequestURI, "?")[0]
 	if pagination.Page > 0 {
-		metadata.Links = append(metadata.Links, map[string]string{"prev": uri + "?order=" + context.QueryParam("order") + "&page=" + strconv.FormatInt(pagination.Page-1, 10) + "&limit=" + strconv.FormatInt(pagination.Limit, 10)})
+		metadata.Links = append(metadata.Links, map[string]string{"prev": uri + "?repoId=" + context.QueryParam("repoId") + "&companyId=" + context.QueryParam("companyId") + "&url=" + context.QueryParam("url") + "&branch=" + context.QueryParam("branch") + "&page=" + strconv.FormatInt(pagination.Page-1, 10) + "&limit=" + strconv.FormatInt(pagination.Limit, 10)})
 	}
-	metadata.Links = append(metadata.Links, map[string]string{"self": uri + "?order=" + context.QueryParam("order") + "&page=" + strconv.FormatInt(pagination.Page, 10) + "&limit=" + strconv.FormatInt(pagination.Limit, 10)})
-	metadata.Links = append(metadata.Links, map[string]string{"next": uri + "?order=" + context.QueryParam("order") + "&page=" + strconv.FormatInt(pagination.Page+1, 10) + "&limit=" + strconv.FormatInt(pagination.Limit, 10)})
+	metadata.Links = append(metadata.Links, map[string]string{"self": uri + "?repoId=" + context.QueryParam("repoId") + "&companyId=" + context.QueryParam("companyId") + "&url=" + context.QueryParam("url") + "&branch=" + context.QueryParam("branch") + "&page=" + strconv.FormatInt(pagination.Page, 10) + "&limit=" + strconv.FormatInt(pagination.Limit, 10)})
+	metadata.Links = append(metadata.Links, map[string]string{"next": uri + "?repoId=" + context.QueryParam("repoId") + "&companyId=" + context.QueryParam("companyId") + "&url=" + context.QueryParam("url") + "&branch=" + context.QueryParam("branch") + "&page=" + strconv.FormatInt(pagination.Page+1, 10) + "&limit=" + strconv.FormatInt(pagination.Limit, 10)})
 	return common.GenerateSuccessResponse(context, commits, &metadata, "success")
 }
 
@@ -144,7 +144,7 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 		for i := 0; i < stepsCount; i++ {
 			if data.Steps[i].Type == enums.BUILD {
 				if images, ok := data.Steps[i].Params["images"]; ok {
-					data.Steps[i].Params["images"] = setImageVersionForBuild(data.Steps[i],branch, revision, images)
+					data.Steps[i].Params["images"] = setImageVersionForBuild(data.Steps[i], branch, revision, images)
 				}
 				if storage, ok := data.Steps[i].Params[enums.STORAGE]; ok {
 					data.Steps[i].Params[enums.STORAGE] = storage
