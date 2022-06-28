@@ -13,7 +13,8 @@ type Company interface {
 	UpdateApplication(companyId string, repositoryId string, app v1.Application) error
 	Delete(companyId string) error
 	GetCompanies(option v1.CompanyQueryOption, status v1.StatusQueryOption) []v1.Company
-	GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64)
+	GetByCompanyId(id string) v1.Company
+	GetByName(name string, status v1.StatusQueryOption) v1.Company
 	GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64)
 	GetRepositoryByRepositoryId(id, repoId string, option v1.CompanyQueryOption) v1.Repository
 	GetAllApplications(companyId string, option v1.CompanyQueryOption) ([]v1.Application, int64)
@@ -30,8 +31,6 @@ type Company interface {
 	AppendApplications(companyId, repositoryId string, apps []v1.Application, option v1.CompanyQueryOption) error
 	SoftDeleteApplications(companyId, repositoryId string, company v1.Company, apps []v1.Application) error
 	DeleteApplications(companyId, repositoryId string, company v1.Company, apps []v1.Application, option v1.CompanyQueryOption) error
-	CreateGithubWebHookAndUpdateApplication(companyId string, repoId string, token string, app v1.Application)
-	CreateBitbucketWebHookAndUpdateApplication(companyId string, repoId string, token string, app v1.Application)
 	UpdateWebhook(companyId, repoId, url, webhookId, action string) error
 	EnableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, token string) error
 	EnableGithubWebhookAndUpdateApplication(companyId, repoId, url, token string) error

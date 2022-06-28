@@ -14,7 +14,8 @@ type CompanyRepository interface {
 	DeleteApplications(companyId, repositoryId string, repos []v1.Repository) error
 	Delete(companyId string) error
 	GetCompanies(option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Company, int64)
-	GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64)
+	GetByCompanyId(id string) v1.Company
+	GetByName(name string, status v1.StatusQueryOption) v1.Company
 	GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64)
 	GetApplicationsByRepositoryId(repoId string, companyId string, option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Application, int64)
 	GetCompanyByApplicationUrl(url string) v1.Company

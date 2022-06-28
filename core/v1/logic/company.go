@@ -43,64 +43,6 @@ func (c companyService) GetRepositoryByRepositoryId(id, repoId string, option v1
 	return c.repo.GetRepositoryByRepositoryId(id, repoId, option)
 }
 
-func (c companyService) CreateWebHookAndUpdateApplications(companyId string, repoType enums.REPOSITORY_TYPE, repoId string, token string, apps []v1.Application) {
-	if repoType == enums.GITHUB {
-		for _, each := range apps {
-			go c.CreateGithubWebHookAndUpdateApplication(companyId, repoId, token, each)
-		}
-	} else if repoType == enums.BIT_BUCKET {
-		for _, each := range apps {
-			go c.CreateBitbucketWebHookAndUpdateApplication(companyId, repoId, token, each)
-		}
-	}
-}
-
-func (c companyService) CreateGithubWebHookAndUpdateApplication(companyId string, repoId string, token string, app v1.Application) {
-	usernameOrorgName, repoName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(app.Url)
-	gitWebhook, err := NewGithubService(c, nil, c.client).CreateRepositoryWebhook(usernameOrorgName, repoName, token, companyId)
-	if err != nil {
-		log.Println("ERROR while creating webhook for application: ", err.Error())
-	}
-	app.Webhook = gitWebhook
-	app.MetaData.IsWebhookEnabled = gitWebhook.Active
-	app.Status = enums.ACTIVE
-	applicationMetadataCollection := v1.ApplicationMetadataCollection{
-		MetaData: app.MetaData,
-		Status:   app.Status,
-	}
-	err = c.applicationMetadataRepository.Update(companyId, applicationMetadataCollection)
-	if err != nil {
-		return
-	}
-	err = c.repo.UpdateApplication(companyId, repoId, app.MetaData.Id, app)
-	if err != nil {
-		return
-	}
-}
-
-func (c companyService) CreateBitbucketWebHookAndUpdateApplication(companyId string, repoId string, token string, app v1.Application) {
-	usernameOrorgName, repoName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(app.Url)
-	gitWebhook, err := NewBitBucketService(c, nil, c.client).CreateRepositoryWebhook(usernameOrorgName, repoName, token, companyId)
-	if err != nil {
-		log.Println("ERROR while creating webhook for application: ", err.Error())
-	}
-	app.Webhook = gitWebhook
-	app.MetaData.IsWebhookEnabled = gitWebhook.Active
-	app.Status = enums.ACTIVE
-	applicationMetadataCollection := v1.ApplicationMetadataCollection{
-		MetaData: app.MetaData,
-		Status:   app.Status,
-	}
-	err = c.applicationMetadataRepository.Update(companyId, applicationMetadataCollection)
-	if err != nil {
-		return
-	}
-	err = c.repo.UpdateApplication(companyId, repoId, app.MetaData.Id, app)
-	if err != nil {
-		return
-	}
-}
-
 func (c companyService) UpdateWebhook(companyId, repoId, url, webhookId, action string) error {
 	option := v1.CompanyQueryOption{
 		Pagination:       v1.Pagination{},
@@ -510,19 +452,12 @@ func (c companyService) GetCompanyByApplicationUrl(url string) v1.Company {
 }
 
 func (c companyService) Store(company v1.Company) error {
-	option := v1.CompanyQueryOption{}
-	statusOption := v1.StatusQueryOption{Option: enums.ACTIVE}
 	if company.Id == "" {
-		return errors.New("[ERROR]: No company id given")
+		return errors.New("[ERROR]: No company id is given")
 	}
-	data := c.GetCompanies(option, statusOption)
-	for _, each := range data {
-		if each.Name == company.Name {
-			return errors.New("[ERROR]: Company name already exists")
-		}
-	}
-	for _, eachRepo := range company.Repositories {
-		go c.CreateWebHookAndUpdateApplications(company.Id, eachRepo.Type, eachRepo.Id, eachRepo.Token, eachRepo.Applications)
+	data := c.GetByName(company.Name, v1.StatusQueryOption{Option: enums.ACTIVE})
+	if data.Id != "" {
+		return errors.New("[ERROR]: Company name already exists")
 	}
 	return c.repo.Store(company)
 }
@@ -540,8 +475,12 @@ func (c companyService) GetCompanies(option v1.CompanyQueryOption, status v1.Sta
 	return companies
 }
 
-func (c companyService) GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64) {
-	return c.repo.GetByCompanyId(id, option)
+func (c companyService) GetByCompanyId(id string) v1.Company {
+	return c.repo.GetByCompanyId(id)
+}
+
+func (c companyService) GetByName(name string, status v1.StatusQueryOption) v1.Company {
+	return c.repo.GetByName(name, status)
 }
 
 func (c companyService) GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64) {

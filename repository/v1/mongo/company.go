@@ -470,21 +470,11 @@ func (c companyRepository) GetCompanies(option v1.CompanyQueryOption, status v1.
 			log.Println("[ERROR]", err)
 			break
 		}
-		if option.LoadRepositories {
-			if option.LoadApplications {
-				results = append(results, *elemValue)
-			} else {
-				results = append(results, elemValue.GetCompanyWithoutApplications(option))
-			}
-		} else {
-			results = append(results, elemValue.GetCompanyWithoutRepository())
-		}
 	}
 	return results, int64(len(results))
 }
 
-func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOption) (v1.Company, int64) {
-	var results v1.Company
+func (c companyRepository) GetByCompanyId(id string) v1.Company {
 	query := bson.M{
 		"$and": []bson.M{{"id": id}},
 	}
@@ -493,28 +483,26 @@ func (c companyRepository) GetByCompanyId(id string, option v1.CompanyQueryOptio
 	if err != nil {
 		log.Println(err.Error())
 	}
-	for result.Next(context.TODO()) {
-		elemValue := new(v1.Company)
-		err := result.Decode(elemValue)
-		if err != nil {
-			log.Println("[ERROR]", err)
-			break
-		}
-		if option.LoadRepositories {
-			if option.LoadApplications {
-				results = *elemValue
-			} else {
-				results = elemValue.GetCompanyWithoutApplications(option)
-			}
-		} else {
-			results = elemValue.GetCompanyWithoutRepository()
-		}
-	}
-	count, err := coll.CountDocuments(c.manager.Ctx, query)
+	res := new(v1.Company)
+	err = result.Decode(res)
 	if err != nil {
-		log.Println(err.Error())
+		log.Println("[ERROR]", err)
 	}
-	return results, count
+	return *res
+}
+
+func (c companyRepository) GetByName(name string, status v1.StatusQueryOption) v1.Company {
+	query := bson.M{
+		"$and": []bson.M{{"name": name}, {"status": status.Option}},
+	}
+	coll := c.manager.Db.Collection(CompanyCollection)
+	result := coll.FindOne(c.manager.Ctx, query, nil)
+	res := new(v1.Company)
+	err := result.Decode(res)
+	if err != nil {
+		log.Println("[ERROR]", err)
+	}
+	return *res
 }
 
 func GetPagination(size int64, page int64, limit int64) (int64, int64) {

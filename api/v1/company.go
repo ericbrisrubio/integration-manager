@@ -15,10 +15,12 @@ import (
 )
 
 type companyApi struct {
-	companyService   service.Company
-	githubService    service.Git
-	bitbucketService service.Git
-	observerList     []service.Observer
+	companyService     service.Company
+	repositoryService  service.Repository
+	applicationService service.Application
+	githubService      service.Git
+	bitbucketService   service.Git
+	observerList       []service.Observer
 }
 
 // Get.. Get applications
@@ -112,17 +114,10 @@ func (c companyApi) Get(context echo.Context) error {
 // @Success 200 {object} common.ResponseDTO
 // @Router /api/v1/companies [POST]
 func (c companyApi) Save(context echo.Context) error {
-	formData := v1.Company{}
-	if err := context.Bind(&formData); err != nil {
+	payload := v1.CompanyDto{}
+	if err := context.Bind(&payload); err != nil {
 		log.Println("Input Error:", err.Error())
 		return common.GenerateErrorResponse(context, nil, "Failed to Bind Input!")
-	}
-	var payload = v1.Company{
-		MetaData:     formData.MetaData,
-		Id:           formData.Id,
-		Name:         formData.Name,
-		Repositories: formData.Repositories,
-		Status:       enums.ACTIVE,
 	}
 	if payload.MetaData.NumberOfConcurrentProcess == 0 {
 		payload.MetaData.NumberOfConcurrentProcess = config.DefaultNumberOfConcurrentProcess
@@ -136,10 +131,40 @@ func (c companyApi) Save(context echo.Context) error {
 			each.Applications[j].Url = UrlFormatter(eachApp.Url)
 		}
 	}
-	err := c.companyService.Store(contextData)
+	company := v1.Company{
+		MetaData: contextData.MetaData,
+		Id:       contextData.Id,
+		Name:     contextData.Name,
+		Status:   contextData.Status,
+	}
+	err := c.companyService.Store(company)
 	if err != nil {
-		log.Println("[Error]:", err.Error())
-		return common.GenerateErrorResponse(context, nil, "Operation Failed!")
+		return common.GenerateErrorResponse(context, "[ERROR]: Company store failed", "Operation Failed!")
+	}
+	var repositories []v1.Repository
+	for _, eachRepo := range contextData.Repositories {
+		repositories = append(repositories, v1.Repository{
+			Id:        eachRepo.Id,
+			CompanyId: contextData.Id,
+			Type:      eachRepo.Type,
+			Token:     eachRepo.Token,
+		})
+		var applications []v1.Application
+		for _, eachApp := range eachRepo.Applications {
+			applications = append(applications, v1.Application{
+				MetaData:     eachApp.MetaData,
+				RepositoryId: eachRepo.Id,
+				CompanyId:    contextData.Id,
+				Url:          eachApp.Url,
+				Webhook:      eachApp.Webhook,
+				Status:       eachApp.Status,
+			})
+		}
+		go c.applicationService.CreateWebHookAndUpdateApplications(eachRepo.Type, eachRepo.Token, applications)
+	}
+	err = c.repositoryService.Store(repositories)
+	if err != nil {
+		return common.GenerateErrorResponse(context, "[ERROR]: Repositories store failed", "Operation Failed!")
 	}
 	return common.GenerateSuccessResponse(context, contextData,
 		nil, "Operation Successful")
@@ -164,9 +189,41 @@ func (c companyApi) GetById(context echo.Context) error {
 		data := c.companyService.GetDashboardData(id)
 		return common.GenerateSuccessResponse(context, data, nil, "Operation Successful")
 	}
+	company := c.companyService.GetByCompanyId(id)
+	companyDto := v1.CompanyDto{
+		MetaData: company.MetaData,
+		Id:       company.Id,
+		Name:     company.Name,
+		Status:   company.Status,
+	}
 	option := getQueryOption(context)
-	data, _ := c.companyService.GetByCompanyId(id, option)
-	return common.GenerateSuccessResponse(context, data, nil, "Success!")
+	var repositoriesDto []v1.RepositoryDto
+	if option.LoadRepositories {
+		repositories := c.repositoryService.GetByCompanyId(id)
+		for _, eachRepo := range repositories {
+			repositoryDto := v1.RepositoryDto{
+				Id:    eachRepo.Id,
+				Type:  eachRepo.Type,
+				Token: eachRepo.Token,
+			}
+			if option.LoadApplications {
+				applications := c.applicationService.GetByCompanyIdAndRepoId(id, eachRepo.Id)
+				var applicationsDto []v1.ApplicationDto
+				for _, eachApp := range applications {
+					applicationsDto = append(applicationsDto, v1.ApplicationDto{
+						MetaData: eachApp.MetaData,
+						Url:      eachApp.Url,
+						Webhook:  eachApp.Webhook,
+						Status:   eachApp.Status,
+					})
+				}
+				repositoryDto.Applications = applicationsDto
+			}
+			repositoriesDto = append(repositoriesDto, repositoryDto)
+		}
+	}
+	companyDto.Repositories = repositoriesDto
+	return common.GenerateSuccessResponse(context, companyDto, nil, "Success!")
 }
 
 // Get.. Get RepositoriesDto by company id
@@ -239,7 +296,7 @@ func (c companyApi) UpdateWebhook(context echo.Context) error {
 	return common.GenerateSuccessResponse(context, nil, nil, "Webhook updated sucessfully")
 }
 
-func generateRepositoryAndApplicationId(payload v1.Company) v1.Company {
+func generateRepositoryAndApplicationId(payload v1.CompanyDto) v1.CompanyDto {
 	for i, each := range payload.Repositories {
 		payload.Repositories[i].Id = guuid.New().String()
 		for j := range each.Applications {
@@ -282,11 +339,13 @@ func getQueryOption(context echo.Context) v1.CompanyQueryOption {
 }
 
 // NewCompanyApi returns Company type api
-func NewCompanyApi(companyService service.Company, githubService service.Git, bitbucketService service.Git, observerList []service.Observer) api.Company {
+func NewCompanyApi(companyService service.Company, repositoryService service.Repository, applicationService service.Application, githubService service.Git, bitbucketService service.Git, observerList []service.Observer) api.Company {
 	return &companyApi{
-		companyService:   companyService,
-		githubService:    githubService,
-		bitbucketService: bitbucketService,
-		observerList:     observerList,
+		companyService:     companyService,
+		repositoryService:  repositoryService,
+		applicationService: applicationService,
+		githubService:      githubService,
+		bitbucketService:   bitbucketService,
+		observerList:       observerList,
 	}
 }
