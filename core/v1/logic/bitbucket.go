@@ -3,6 +3,7 @@ package logic
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/klovercloud-ci-cd/integration-manager/config"
 	v1 "github.com/klovercloud-ci-cd/integration-manager/core/v1"
@@ -24,17 +25,17 @@ type bitbucketService struct {
 
 func (b bitbucketService) GetContent(repositoryName, username, token, path string) (v1.GitContent, error) {
 	//TODO implement me
-	panic("implement me")
+	return v1.GitContent{}, errors.New("bitbucket doesn't support this api")
 }
 
 func (b bitbucketService) CreateDirectoryContent(repositoryName, username, token, path string, content v1.DirectoryContentCreatePayload) (v1.DirectoryContentCreateAndUpdateResponse, error) {
 	//TODO implement me
-	panic("implement me")
+	return v1.DirectoryContentCreateAndUpdateResponse{}, errors.New("bitbucket doesn't support this api")
 }
 
 func (b bitbucketService) UpdateDirectoryContent(repositoryName, username, token, path string, content v1.DirectoryContentUpdatePayload) (v1.DirectoryContentCreateAndUpdateResponse, error) {
 	//TODO implement me
-	panic("implement me")
+	return v1.DirectoryContentCreateAndUpdateResponse{}, errors.New("bitbucket doesn't support this api")
 }
 
 func (b bitbucketService) GetCommitsByBranch(username, repositoryName, branch, token string, option v1.Pagination) ([]v1.GitCommit, int64, error) {
