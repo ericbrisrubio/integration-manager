@@ -100,13 +100,45 @@ func (c companyApi) UpdateRepositories(context echo.Context) error {
 // @Param limit query int64 false "Record count"
 // @Param loadRepositories query bool false "Loads RepositoriesDto"
 // @Param loadApplications query bool false "Loads ApplicationsDto"
-// @Success 200 {object} common.ResponseDTO{data=[]v1.Company}
+// @Success 200 {object} common.ResponseDTO{data=[]v1.CompanyDto}
 // @Router /api/v1/companies [GET]
 func (c companyApi) Get(context echo.Context) error {
 	option := getQueryOption(context)
 	status := getStatusOption(context)
+	var companies []v1.CompanyDto
 	data := c.companyService.GetCompanies(option, status)
-	return common.GenerateSuccessResponse(context, data, nil, "Success!")
+	for _, eachCompany := range data {
+		company := v1.CompanyDto{
+			MetaData: eachCompany.MetaData,
+			Id:       eachCompany.Id,
+			Name:     eachCompany.Name,
+			Status:   eachCompany.Status,
+		}
+		if option.LoadRepositories {
+			repositories, _ := c.repositoryService.GetByCompanyId(eachCompany.Id, false, v1.CompanyQueryOption{})
+			for _, eachRepo := range repositories {
+				repository := v1.RepositoryDto{
+					Id:    eachRepo.Id,
+					Type:  eachRepo.Type,
+					Token: eachRepo.Token,
+				}
+				if option.LoadApplications {
+					applications, _ := c.applicationService.GetByCompanyIdAndRepoId(eachCompany.Id, eachRepo.Id, false, v1.CompanyQueryOption{}, false, v1.StatusQueryOption{})
+					for _, eachApp := range applications {
+						repository.Applications = append(repository.Applications, v1.ApplicationDto{
+							MetaData: eachApp.MetaData,
+							Url:      eachApp.Url,
+							Webhook:  eachApp.Webhook,
+							Status:   eachApp.Status,
+						})
+					}
+				}
+				company.Repositories = append(company.Repositories, repository)
+			}
+		}
+		companies = append(companies, company)
+	}
+	return common.GenerateSuccessResponse(context, companies, nil, "Success!")
 }
 
 // Save... Save company
