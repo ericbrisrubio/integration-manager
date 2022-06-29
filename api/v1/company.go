@@ -31,7 +31,7 @@ type companyApi struct {
 // @Param id path string true "Company id"
 // @Param repository_type query string true "Repository type"
 // @Param companyUpdateOption query string true "Company Update Option"
-// @Success 200 {object} common.ResponseDTO{data=[]v1.Application}
+// @Success 200 {object} common.ResponseDTO{data=[]v1.ApplicationDto}
 // @Router /api/v1/companies/{id}/applications [GET]
 func (c companyApi) GetApplicationsByCompanyIdAndRepositoryType(context echo.Context) error {
 	id := context.Param("id")
@@ -41,11 +41,11 @@ func (c companyApi) GetApplicationsByCompanyIdAndRepositoryType(context echo.Con
 	repositoryType := context.QueryParam("repository_type")
 	status := getStatusOption(context)
 	option := getQueryOption(context)
-	apps := c.companyService.GetApplicationsByCompanyIdAndRepositoryType(id, enums.REPOSITORY_TYPE(repositoryType), option, status)
-	if apps == nil {
+	applications, total := c.applicationService.GetApplicationsByCompanyIdAndRepositoryType(id, enums.REPOSITORY_TYPE(repositoryType), false, option, false, status)
+	if total == 0 {
 		return common.GenerateErrorResponse(context, nil, "Company Id is not found!")
 	}
-	return common.GenerateSuccessResponse(context, apps, nil, "success")
+	return common.GenerateSuccessResponse(context, applications, nil, "success")
 }
 
 // Update... Update repositories
@@ -68,7 +68,7 @@ func (c companyApi) UpdateRepositories(context echo.Context) error {
 	if id == "" {
 		return common.GenerateErrorResponse(context, nil, "Company Id is required!")
 	}
-	var payload []v1.Repository
+	var payload []v1.RepositoryDto
 	payload = formData.Repositories
 	for _, each := range payload {
 		for j, eachApp := range each.Applications {
@@ -78,7 +78,11 @@ func (c companyApi) UpdateRepositories(context echo.Context) error {
 	var options v1.RepositoryUpdateOption
 	Option := context.QueryParam("companyUpdateOption")
 	options.Option = enums.REPOSITORY_UPDATE_OPTION(Option)
-	err := c.companyService.UpdateRepositories(id, payload, options)
+	company := c.companyService.GetByCompanyId(id)
+	if company.Id == "" {
+		return common.GenerateErrorResponse(context, "[ERROR] Company does not exist", "Operation Failed")
+	}
+	err := c.repositoryService.UpdateRepositories(id, payload, options)
 	if err != nil {
 		log.Println("Update Error:", err.Error())
 		return common.GenerateErrorResponse(context, nil, err.Error())
@@ -110,7 +114,7 @@ func (c companyApi) Get(context echo.Context) error {
 // @Description Saves company
 // @Tags Company
 // @Produce json
-// @Param data body v1.Company true "Company data"
+// @Param data body v1.CompanyDto true "Company data"
 // @Success 200 {object} common.ResponseDTO
 // @Router /api/v1/companies [POST]
 func (c companyApi) Save(context echo.Context) error {
@@ -152,12 +156,13 @@ func (c companyApi) Save(context echo.Context) error {
 		var applications []v1.Application
 		for _, eachApp := range eachRepo.Applications {
 			applications = append(applications, v1.Application{
-				MetaData:     eachApp.MetaData,
-				RepositoryId: eachRepo.Id,
-				CompanyId:    contextData.Id,
-				Url:          eachApp.Url,
-				Webhook:      eachApp.Webhook,
-				Status:       eachApp.Status,
+				MetaData:       eachApp.MetaData,
+				RepositoryId:   eachRepo.Id,
+				RepositoryType: eachRepo.Type,
+				CompanyId:      contextData.Id,
+				Url:            eachApp.Url,
+				Webhook:        eachApp.Webhook,
+				Status:         eachApp.Status,
 			})
 		}
 		go c.applicationService.CreateWebHookAndUpdateApplications(eachRepo.Type, eachRepo.Token, applications)
@@ -176,8 +181,11 @@ func (c companyApi) Save(context echo.Context) error {
 // @Tags Company
 // @Produce json
 // @Param action query string false "action [dashboard_data]"
+// @Param loadRepositories query bool false "Loads RepositoriesDto"
+// @Param loadApplications query bool false "Loads ApplicationsDto"
+// @Param loadToken query bool false "Loads TokenDto"
 // @Param id path string true "Company id"
-// @Success 200 {object} common.ResponseDTO{data=v1.Company}
+// @Success 200 {object} common.ResponseDTO{data=v1.CompanyDto}
 // @Router /api/v1/companies/{id} [GET]
 func (c companyApi) GetById(context echo.Context) error {
 	id := context.Param("id")
@@ -186,7 +194,35 @@ func (c companyApi) GetById(context echo.Context) error {
 	}
 	action := context.QueryParam("action")
 	if action == "dashboard_data" {
-		data := c.companyService.GetDashboardData(id)
+		repositories, repoCount := c.repositoryService.GetByCompanyId(id, false, v1.CompanyQueryOption{})
+		var enabled, disabled int64
+		for _, eachRepo := range repositories {
+			applications, _ := c.applicationService.GetByCompanyIdAndRepoId(id, eachRepo.Id, false, v1.CompanyQueryOption{}, false, v1.StatusQueryOption{})
+			for _, eachApp := range applications {
+				if eachApp.Webhook.Active {
+					enabled++
+				} else {
+					disabled++
+				}
+			}
+		}
+		data := v1.DashboardData{
+			Repository: struct {
+				Count int64 `json:"count"`
+			}{Count: repoCount},
+			Application: struct {
+				Webhook struct {
+					Enabled  int64 `json:"enabled"`
+					Disabled int64 `json:"disabled"`
+				} `json:"webhook"`
+			}{Webhook: struct {
+				Enabled  int64 `json:"enabled"`
+				Disabled int64 `json:"disabled"`
+			}(struct {
+				Enabled  int64
+				Disabled int64
+			}{Enabled: enabled, Disabled: disabled})},
+		}
 		return common.GenerateSuccessResponse(context, data, nil, "Operation Successful")
 	}
 	company := c.companyService.GetByCompanyId(id)
@@ -199,15 +235,17 @@ func (c companyApi) GetById(context echo.Context) error {
 	option := getQueryOption(context)
 	var repositoriesDto []v1.RepositoryDto
 	if option.LoadRepositories {
-		repositories := c.repositoryService.GetByCompanyId(id)
+		repositories, _ := c.repositoryService.GetByCompanyId(id, false, v1.CompanyQueryOption{})
 		for _, eachRepo := range repositories {
 			repositoryDto := v1.RepositoryDto{
-				Id:    eachRepo.Id,
-				Type:  eachRepo.Type,
-				Token: eachRepo.Token,
+				Id:   eachRepo.Id,
+				Type: eachRepo.Type,
+			}
+			if option.LoadToken {
+				repositoryDto.Token = eachRepo.Token
 			}
 			if option.LoadApplications {
-				applications := c.applicationService.GetByCompanyIdAndRepoId(id, eachRepo.Id)
+				applications, _ := c.applicationService.GetByCompanyIdAndRepoId(id, eachRepo.Id, false, v1.CompanyQueryOption{}, false, v1.StatusQueryOption{})
 				var applicationsDto []v1.ApplicationDto
 				for _, eachApp := range applications {
 					applicationsDto = append(applicationsDto, v1.ApplicationDto{
@@ -233,7 +271,8 @@ func (c companyApi) GetById(context echo.Context) error {
 // @Produce json
 // @Param id path string true "Company id"
 // @Param loadApplications query bool false "Loads ApplicationsDto"
-// @Success 200 {object} common.ResponseDTO{data=[]v1.Repository}
+// @Param loadToken query bool false "Loads TokenDto"
+// @Success 200 {object} common.ResponseDTO{data=[]v1.RepositoryDto}
 // @Router /api/v1/companies/{id}/repositories [GET]
 func (c companyApi) GetRepositoriesById(context echo.Context) error {
 	id := context.Param("id")
@@ -241,8 +280,32 @@ func (c companyApi) GetRepositoriesById(context echo.Context) error {
 		return common.GenerateErrorResponse(context, nil, "Company Id is required!")
 	}
 	option := getQueryOption(context)
-	data, total := c.companyService.GetRepositoriesByCompanyId(id, option)
-	metadata := common.GetPaginationMetadata(option.Pagination.Page, option.Pagination.Limit, total, int64(len(data)))
+	var repositoriesDto []v1.RepositoryDto
+	repositories, total := c.repositoryService.GetByCompanyId(id, true, option)
+	for _, eachRepo := range repositories {
+		repositoryDto := v1.RepositoryDto{
+			Id:   eachRepo.Id,
+			Type: eachRepo.Type,
+		}
+		if option.LoadToken {
+			repositoryDto.Token = eachRepo.Token
+		}
+		if option.LoadApplications {
+			applications, _ := c.applicationService.GetByCompanyIdAndRepoId(id, eachRepo.Id, false, v1.CompanyQueryOption{}, false, v1.StatusQueryOption{})
+			var applicationsDto []v1.ApplicationDto
+			for _, eachApp := range applications {
+				applicationsDto = append(applicationsDto, v1.ApplicationDto{
+					MetaData: eachApp.MetaData,
+					Url:      eachApp.Url,
+					Webhook:  eachApp.Webhook,
+					Status:   eachApp.Status,
+				})
+			}
+			repositoryDto.Applications = applicationsDto
+		}
+		repositoriesDto = append(repositoriesDto, repositoryDto)
+	}
+	metadata := common.GetPaginationMetadata(option.Pagination.Page, option.Pagination.Limit, total, int64(len(repositoriesDto)))
 	uri := strings.Split(context.Request().RequestURI, "?")[0]
 	if option.Pagination.Page > 0 {
 		metadata.Links = append(metadata.Links, map[string]string{"prev": uri + "?loadApplications=" + context.QueryParam("loadApplications") + "&loadRepositories=" + context.QueryParam("loadRepositories") + "&loadToken=" + context.QueryParam("loadToken") + "&page=" + strconv.FormatInt(option.Pagination.Page-1, 10) + "&limit=" + strconv.FormatInt(option.Pagination.Limit, 10)})
@@ -252,7 +315,7 @@ func (c companyApi) GetRepositoriesById(context echo.Context) error {
 	if (option.Pagination.Page+1)*option.Pagination.Limit < metadata.TotalCount {
 		metadata.Links = append(metadata.Links, map[string]string{"next": uri + "?loadApplications=" + context.QueryParam("loadApplications") + "&loadRepositories=" + context.QueryParam("loadRepositories") + "&loadToken=" + context.QueryParam("loadToken") + "&page=" + strconv.FormatInt(option.Pagination.Page+1, 10) + "&limit=" + strconv.FormatInt(option.Pagination.Limit, 10)})
 	}
-	return common.GenerateSuccessResponse(context, data, &metadata, "")
+	return common.GenerateSuccessResponse(context, repositoriesDto, &metadata, "")
 }
 
 // UpdateWebhook... Update Webhook
@@ -289,7 +352,11 @@ func (c companyApi) UpdateWebhook(context echo.Context) error {
 	if webhookId == "" && action == string(enums.WEBHOOK_DISABLE) {
 		return common.GenerateErrorResponse(context, "[ERROR]: webhook id is not provided", "Please provide webook id")
 	}
-	err := c.companyService.UpdateWebhook(id, repoId, url, webhookId, action)
+	repository := c.repositoryService.GetById(id, repoId)
+	if repository.Id == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: repository not found", "Please provide valid repository id")
+	}
+	err := c.applicationService.UpdateWebhook(repository, url, webhookId, action)
 	if err != nil {
 		return common.GenerateErrorResponse(context, err, err.Error())
 	}

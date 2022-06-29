@@ -8,12 +8,13 @@ import (
 
 // Application contains application info
 type Application struct {
-	MetaData     ApplicationMetadata  `bson:"_metadata" json:"_metadata"`
-	RepositoryId string               `bson:"repositoryId" json:"repositoryId"`
-	CompanyId    string               `bson:"companyId" json:"companyId"`
-	Url          string               `bson:"url" json:"url"`
-	Webhook      GitWebhook           `bson:"webhook" json:"webhook"`
-	Status       enums.COMPANY_STATUS `bson:"status" json:"status"`
+	MetaData       ApplicationMetadata   `bson:"_metadata" json:"_metadata"`
+	RepositoryId   string                `bson:"repositoryId" json:"repositoryId"`
+	RepositoryType enums.REPOSITORY_TYPE `bson:"repository_type" json:"repository_type"`
+	CompanyId      string                `bson:"companyId" json:"companyId"`
+	Url            string                `bson:"url" json:"url"`
+	Webhook        GitWebhook            `bson:"webhook" json:"webhook"`
+	Status         enums.COMPANY_STATUS  `bson:"status" json:"status"`
 }
 
 // ApplicationDto contains application info

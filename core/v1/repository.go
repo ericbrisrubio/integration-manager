@@ -20,6 +20,11 @@ type RepositoryDto struct {
 	Applications []ApplicationDto      `bson:"applications" json:"applications"`
 }
 
+// RepositoriesDto contains repository list
+type RepositoriesDto struct {
+	Repositories []RepositoryDto `bson:"repositories" json:"repositories"`
+}
+
 // Validate validates repository info
 //func (repository Repository) Validate() error {
 //	if repository.Id == "" {

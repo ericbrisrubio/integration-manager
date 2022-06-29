@@ -27,248 +27,249 @@ func (c companyService) GetAllApplications(companyId string, option v1.CompanyQu
 	return applications, int64(len(applications))
 }
 
-func (c companyService) GetApplicationsByRepositoryId(repositoryId string, companyId string, option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Application, int64) {
-	return c.repo.GetApplicationsByRepositoryId(repositoryId, companyId, option, status)
-}
+//func (c companyService) GetApplicationsByRepositoryId(repositoryId string, companyId string, option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Application, int64) {
+//	return c.repo.GetApplicationsByRepositoryId(repositoryId, companyId, option, status)
+//}
 
 func (c companyService) GetApplicationByApplicationId(companyId string, repoId string, applicationId string) v1.Application {
 	return c.repo.GetApplicationByApplicationId(companyId, repoId, applicationId)
 }
 
-func (c companyService) GetDashboardData(companyId string) v1.DashboardData {
-	return c.repo.GetDashboardData(companyId)
-}
+//func (c companyService) GetDashboardData(companyId string) v1.DashboardData {
+//	return c.repo.GetDashboardData(companyId)
+//}
 
-func (c companyService) GetRepositoryByRepositoryId(id, repoId string, option v1.CompanyQueryOption) v1.Repository {
-	return c.repo.GetRepositoryByRepositoryId(id, repoId, option)
-}
+//func (c companyService) GetRepositoryByRepositoryId(id, repoId string, option v1.CompanyQueryOption) v1.Repository {
+//	return c.repo.GetRepositoryByRepositoryId(id, repoId, option)
+//}
 
-func (c companyService) UpdateWebhook(companyId, repoId, url, webhookId, action string) error {
-	option := v1.CompanyQueryOption{
-		Pagination:       v1.Pagination{},
-		LoadRepositories: true,
-		LoadApplications: true,
-		LoadToken:        true,
-	}
-	repo := c.repo.GetRepositoryByRepositoryId(companyId, repoId, option)
-	if repo.Id == "" {
-		return errors.New("repository not found")
-	}
-	if action == string(enums.WEBHOOK_EANBLE) {
-		if repo.Type == enums.GITHUB {
-			return c.EnableGithubWebhookAndUpdateApplication(companyId, repoId, url, repo.Token)
-		} else if repo.Type == enums.BIT_BUCKET {
-			return c.EnableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, repo.Token)
-		}
-	} else if action == string(enums.WEBHOOK_DISABLE) {
-		if repo.Type == enums.GITHUB {
-			return c.DisableGithubWebhookAndUpdateApplication(companyId, repoId, url, webhookId, repo.Token)
-		} else if repo.Type == enums.BIT_BUCKET {
-			return c.DisableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, webhookId, repo.Token)
-		}
-	}
-	return errors.New("provice valid action")
-}
+//func (c companyService) UpdateWebhook(companyId, repoId, url, webhookId, action string) error {
+//	option := v1.CompanyQueryOption{
+//		Pagination:       v1.Pagination{},
+//		LoadRepositories: true,
+//		LoadApplications: true,
+//		LoadToken:        true,
+//	}
+//	repo := c.repo.GetRepositoryByRepositoryId(companyId, repoId, option)
+//	if repo.Id == "" {
+//		return errors.New("repository not found")
+//	}
+//	if action == string(enums.WEBHOOK_EANBLE) {
+//		if repo.Type == enums.GITHUB {
+//			return c.EnableGithubWebhookAndUpdateApplication(companyId, repoId, url, repo.Token)
+//		} else if repo.Type == enums.BIT_BUCKET {
+//			return c.EnableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, repo.Token)
+//		}
+//	} else if action == string(enums.WEBHOOK_DISABLE) {
+//		if repo.Type == enums.GITHUB {
+//			return c.DisableGithubWebhookAndUpdateApplication(companyId, repoId, url, webhookId, repo.Token)
+//		} else if repo.Type == enums.BIT_BUCKET {
+//			return c.DisableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, webhookId, repo.Token)
+//		}
+//	}
+//	return errors.New("provide valid action")
+//}
+//
+//func (c companyService) EnableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, token string) error {
+//	username, repositoryName := v1.GetUsernameAndRepoNameFromBitbucketRepositoryUrl(url)
+//	webhook, err := NewBitBucketService(c, nil, c.client).CreateRepositoryWebhook(username, repositoryName, token, companyId)
+//	if err != nil {
+//		return err
+//	}
+//	var app v1.Application
+//	company, _ := c.repo.GetByCompanyId(companyId, v1.CompanyQueryOption{LoadRepositories: true, LoadApplications: true})
+//	for _, eachRepo := range company.Repositories {
+//		if eachRepo.Id == repoId {
+//			for _, eachApp := range eachRepo.Applications {
+//				if eachApp.Url == url {
+//					app = eachApp
+//				}
+//			}
+//		}
+//	}
+//	app.Webhook = webhook
+//	app.MetaData.IsWebhookEnabled = true
+//	err = c.repo.UpdateApplication(companyId, repoId, app.MetaData.Id, app)
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}
+//
+//func (c companyService) DisableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, webhookId, token string) error {
+//	username, repositoryName := v1.GetUsernameAndRepoNameFromBitbucketRepositoryUrl(url)
+//	err := NewBitBucketService(c, nil, c.client).DeleteRepositoryWebhookById(username, repositoryName, webhookId, token)
+//	if err != nil {
+//		return err
+//	}
+//	var app v1.Application
+//	company, _ := c.repo.GetByCompanyId(companyId, v1.CompanyQueryOption{LoadRepositories: true, LoadApplications: true})
+//	for _, eachRepo := range company.Repositories {
+//		if eachRepo.Id == repoId {
+//			for _, eachApp := range eachRepo.Applications {
+//				if eachApp.Url == url {
+//					app = eachApp
+//				}
+//			}
+//		}
+//	}
+//	app.Webhook = v1.GitWebhook{}
+//	app.MetaData.IsWebhookEnabled = false
+//	err = c.repo.UpdateApplication(companyId, repoId, app.MetaData.Id, app)
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}
+//
+//func (c companyService) EnableGithubWebhookAndUpdateApplication(companyId, repoId, url, token string) error {
+//	username, repositoryName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(url)
+//	webhook, err := NewGithubService(c, nil, c.client).CreateRepositoryWebhook(username, repositoryName, token, companyId)
+//	if err != nil {
+//		return err
+//	}
+//	var app v1.Application
+//	company, _ := c.repo.GetByCompanyId(companyId, v1.CompanyQueryOption{LoadRepositories: true, LoadApplications: true})
+//	for _, eachRepo := range company.Repositories {
+//		if eachRepo.Id == repoId {
+//			for _, eachApp := range eachRepo.Applications {
+//				if eachApp.Url == url {
+//					app = eachApp
+//				}
+//			}
+//		}
+//	}
+//	app.Webhook = webhook
+//	app.MetaData.IsWebhookEnabled = true
+//	err = c.repo.UpdateApplication(companyId, repoId, app.MetaData.Id, app)
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}
+//
+//func (c companyService) DisableGithubWebhookAndUpdateApplication(companyId, repoId, url, webhookId, token string) error {
+//	username, repositoryName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(url)
+//	err := NewGithubService(c, nil, c.client).DeleteRepositoryWebhookById(username, repositoryName, webhookId, token)
+//	if err != nil {
+//		return err
+//	}
+//	var app v1.Application
+//	company, _ := c.repo.GetByCompanyId(companyId, v1.CompanyQueryOption{LoadRepositories: true, LoadApplications: true})
+//	for _, eachRepo := range company.Repositories {
+//		if eachRepo.Id == repoId {
+//			for _, eachApp := range eachRepo.Applications {
+//				if eachApp.Url == url {
+//					app = eachApp
+//				}
+//			}
+//		}
+//	}
+//	app.Webhook = v1.GitWebhook{}
+//	app.MetaData.IsWebhookEnabled = false
+//	err = c.repo.UpdateApplication(companyId, repoId, app.MetaData.Id, app)
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}
 
-func (c companyService) EnableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, token string) error {
-	username, repositoryName := v1.GetUsernameAndRepoNameFromBitbucketRepositoryUrl(url)
-	webhook, err := NewBitBucketService(c, nil, c.client).CreateRepositoryWebhook(username, repositoryName, token, companyId)
-	if err != nil {
-		return err
-	}
-	var app v1.Application
-	company, _ := c.repo.GetByCompanyId(companyId, v1.CompanyQueryOption{LoadRepositories: true, LoadApplications: true})
-	for _, eachRepo := range company.Repositories {
-		if eachRepo.Id == repoId {
-			for _, eachApp := range eachRepo.Applications {
-				if eachApp.Url == url {
-					app = eachApp
-				}
-			}
-		}
-	}
-	app.Webhook = webhook
-	app.MetaData.IsWebhookEnabled = true
-	err = c.repo.UpdateApplication(companyId, repoId, app.MetaData.Id, app)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+//func (c companyService) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
+//	return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl)
+//}
 
-func (c companyService) DisableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, webhookId, token string) error {
-	username, repositoryName := v1.GetUsernameAndRepoNameFromBitbucketRepositoryUrl(url)
-	err := NewBitBucketService(c, nil, c.client).DeleteRepositoryWebhookById(username, repositoryName, webhookId, token)
-	if err != nil {
-		return err
-	}
-	var app v1.Application
-	company, _ := c.repo.GetByCompanyId(companyId, v1.CompanyQueryOption{LoadRepositories: true, LoadApplications: true})
-	for _, eachRepo := range company.Repositories {
-		if eachRepo.Id == repoId {
-			for _, eachApp := range eachRepo.Applications {
-				if eachApp.Url == url {
-					app = eachApp
-				}
-			}
-		}
-	}
-	app.Webhook = v1.GitWebhook{}
-	app.MetaData.IsWebhookEnabled = false
-	err = c.repo.UpdateApplication(companyId, repoId, app.MetaData.Id, app)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c companyService) EnableGithubWebhookAndUpdateApplication(companyId, repoId, url, token string) error {
-	username, repositoryName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(url)
-	webhook, err := NewGithubService(c, nil, c.client).CreateRepositoryWebhook(username, repositoryName, token, companyId)
-	if err != nil {
-		return err
-	}
-	var app v1.Application
-	company, _ := c.repo.GetByCompanyId(companyId, v1.CompanyQueryOption{LoadRepositories: true, LoadApplications: true})
-	for _, eachRepo := range company.Repositories {
-		if eachRepo.Id == repoId {
-			for _, eachApp := range eachRepo.Applications {
-				if eachApp.Url == url {
-					app = eachApp
-				}
-			}
-		}
-	}
-	app.Webhook = webhook
-	app.MetaData.IsWebhookEnabled = true
-	err = c.repo.UpdateApplication(companyId, repoId, app.MetaData.Id, app)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c companyService) DisableGithubWebhookAndUpdateApplication(companyId, repoId, url, webhookId, token string) error {
-	username, repositoryName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(url)
-	err := NewGithubService(c, nil, c.client).DeleteRepositoryWebhookById(username, repositoryName, webhookId, token)
-	if err != nil {
-		return err
-	}
-	var app v1.Application
-	company, _ := c.repo.GetByCompanyId(companyId, v1.CompanyQueryOption{LoadRepositories: true, LoadApplications: true})
-	for _, eachRepo := range company.Repositories {
-		if eachRepo.Id == repoId {
-			for _, eachApp := range eachRepo.Applications {
-				if eachApp.Url == url {
-					app = eachApp
-				}
-			}
-		}
-	}
-	app.Webhook = v1.GitWebhook{}
-	app.MetaData.IsWebhookEnabled = false
-	err = c.repo.UpdateApplication(companyId, repoId, app.MetaData.Id, app)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c companyService) GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl string) v1.Application {
-	return c.repo.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repositoryId, applicationUrl)
-}
-func (c companyService) UpdateRepositories(companyId string, repositories []v1.Repository, companyUpdateOption v1.RepositoryUpdateOption) error {
-	option := v1.CompanyQueryOption{LoadRepositories: true, LoadApplications: true, LoadToken: true}
-	company, _ := c.repo.GetByCompanyId(companyId, option)
-	if company.Id == "" {
-		return errors.New("[ERROR] Company does not exist")
-	}
-	if companyUpdateOption.Option == enums.APPEND_REPOSITORY {
-		return c.AppendRepositories(companyId, repositories)
-	} else if companyUpdateOption.Option == enums.SOFT_DELETE_REPOSITORY {
-		return c.SoftDeleteRepositories(companyId, company, repositories)
-	} else if companyUpdateOption.Option == enums.DELETE_REPOSITORY {
-		return c.DeleteRepositories(companyId, company, repositories)
-	} else {
-		return errors.New("invalid repository update option")
-	}
-}
-
-func (c companyService) AppendRepositories(companyId string, repositories []v1.Repository) error {
-	for i, each := range repositories {
-		repositories[i].Id = uuid.New().String()
-		for j := range each.Applications {
-			each.Applications[j].MetaData.Id = uuid.New().String()
-		}
-		if each.Type == enums.GITHUB {
-			c.webHookForGithub(each.Applications, companyId, each.Token)
-		} else if each.Type == enums.BIT_BUCKET {
-			c.webHookForBitbucket(each.Applications, companyId, each.Token)
-		}
-	}
-	err := c.repo.AppendRepositories(companyId, repositories)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c companyService) SoftDeleteRepositories(companyId string, company v1.Company, repositories []v1.Repository) error {
-	var count int64
-	for i, _ := range company.Repositories {
-		for j, _ := range repositories {
-			if company.Repositories[i].Id == repositories[j].Id {
-				for k := range company.Repositories[i].Applications {
-					company.Repositories[i].Applications[k].Status = enums.INACTIVE
-					applicationMetadataCollection := v1.ApplicationMetadataCollection{
-						MetaData: company.Repositories[i].Applications[k].MetaData,
-						Status:   company.Repositories[i].Applications[k].Status,
-					}
-					err := c.applicationMetadataRepository.Update(companyId, applicationMetadataCollection)
-					if err != nil {
-						return err
-					}
-				}
-				count++
-			}
-		}
-	}
-	if count < 1 {
-		return errors.New("repository id does not match")
-	}
-	err := c.repo.DeleteRepositories(companyId, company.Repositories)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c companyService) DeleteRepositories(companyId string, company v1.Company, repositories []v1.Repository) error {
-	var count int64
-	for i := range repositories {
-		for j, eachRepo := range company.Repositories {
-			if repositories[i].Id == eachRepo.Id {
-				for _, eachApp := range eachRepo.Applications {
-					err := c.applicationMetadataRepository.Delete(eachApp.MetaData.Id, companyId)
-					if err != nil {
-						return err
-					}
-				}
-				company.Repositories = v1.RemoveRepository(company.Repositories, j)
-				count++
-				break
-			}
-		}
-	}
-	if count < 1 {
-		return errors.New("repository id does not match")
-	}
-	err := c.repo.DeleteRepositories(companyId, company.Repositories)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+//func (c companyService) UpdateRepositories(companyId string, repositories []v1.Repository, companyUpdateOption v1.RepositoryUpdateOption) error {
+//	option := v1.CompanyQueryOption{LoadRepositories: true, LoadApplications: true, LoadToken: true}
+//	company, _ := c.repo.GetByCompanyId(companyId, option)
+//	if company.Id == "" {
+//		return errors.New("[ERROR] Company does not exist")
+//	}
+//	if companyUpdateOption.Option == enums.APPEND_REPOSITORY {
+//		return c.AppendRepositories(companyId, repositories)
+//	} else if companyUpdateOption.Option == enums.SOFT_DELETE_REPOSITORY {
+//		return c.SoftDeleteRepositories(companyId, company, repositories)
+//	} else if companyUpdateOption.Option == enums.DELETE_REPOSITORY {
+//		return c.DeleteRepositories(companyId, company, repositories)
+//	} else {
+//		return errors.New("invalid repository update option")
+//	}
+//}
+//
+//func (c companyService) AppendRepositories(companyId string, repositories []v1.Repository) error {
+//	for i, each := range repositories {
+//		repositories[i].Id = uuid.New().String()
+//		for j := range each.Applications {
+//			each.Applications[j].MetaData.Id = uuid.New().String()
+//		}
+//		if each.Type == enums.GITHUB {
+//			c.webHookForGithub(each.Applications, companyId, each.Token)
+//		} else if each.Type == enums.BIT_BUCKET {
+//			c.webHookForBitbucket(each.Applications, companyId, each.Token)
+//		}
+//	}
+//	err := c.repo.AppendRepositories(companyId, repositories)
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}
+//
+//func (c companyService) SoftDeleteRepositories(companyId string, company v1.Company, repositories []v1.Repository) error {
+//	var count int64
+//	for i, _ := range company.Repositories {
+//		for j, _ := range repositories {
+//			if company.Repositories[i].Id == repositories[j].Id {
+//				for k := range company.Repositories[i].Applications {
+//					company.Repositories[i].Applications[k].Status = enums.INACTIVE
+//					applicationMetadataCollection := v1.ApplicationMetadataCollection{
+//						MetaData: company.Repositories[i].Applications[k].MetaData,
+//						Status:   company.Repositories[i].Applications[k].Status,
+//					}
+//					err := c.applicationMetadataRepository.Update(companyId, applicationMetadataCollection)
+//					if err != nil {
+//						return err
+//					}
+//				}
+//				count++
+//			}
+//		}
+//	}
+//	if count < 1 {
+//		return errors.New("repository id does not match")
+//	}
+//	err := c.repo.DeleteRepositories(companyId, company.Repositories)
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}
+//
+//func (c companyService) DeleteRepositories(companyId string, company v1.Company, repositories []v1.Repository) error {
+//	var count int64
+//	for i := range repositories {
+//		for j, eachRepo := range company.Repositories {
+//			if repositories[i].Id == eachRepo.Id {
+//				for _, eachApp := range eachRepo.Applications {
+//					err := c.applicationMetadataRepository.Delete(eachApp.MetaData.Id, companyId)
+//					if err != nil {
+//						return err
+//					}
+//				}
+//				company.Repositories = v1.RemoveRepository(company.Repositories, j)
+//				count++
+//				break
+//			}
+//		}
+//	}
+//	if count < 1 {
+//		return errors.New("repository id does not match")
+//	}
+//	err := c.repo.DeleteRepositories(companyId, company.Repositories)
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}
 
 func (c companyService) webHookForGithub(apps []v1.Application, companyId string, token string) {
 	for i := range apps {
@@ -483,13 +484,13 @@ func (c companyService) GetByName(name string, status v1.StatusQueryOption) v1.C
 	return c.repo.GetByName(name, status)
 }
 
-func (c companyService) GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64) {
-	return c.repo.GetRepositoriesByCompanyId(id, option)
-}
-
-func (c companyService) GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption, status v1.StatusQueryOption) []v1.Application {
-	return c.repo.GetApplicationsByCompanyIdAndRepositoryType(id, _type, option, status)
-}
+//func (c companyService) GetRepositoriesByCompanyId(id string, option v1.CompanyQueryOption) ([]v1.Repository, int64) {
+//	return c.repo.GetRepositoriesByCompanyId(id, option)
+//}
+//
+//func (c companyService) GetApplicationsByCompanyIdAndRepositoryType(id string, _type enums.REPOSITORY_TYPE, option v1.CompanyQueryOption, status v1.StatusQueryOption) []v1.Application {
+//	return c.repo.GetApplicationsByCompanyIdAndRepositoryType(id, _type, option, status)
+//}
 
 // NewCompanyService returns Company type service
 func NewCompanyService(repo repository.CompanyRepository, applicationMetadataRepository repository.ApplicationMetadataRepository, client service.HttpClient) service.Company {
