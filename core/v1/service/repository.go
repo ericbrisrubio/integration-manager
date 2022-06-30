@@ -8,4 +8,5 @@ type Repository interface {
 	GetByCompanyId(companyId string, pagination bool, option v1.CompanyQueryOption) ([]v1.Repository, int64)
 	UpdateRepositories(companyId string, repositoriesDto []v1.RepositoryDto, repositoryUpdateOption v1.RepositoryUpdateOption) error
 	GetById(companyId, repositoryId string) v1.Repository
+	GetByCompanyIdAndApplicationUrl(companyId, url string) v1.Repository
 }

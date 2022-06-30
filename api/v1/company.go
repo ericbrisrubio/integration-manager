@@ -1,7 +1,7 @@
 package v1
 
 import (
-	guuid "github.com/google/uuid"
+	uuid "github.com/google/uuid"
 	"github.com/klovercloud-ci-cd/integration-manager/api/common"
 	"github.com/klovercloud-ci-cd/integration-manager/config"
 	v1 "github.com/klovercloud-ci-cd/integration-manager/core/v1"
@@ -34,6 +34,7 @@ type companyApi struct {
 // @Success 200 {object} common.ResponseDTO{data=[]v1.ApplicationDto}
 // @Router /api/v1/companies/{id}/applications [GET]
 func (c companyApi) GetApplicationsByCompanyIdAndRepositoryType(context echo.Context) error {
+
 	id := context.Param("id")
 	if id == "" {
 		return common.GenerateErrorResponse(context, nil, "Company Id is required!")
@@ -84,7 +85,63 @@ func (c companyApi) UpdateRepositories(context echo.Context) error {
 	}
 	err := c.repositoryService.UpdateRepositories(id, payload, options)
 	if err != nil {
-		log.Println("Update Error:", err.Error())
+		return common.GenerateErrorResponse(context, nil, err.Error())
+	}
+	return common.GenerateSuccessResponse(context, formData,
+		nil, "Operation Successful")
+}
+
+// Update... Update repositories
+// @Summary Update repositories by company id
+// @Description updates repositories
+// @Tags Company
+// @Produce json
+// @Param data body v1.RepositoriesDto true "RepositoriesDto data"
+// @Param id path string true "Company id"
+// @Param repoId path string true "Repository id"
+// @Param companyUpdateOption query string true "Company Update Option"
+// @Success 200 {object} common.ResponseDTO
+// @Router /api/v1/companies/{id}/repositories/{repoId}/applications [PUT]
+func (c companyApi) UpdateApplications(context echo.Context) error {
+	id := context.Param("id")
+	if id == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: Company id is required", "Operation failed")
+	}
+	repoId := context.Param("repoId")
+	if repoId == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: Repository id is required", "Operation failed")
+	}
+	company := c.companyService.GetByCompanyId(id)
+	if company.Id == "" {
+		return common.GenerateErrorResponse(context, "[ERROR] Company does not exist", "Operation failed")
+	}
+	repository := c.repositoryService.GetById(id, repoId)
+	if repository.Id == "" {
+		return common.GenerateErrorResponse(context, "[ERROR] Repository does not exist", "Operation failed")
+	}
+	updateOption := context.QueryParam("companyUpdateOption")
+	var options v1.ApplicationUpdateOption
+	options.Option = enums.APPLICATION_UPDATE_OPTION(updateOption)
+	var formData v1.Applications
+	if err := context.Bind(&formData); err != nil {
+		log.Println("Input Error:", err.Error())
+		return common.GenerateErrorResponse(context, err.Error(), "Operation failed")
+	}
+	var payload []v1.Application
+	payload = formData.Applications
+	for i, _ := range payload {
+		payload[i].MetaData.Id = uuid.New().String()
+		payload[i].Url = UrlFormatter(payload[i].Url)
+		if payload[i].MetaData.Labels == nil {
+			payload[i].MetaData.Labels = make(map[string]string)
+		}
+		payload[i].MetaData.Labels["CompanyId"] = id
+		payload[i].CompanyId = id
+		payload[i].RepositoryId = repoId
+		payload[i].RepositoryType = repository.Type
+	}
+	err := c.applicationService.UpdateApplications(repository, payload, options)
+	if err != nil {
 		return common.GenerateErrorResponse(context, nil, err.Error())
 	}
 	return common.GenerateSuccessResponse(context, formData,
@@ -397,9 +454,9 @@ func (c companyApi) UpdateWebhook(context echo.Context) error {
 
 func generateRepositoryAndApplicationId(payload v1.CompanyDto) v1.CompanyDto {
 	for i, each := range payload.Repositories {
-		payload.Repositories[i].Id = guuid.New().String()
+		payload.Repositories[i].Id = uuid.New().String()
 		for j := range each.Applications {
-			payload.Repositories[i].Applications[j].MetaData.Id = guuid.New().String()
+			payload.Repositories[i].Applications[j].MetaData.Id = uuid.New().String()
 		}
 	}
 	return payload

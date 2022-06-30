@@ -108,80 +108,80 @@ type companyRepository struct {
 //	return results, int64(len(results))
 //}
 
-func (c companyRepository) GetApplicationByApplicationId(companyId string, repoId string, applicationId string) v1.Application {
-	var app v1.Application
-	var repo v1.Repository
-	query := bson.M{
-		"$and": []bson.M{{"id": companyId}},
-	}
-	coll := c.manager.Db.Collection(CompanyCollection)
-	result, err := coll.Find(c.manager.Ctx, query)
-	if err != nil {
-		log.Println(err.Error())
-	}
-	for result.Next(context.TODO()) {
-		elemValues := new(v1.Company)
-		err := result.Decode(elemValues)
-		if err != nil {
-			log.Println("[ERROR]", err)
-			break
-		}
-		for _, each := range elemValues.Repositories {
-			if repoId == each.Id {
-				repo = each
-			}
-		}
-		for _, each := range repo.Applications {
-			if applicationId == each.MetaData.Id {
-				app = each
-			}
-		}
-	}
-	return app
-}
+//func (c companyRepository) GetApplicationByApplicationId(companyId string, repoId string, applicationId string) v1.Application {
+//	var app v1.Application
+//	var repo v1.Repository
+//	query := bson.M{
+//		"$and": []bson.M{{"id": companyId}},
+//	}
+//	coll := c.manager.Db.Collection(CompanyCollection)
+//	result, err := coll.Find(c.manager.Ctx, query)
+//	if err != nil {
+//		log.Println(err.Error())
+//	}
+//	for result.Next(context.TODO()) {
+//		elemValues := new(v1.Company)
+//		err := result.Decode(elemValues)
+//		if err != nil {
+//			log.Println("[ERROR]", err)
+//			break
+//		}
+//		for _, each := range elemValues.Repositories {
+//			if repoId == each.Id {
+//				repo = each
+//			}
+//		}
+//		for _, each := range repo.Applications {
+//			if applicationId == each.MetaData.Id {
+//				app = each
+//			}
+//		}
+//	}
+//	return app
+//}
 
-func (c companyRepository) UpdateApplication(companyId string, repositoryId string, applicationId string, app v1.Application) error {
-	option := v1.CompanyQueryOption{
-		Pagination:       v1.Pagination{},
-		LoadRepositories: true,
-		LoadApplications: true,
-	}
-	company, _ := c.GetByCompanyId(companyId, option)
-
-	for i, eachRepo := range company.Repositories {
-		if eachRepo.Id == repositoryId {
-			for j, eachApp := range eachRepo.Applications {
-				if eachApp.MetaData.Id == app.MetaData.Id {
-					company.Repositories[i].Applications[j] = app
-					break
-				}
-			}
-			break
-		}
-	}
-
-	filter := bson.M{
-		"$and": []bson.M{
-			{"id": companyId},
-		},
-	}
-	update := bson.M{
-		"$set": company,
-	}
-	upsert := true
-	after := options.After
-	opt := options.FindOneAndUpdateOptions{
-		ReturnDocument: &after,
-		Upsert:         &upsert,
-	}
-	coll := c.manager.Db.Collection(CompanyCollection)
-	res := coll.FindOneAndUpdate(c.manager.Ctx, filter, update, &opt)
-	if res.Err() != nil {
-		log.Println("[ERROR]", res.Err())
-		return res.Err()
-	}
-	return nil
-}
+//func (c companyRepository) UpdateApplication(companyId string, repositoryId string, applicationId string, app v1.Application) error {
+//	option := v1.CompanyQueryOption{
+//		Pagination:       v1.Pagination{},
+//		LoadRepositories: true,
+//		LoadApplications: true,
+//	}
+//	company, _ := c.GetByCompanyId(companyId, option)
+//
+//	for i, eachRepo := range company.Repositories {
+//		if eachRepo.Id == repositoryId {
+//			for j, eachApp := range eachRepo.Applications {
+//				if eachApp.MetaData.Id == app.MetaData.Id {
+//					company.Repositories[i].Applications[j] = app
+//					break
+//				}
+//			}
+//			break
+//		}
+//	}
+//
+//	filter := bson.M{
+//		"$and": []bson.M{
+//			{"id": companyId},
+//		},
+//	}
+//	update := bson.M{
+//		"$set": company,
+//	}
+//	upsert := true
+//	after := options.After
+//	opt := options.FindOneAndUpdateOptions{
+//		ReturnDocument: &after,
+//		Upsert:         &upsert,
+//	}
+//	coll := c.manager.Db.Collection(CompanyCollection)
+//	res := coll.FindOneAndUpdate(c.manager.Ctx, filter, update, &opt)
+//	if res.Err() != nil {
+//		log.Println("[ERROR]", res.Err())
+//		return res.Err()
+//	}
+//	return nil
+//}
 
 //func (c companyRepository) GetRepositoryByRepositoryId(id, repositoryId string, option v1.CompanyQueryOption) v1.Repository {
 //	var repo v1.Repository
@@ -259,195 +259,195 @@ func (c companyRepository) UpdateApplication(companyId string, repositoryId stri
 //	return app
 //}
 
-func (c companyRepository) AppendRepositories(companyId string, repos []v1.Repository) error {
+//func (c companyRepository) AppendRepositories(companyId string, repos []v1.Repository) error {
+//
+//	option := v1.CompanyQueryOption{
+//		Pagination:       v1.Pagination{},
+//		LoadRepositories: true,
+//		LoadApplications: true,
+//	}
+//	company, _ := c.GetByCompanyId(companyId, option)
+//
+//	company.Repositories = append(company.Repositories, repos...)
+//	filter := bson.M{
+//		"$and": []bson.M{
+//			{"id": companyId},
+//		},
+//	}
+//	update := bson.M{
+//		"$set": company,
+//	}
+//	upsert := true
+//	after := options.After
+//	opt := options.FindOneAndUpdateOptions{
+//		ReturnDocument: &after,
+//		Upsert:         &upsert,
+//	}
+//	coll := c.manager.Db.Collection(CompanyCollection)
+//	res := coll.FindOneAndUpdate(c.manager.Ctx, filter, update, &opt)
+//	if res.Err() != nil {
+//		log.Println("[ERROR]", res.Err())
+//		return res.Err()
+//	}
+//	return nil
+//}
 
-	option := v1.CompanyQueryOption{
-		Pagination:       v1.Pagination{},
-		LoadRepositories: true,
-		LoadApplications: true,
-	}
-	company, _ := c.GetByCompanyId(companyId, option)
+//func (c companyRepository) DeleteRepositories(companyId string, repos []v1.Repository) error {
+//	option := v1.CompanyQueryOption{
+//		Pagination:       v1.Pagination{},
+//		LoadRepositories: true,
+//		LoadApplications: true,
+//	}
+//	company, _ := c.GetByCompanyId(companyId, option)
+//	company.Repositories = repos
+//	filter := bson.M{
+//		"$and": []bson.M{
+//			{"id": companyId},
+//		},
+//	}
+//	update := bson.M{
+//		"$set": company,
+//	}
+//	//upsert := true
+//	//after := options.After
+//	//opt := options.FindOneAndUpdateOptions{
+//	//	ReturnDocument: &after,
+//	//	Upsert:         &upsert,
+//	//}
+//	coll := c.manager.Db.Collection(CompanyCollection)
+//	res := coll.FindOneAndUpdate(c.manager.Ctx, filter, update, nil)
+//	if res.Err() != nil {
+//		log.Println("[ERROR]", res.Err())
+//		return res.Err()
+//	}
+//	return nil
+//}
 
-	company.Repositories = append(company.Repositories, repos...)
-	filter := bson.M{
-		"$and": []bson.M{
-			{"id": companyId},
-		},
-	}
-	update := bson.M{
-		"$set": company,
-	}
-	upsert := true
-	after := options.After
-	opt := options.FindOneAndUpdateOptions{
-		ReturnDocument: &after,
-		Upsert:         &upsert,
-	}
-	coll := c.manager.Db.Collection(CompanyCollection)
-	res := coll.FindOneAndUpdate(c.manager.Ctx, filter, update, &opt)
-	if res.Err() != nil {
-		log.Println("[ERROR]", res.Err())
-		return res.Err()
-	}
-	return nil
-}
+//func (c companyRepository) AppendApplications(companyId, repositoryId string, apps []v1.Application) error {
+//	option := v1.CompanyQueryOption{
+//		Pagination:       v1.Pagination{},
+//		LoadRepositories: true,
+//		LoadApplications: true,
+//	}
+//	company, _ := c.GetByCompanyId(companyId, option)
+//
+//	for i := range company.Repositories {
+//		if company.Repositories[i].Id == repositoryId {
+//			company.Repositories[i].Applications = append(company.Repositories[i].Applications, apps...)
+//		}
+//	}
+//	filter := bson.M{
+//		"$and": []bson.M{
+//			{"id": companyId, "repositories.id": repositoryId},
+//		},
+//	}
+//	update := bson.M{
+//		"$set": company,
+//	}
+//	upsert := true
+//	after := options.After
+//	opt := options.FindOneAndUpdateOptions{
+//		ReturnDocument: &after,
+//		Upsert:         &upsert,
+//	}
+//	coll := c.manager.Db.Collection(CompanyCollection)
+//	res := coll.FindOneAndUpdate(c.manager.Ctx, filter, update, &opt)
+//	if res.Err() != nil {
+//		log.Println("[ERROR]", res.Err())
+//		return res.Err()
+//	}
+//	return nil
+//}
+//
+//func (c companyRepository) DeleteApplications(companyId, repositoryId string, repos []v1.Repository) error {
+//	option := v1.CompanyQueryOption{
+//		Pagination:       v1.Pagination{},
+//		LoadRepositories: true,
+//		LoadApplications: true,
+//	}
+//	company, _ := c.GetByCompanyId(companyId, option)
+//	company.Repositories = repos
+//	filter := bson.M{
+//		"$and": []bson.M{
+//			{"id": companyId, "repositories.id": repositoryId},
+//		},
+//	}
+//	update := bson.M{
+//		"$set": company,
+//	}
+//	coll := c.manager.Db.Collection(CompanyCollection)
+//	res := coll.FindOneAndUpdate(c.manager.Ctx, filter, update, nil)
+//	if res.Err() != nil {
+//		log.Println("[ERROR]", res.Err())
+//		return res.Err()
+//	}
+//	return nil
+//}
 
-func (c companyRepository) DeleteRepositories(companyId string, repos []v1.Repository) error {
-	option := v1.CompanyQueryOption{
-		Pagination:       v1.Pagination{},
-		LoadRepositories: true,
-		LoadApplications: true,
-	}
-	company, _ := c.GetByCompanyId(companyId, option)
-	company.Repositories = repos
-	filter := bson.M{
-		"$and": []bson.M{
-			{"id": companyId},
-		},
-	}
-	update := bson.M{
-		"$set": company,
-	}
-	//upsert := true
-	//after := options.After
-	//opt := options.FindOneAndUpdateOptions{
-	//	ReturnDocument: &after,
-	//	Upsert:         &upsert,
-	//}
-	coll := c.manager.Db.Collection(CompanyCollection)
-	res := coll.FindOneAndUpdate(c.manager.Ctx, filter, update, nil)
-	if res.Err() != nil {
-		log.Println("[ERROR]", res.Err())
-		return res.Err()
-	}
-	return nil
-}
+//func (c companyRepository) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {
+//	var results v1.Repository
+//	query := bson.M{
+//		"$and": []bson.M{{"id": id}},
+//	}
+//	coll := c.manager.Db.Collection(CompanyCollection)
+//	result, err := coll.Find(c.manager.Ctx, query)
+//	if err != nil {
+//		log.Println(err.Error())
+//	}
+//	for result.Next(context.TODO()) {
+//		elemValue := new(v1.Company)
+//		err := result.Decode(elemValue)
+//		if err != nil {
+//			log.Println("[ERROR]", err)
+//			break
+//		}
+//		for _, each := range elemValue.Repositories {
+//			for _, eachApp := range each.Applications {
+//				if url == eachApp.Url {
+//					r := v1.Repository{
+//						Id:           each.Id,
+//						Type:         each.Type,
+//						Token:        each.Token,
+//						Applications: each.Applications,
+//					}
+//					results = r
+//				}
+//			}
+//		}
+//	}
+//	return results
+//}
 
-func (c companyRepository) AppendApplications(companyId, repositoryId string, apps []v1.Application) error {
-	option := v1.CompanyQueryOption{
-		Pagination:       v1.Pagination{},
-		LoadRepositories: true,
-		LoadApplications: true,
-	}
-	company, _ := c.GetByCompanyId(companyId, option)
-
-	for i := range company.Repositories {
-		if company.Repositories[i].Id == repositoryId {
-			company.Repositories[i].Applications = append(company.Repositories[i].Applications, apps...)
-		}
-	}
-	filter := bson.M{
-		"$and": []bson.M{
-			{"id": companyId, "repositories.id": repositoryId},
-		},
-	}
-	update := bson.M{
-		"$set": company,
-	}
-	upsert := true
-	after := options.After
-	opt := options.FindOneAndUpdateOptions{
-		ReturnDocument: &after,
-		Upsert:         &upsert,
-	}
-	coll := c.manager.Db.Collection(CompanyCollection)
-	res := coll.FindOneAndUpdate(c.manager.Ctx, filter, update, &opt)
-	if res.Err() != nil {
-		log.Println("[ERROR]", res.Err())
-		return res.Err()
-	}
-	return nil
-}
-
-func (c companyRepository) DeleteApplications(companyId, repositoryId string, repos []v1.Repository) error {
-	option := v1.CompanyQueryOption{
-		Pagination:       v1.Pagination{},
-		LoadRepositories: true,
-		LoadApplications: true,
-	}
-	company, _ := c.GetByCompanyId(companyId, option)
-	company.Repositories = repos
-	filter := bson.M{
-		"$and": []bson.M{
-			{"id": companyId, "repositories.id": repositoryId},
-		},
-	}
-	update := bson.M{
-		"$set": company,
-	}
-	coll := c.manager.Db.Collection(CompanyCollection)
-	res := coll.FindOneAndUpdate(c.manager.Ctx, filter, update, nil)
-	if res.Err() != nil {
-		log.Println("[ERROR]", res.Err())
-		return res.Err()
-	}
-	return nil
-}
-
-func (c companyRepository) GetRepositoryByCompanyIdAndApplicationUrl(id, url string) v1.Repository {
-	var results v1.Repository
-	query := bson.M{
-		"$and": []bson.M{{"id": id}},
-	}
-	coll := c.manager.Db.Collection(CompanyCollection)
-	result, err := coll.Find(c.manager.Ctx, query)
-	if err != nil {
-		log.Println(err.Error())
-	}
-	for result.Next(context.TODO()) {
-		elemValue := new(v1.Company)
-		err := result.Decode(elemValue)
-		if err != nil {
-			log.Println("[ERROR]", err)
-			break
-		}
-		for _, each := range elemValue.Repositories {
-			for _, eachApp := range each.Applications {
-				if url == eachApp.Url {
-					r := v1.Repository{
-						Id:           each.Id,
-						Type:         each.Type,
-						Token:        each.Token,
-						Applications: each.Applications,
-					}
-					results = r
-				}
-			}
-		}
-	}
-	return results
-}
-
-func (c companyRepository) GetCompanyByApplicationUrl(url string) v1.Company {
-	var results v1.Company
-	query := bson.M{
-		"$and": []bson.M{{"repositories.applications.url": url}},
-	}
-	coll := c.manager.Db.Collection(CompanyCollection)
-	result, err := coll.Find(c.manager.Ctx, query)
-	if err != nil {
-		log.Println(err.Error())
-	}
-	for result.Next(context.TODO()) {
-		elemValue := new(v1.Company)
-		err := result.Decode(elemValue)
-		if err != nil {
-			log.Println("[ERROR]", err)
-			break
-		}
-		for i, each := range elemValue.Repositories {
-			r := v1.Repository{
-				Id:           each.Id,
-				Type:         each.Type,
-				Token:        "",
-				Applications: each.Applications,
-			}
-			elemValue.Repositories[i] = r
-		}
-		results = *elemValue
-	}
-	return results
-}
+//func (c companyRepository) GetCompanyByApplicationUrl(url string) v1.Company {
+//	var results v1.Company
+//	query := bson.M{
+//		"$and": []bson.M{{"repositories.applications.url": url}},
+//	}
+//	coll := c.manager.Db.Collection(CompanyCollection)
+//	result, err := coll.Find(c.manager.Ctx, query)
+//	if err != nil {
+//		log.Println(err.Error())
+//	}
+//	for result.Next(context.TODO()) {
+//		elemValue := new(v1.Company)
+//		err := result.Decode(elemValue)
+//		if err != nil {
+//			log.Println("[ERROR]", err)
+//			break
+//		}
+//		for i, each := range elemValue.Repositories {
+//			r := v1.Repository{
+//				Id:           each.Id,
+//				Type:         each.Type,
+//				Token:        "",
+//				Applications: each.Applications,
+//			}
+//			elemValue.Repositories[i] = r
+//		}
+//		results = *elemValue
+//	}
+//	return results
+//}
 
 func (c companyRepository) GetCompanies(option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Company, int64) {
 	var results []v1.Company

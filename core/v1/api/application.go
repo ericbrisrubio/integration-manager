@@ -4,10 +4,6 @@ import "github.com/labstack/echo/v4"
 
 // Application application api operations
 type Application interface {
-	Update(context echo.Context) error
 	GetById(context echo.Context) error
 	Get(context echo.Context) error
-	GetPipelineForValidation(context echo.Context) error
-	CreateApplicationPipeLine(context echo.Context) error
-	UpdateApplicationPipeLine(context echo.Context) error
 }

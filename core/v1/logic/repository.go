@@ -22,6 +22,15 @@ func (r repositoryService) GetByCompanyId(companyId string, pagination bool, opt
 	return r.repo.GetByCompanyId(companyId, pagination, option)
 }
 
+func (r repositoryService) GetByCompanyIdAndApplicationUrl(companyId, url string) v1.Repository {
+	application := r.applicationService.GetByCompanyIdAndUrl(companyId, url)
+	if application.Url == "" {
+		return v1.Repository{}
+	}
+	repo := r.repo.GetById(companyId, application.RepositoryId)
+	return repo
+}
+
 func (r repositoryService) Store(repositories []v1.Repository) error {
 	return r.repo.Store(repositories)
 }

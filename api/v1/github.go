@@ -19,6 +19,8 @@ import (
 type v1GithubApi struct {
 	gitService                   service.Git
 	companyService               service.Company
+	repositoryService            service.Repository
+	applicationService           service.Application
 	processInventoryEventService service.ProcessInventoryEvent
 	observerList                 []service.Observer
 }
@@ -44,7 +46,7 @@ func (g v1GithubApi) GetCommitsByBranch(context echo.Context) error {
 		LoadToken:        true,
 	}
 	id := context.QueryParam("companyId")
-	repo := g.companyService.GetRepositoryByRepositoryId(id, repoId, option)
+	repo := g.repositoryService.GetById(id, repoId)
 	url := context.QueryParam("url")
 	if url == "" {
 		return errors.New("repository url is required")
@@ -93,14 +95,8 @@ func getCommitsPaginationOption(context echo.Context) v1.Pagination {
 // @Router /api/v1/githubs/branches [GET]
 func (g v1GithubApi) GetBranches(context echo.Context) error {
 	repoId := context.QueryParam("repoId")
-	option := v1.CompanyQueryOption{
-		Pagination:       v1.Pagination{},
-		LoadRepositories: true,
-		LoadApplications: true,
-		LoadToken:        true,
-	}
 	id := context.QueryParam("companyId")
-	repo := g.companyService.GetRepositoryByRepositoryId(id, repoId, option)
+	repo := g.repositoryService.GetById(id, repoId)
 	url := context.QueryParam("url")
 	if url == "" {
 		return errors.New("repository url is required")
@@ -137,10 +133,10 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 	repoName := resource.Repository.Name
 	owner := resource.Repository.Owner.Login
 	revision := resource.After
-	repository := g.companyService.GetRepositoryByCompanyIdAndApplicationUrl(companyId, resource.Repository.URL)
-	application := g.companyService.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repository.Id, resource.Repository.URL)
+	repository := g.repositoryService.GetByCompanyIdAndApplicationUrl(companyId, resource.Repository.URL)
+	application := g.applicationService.GetByCompanyIdAndRepositoryIdAndUrl(companyId, repository.Id, resource.Repository.URL)
 	if !application.MetaData.IsWebhookEnabled {
-		return common.GenerateForbiddenResponse(context, "[Forbidden]: Web hook is disabled!", "Operation Failed!")
+		return common.GenerateForbiddenResponse(context, "[Forbidden]: Webhook is disabled!", "Operation Failed!")
 	}
 	data, err := g.gitService.GetPipeline(repoName, owner, revision, repository.Token)
 	if err != nil {
@@ -208,7 +204,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 	}
 	data.ProcessId = uuid.NewV4().String()
 
-	company, _ := g.companyService.GetByCompanyId(companyId, v1.CompanyQueryOption{v1.Pagination{}, false, false, false})
+	company := g.companyService.GetByCompanyId(companyId)
 	todaysRanProcess := g.processInventoryEventService.CountTodaysRanProcessByCompanyId(companyId)
 	data.MetaData = v1.PipelineMetadata{
 		CompanyId:       companyId,
@@ -340,10 +336,12 @@ func (g v1GithubApi) notifyAll(listener v1.Subject) {
 }
 
 // NewGithubApi returns Git type api
-func NewGithubApi(gitService service.Git, companyService service.Company, processInventoryEventService service.ProcessInventoryEvent, observerList []service.Observer) api.Git {
+func NewGithubApi(gitService service.Git, companyService service.Company, repositoryService service.Repository, applicationService service.Application, processInventoryEventService service.ProcessInventoryEvent, observerList []service.Observer) api.Git {
 	return &v1GithubApi{
 		gitService:                   gitService,
 		companyService:               companyService,
+		repositoryService:            repositoryService,
+		applicationService:           applicationService,
 		observerList:                 observerList,
 		processInventoryEventService: processInventoryEventService,
 	}

@@ -25,6 +25,11 @@ type ApplicationDto struct {
 	Status   enums.COMPANY_STATUS `bson:"status" json:"status"`
 }
 
+// Applications contains applications info
+type Applications struct {
+	Applications []Application `bson:"applications" json:"applications"`
+}
+
 // Validate validates application info
 //func (application Application) Validate() error {
 //	if application.Url == "" {

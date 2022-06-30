@@ -21,6 +21,57 @@ type applicationRepository struct {
 	timeout time.Duration
 }
 
+func (a applicationRepository) GetByApplicationId(companyId string, repoId string, applicationId string) v1.Application {
+	query := bson.M{
+		"$and": []bson.M{
+			{"repositoryId": repoId},
+			{"companyId": companyId},
+			{"_metadata.id": applicationId},
+		},
+	}
+	temp := new(v1.Application)
+	coll := a.manager.Db.Collection(ApplicationCollection)
+	result := coll.FindOne(a.manager.Ctx, query)
+	err := result.Decode(&temp)
+	if err != nil {
+		log.Println("[ERROR]", err)
+	}
+	return *temp
+}
+
+func (a applicationRepository) GetAll(companyId string, option v1.CompanyQueryOption) ([]v1.Application, int64) {
+	var results []v1.Application
+	query := bson.M{
+		"$and": []bson.M{
+			{"companyId": companyId},
+		},
+	}
+	coll := a.manager.Db.Collection(ApplicationCollection)
+	skip := option.Pagination.Page * option.Pagination.Limit
+	findOption := options.FindOptions{
+		Limit: &option.Pagination.Limit,
+		Skip:  &skip,
+	}
+	result, err := coll.Find(a.manager.Ctx, query, &findOption)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	for result.Next(context.TODO()) {
+		elemValue := new(v1.Application)
+		err := result.Decode(elemValue)
+		if err != nil {
+			log.Println("[ERROR]", err)
+			break
+		}
+		results = append(results, *elemValue)
+	}
+	count, err := coll.CountDocuments(a.manager.Ctx, query)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	return results, count
+}
+
 func (a applicationRepository) GetByCompanyIdAndRepoId(companyId, repoId string, pagination bool, option v1.CompanyQueryOption, statusQuery bool, status v1.StatusQueryOption) ([]v1.Application, int64) {
 	var results []v1.Application
 	var query bson.M
@@ -71,6 +122,23 @@ func (a applicationRepository) GetByCompanyIdAndRepositoryIdAndUrl(companyId, re
 	query := bson.M{
 		"$and": []bson.M{
 			{"repositoryId": repositoryId},
+			{"companyId": companyId},
+			{"url": applicationUrl},
+		},
+	}
+	temp := new(v1.Application)
+	coll := a.manager.Db.Collection(ApplicationCollection)
+	result := coll.FindOne(a.manager.Ctx, query)
+	err := result.Decode(&temp)
+	if err != nil {
+		log.Println("[ERROR]", err)
+	}
+	return *temp
+}
+
+func (a applicationRepository) GetByCompanyIdAndUrl(companyId, applicationUrl string) v1.Application {
+	query := bson.M{
+		"$and": []bson.M{
 			{"companyId": companyId},
 			{"url": applicationUrl},
 		},

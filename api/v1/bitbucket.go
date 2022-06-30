@@ -19,6 +19,8 @@ import (
 type v1BitbucketApi struct {
 	gitService                   service.Git
 	companyService               service.Company
+	repositoryService            service.Repository
+	applicationService           service.Application
 	processInventoryEventService service.ProcessInventoryEvent
 	observerList                 []service.Observer
 }
@@ -44,7 +46,7 @@ func (b v1BitbucketApi) GetCommitsByBranch(context echo.Context) error {
 		LoadToken:        true,
 	}
 	id := context.QueryParam("companyId")
-	repo := b.companyService.GetRepositoryByRepositoryId(id, repoId, option)
+	repo := b.repositoryService.GetById(id, repoId)
 	url := context.QueryParam("url")
 	if url == "" {
 		return errors.New("repository url is required")
@@ -81,14 +83,8 @@ func (b v1BitbucketApi) GetCommitsByBranch(context echo.Context) error {
 // @Router /api/v1/bitbuckets/branches [GET]
 func (b v1BitbucketApi) GetBranches(context echo.Context) error {
 	repoId := context.QueryParam("repoId")
-	option := v1.CompanyQueryOption{
-		Pagination:       v1.Pagination{},
-		LoadRepositories: true,
-		LoadApplications: true,
-		LoadToken:        true,
-	}
 	id := context.QueryParam("companyId")
-	repo := b.companyService.GetRepositoryByRepositoryId(id, repoId, option)
+	repo := b.repositoryService.GetById(id, repoId)
 	url := context.QueryParam("url")
 	if url == "" {
 		return errors.New("repository url is required")
@@ -125,8 +121,8 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 	repoName := resource.Repository.Name
 	owner := resource.Repository.Workspace.Slug
 	revision := resource.Push.Changes[len(resource.Push.Changes)-1].New.Target.Hash
-	repository := b.companyService.GetRepositoryByCompanyIdAndApplicationUrl(companyId, resource.Repository.Links.HTML.Href)
-	application := b.companyService.GetApplicationByCompanyIdAndRepositoryIdAndApplicationUrl(companyId, repository.Id, resource.Repository.Links.HTML.Href)
+	repository := b.repositoryService.GetByCompanyIdAndApplicationUrl(companyId, resource.Repository.Links.HTML.Href)
+	application := b.applicationService.GetByCompanyIdAndRepositoryIdAndUrl(companyId, repository.Id, resource.Repository.Links.HTML.Href)
 	if !application.MetaData.IsWebhookEnabled {
 		return common.GenerateForbiddenResponse(context, "[Forbidden]: Web hook is disabled!", "Operation Failed!")
 	}
@@ -193,7 +189,7 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 	}
 	data.ProcessId = uuid.NewV4().String()
 
-	company, _ := b.companyService.GetByCompanyId(companyId, v1.CompanyQueryOption{})
+	company := b.companyService.GetByCompanyId(companyId)
 	todaysRanProcess := b.processInventoryEventService.CountTodaysRanProcessByCompanyId(companyId)
 	data.MetaData = v1.PipelineMetadata{
 		CompanyId:       companyId,
@@ -255,10 +251,12 @@ func (b v1BitbucketApi) notifyAll(listener v1.Subject) {
 }
 
 // NewBitbucketApi returns Git type api
-func NewBitbucketApi(gitService service.Git, companyService service.Company, processInventoryEventService service.ProcessInventoryEvent, observerList []service.Observer) api.Git {
+func NewBitbucketApi(gitService service.Git, companyService service.Company, repositoryService service.Repository, applicationService service.Application, processInventoryEventService service.ProcessInventoryEvent, observerList []service.Observer) api.Git {
 	return &v1BitbucketApi{
 		gitService:                   gitService,
 		companyService:               companyService,
+		repositoryService:            repositoryService,
+		applicationService:           applicationService,
 		observerList:                 observerList,
 		processInventoryEventService: processInventoryEventService,
 	}

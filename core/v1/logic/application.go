@@ -6,7 +6,6 @@ import (
 	"github.com/klovercloud-ci-cd/integration-manager/core/v1/repository"
 	"github.com/klovercloud-ci-cd/integration-manager/core/v1/service"
 	"github.com/klovercloud-ci-cd/integration-manager/enums"
-	"k8s.io/apimachinery/pkg/util/yaml"
 	"log"
 )
 
@@ -14,6 +13,22 @@ type applicationService struct {
 	repo                       repository.ApplicationRepository
 	applicationMetadataService service.ApplicationMetadataService
 	client                     service.HttpClient
+}
+
+func (a applicationService) GetByCompanyIdAndUrl(companyId, applicationUrl string) v1.Application {
+	return a.repo.GetByCompanyIdAndUrl(companyId, applicationUrl)
+}
+
+func (a applicationService) GetByCompanyIdAndRepositoryIdAndUrl(companyId, repositoryId, applicationUrl string) v1.Application {
+	return a.repo.GetByCompanyIdAndRepositoryIdAndUrl(companyId, repositoryId, applicationUrl)
+}
+
+func (a applicationService) GetByApplicationId(companyId string, repoId string, applicationId string) v1.Application {
+	return a.repo.GetByApplicationId(companyId, repoId, applicationId)
+}
+
+func (a applicationService) GetAll(companyId string, option v1.CompanyQueryOption) ([]v1.Application, int64) {
+	return a.repo.GetAll(companyId, option)
 }
 
 func (a applicationService) GetByCompanyIdAndRepoId(companyId, repoId string, pagination bool, option v1.CompanyQueryOption, statusQuery bool, status v1.StatusQueryOption) ([]v1.Application, int64) {
@@ -26,6 +41,56 @@ func (a applicationService) GetApplicationsByCompanyIdAndRepositoryType(companyI
 
 func (a applicationService) StoreAll(applications []v1.Application) error {
 	return a.repo.StoreAll(applications)
+}
+
+func (a applicationService) UpdateApplications(repository v1.Repository, apps []v1.Application, applicationUpdateOption v1.ApplicationUpdateOption) error {
+	if applicationUpdateOption.Option == enums.APPEND_APPLICATION {
+		return a.AppendApplications(repository, apps)
+	} else if applicationUpdateOption.Option == enums.SOFT_DELETE_APPLICATION {
+		return a.SoftDeleteApplications(repository, apps)
+	} else if applicationUpdateOption.Option == enums.DELETE_APPLICATION {
+		return a.DeleteApplications(repository, apps)
+	} else {
+		return errors.New("invalid application update option")
+	}
+}
+
+func (a applicationService) AppendApplications(repository v1.Repository, apps []v1.Application) error {
+	a.CreateWebHookAndUpdateApplications(repository.Type, repository.Token, apps)
+	return nil
+}
+
+func (a applicationService) SoftDeleteApplications(repository v1.Repository, apps []v1.Application) error {
+	for _, each := range apps {
+		each.Status = enums.INACTIVE
+		applicationMetadataCollection := v1.ApplicationMetadataCollection{
+			MetaData: each.MetaData,
+			Status:   each.Status,
+		}
+		err := a.applicationMetadataService.Update(repository.CompanyId, applicationMetadataCollection)
+		if err != nil {
+			return err
+		}
+		err = a.repo.SoftDeleteApplication(each)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (a applicationService) DeleteApplications(repository v1.Repository, apps []v1.Application) error {
+	for _, each := range apps {
+		err := a.applicationMetadataService.Delete(each.MetaData.Id, repository.CompanyId)
+		if err != nil {
+			return err
+		}
+		err = a.repo.DeleteApplication(repository.CompanyId, repository.Id, each.MetaData.Id)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (a applicationService) CreateWebHookAndUpdateApplications(repoType enums.REPOSITORY_TYPE, token string, apps []v1.Application) {
@@ -83,54 +148,6 @@ func (a applicationService) CreateBitbucketWebHookAndStoreApplication(token stri
 	err = a.repo.Store(app)
 	if err != nil {
 		return
-	}
-}
-
-func (a applicationService) webHookForGithub(apps []v1.ApplicationDto, companyId string, token string) {
-	for i := range apps {
-		usernameOrorgName, repoName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
-		gitWebhook, err := NewGithubService(nil, a.client).CreateRepositoryWebhook(usernameOrorgName, repoName, token, companyId)
-		if err != nil {
-			log.Println("[ERROR] Failed to create webhook ", err.Error())
-		}
-		apps[i].Webhook = gitWebhook
-		apps[i].MetaData.IsWebhookEnabled = gitWebhook.Active
-		apps[i].Status = enums.ACTIVE
-		applicationMetadataCollection := v1.ApplicationMetadataCollection{
-			MetaData: apps[i].MetaData,
-			Status:   apps[i].Status,
-		}
-		err = a.applicationMetadataService.Store(applicationMetadataCollection)
-		if err != nil {
-			return
-		}
-	}
-}
-
-func (a applicationService) webHookForBitbucket(apps []v1.ApplicationDto, companyId string, token string) {
-	for i := range apps {
-		usernameOrOrgName, repoName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(apps[i].Url)
-		b, err := a.client.Get(enums.BITBUCKET_API_BASE_URL+"repositories/"+usernameOrOrgName+"/"+repoName, nil)
-		var repositoryDetails v1.BitbucketRepository
-		err = yaml.Unmarshal(b, &repositoryDetails)
-		if err != nil {
-			log.Println(err.Error())
-		}
-		bitbucketWebhook, err := NewBitBucketService(nil, a.client).CreateRepositoryWebhook(repositoryDetails.Workspace.Slug, repositoryDetails.Slug, token, companyId)
-		if err != nil {
-			log.Println("ERROR failed to create webhook", err.Error())
-		}
-		apps[i].Webhook = bitbucketWebhook
-		apps[i].MetaData.IsWebhookEnabled = bitbucketWebhook.Active
-		apps[i].Status = enums.ACTIVE
-		applicationMetadataCollection := v1.ApplicationMetadataCollection{
-			MetaData: apps[i].MetaData,
-			Status:   apps[i].Status,
-		}
-		err = a.applicationMetadataService.Store(applicationMetadataCollection)
-		if err != nil {
-			return
-		}
 	}
 }
 
