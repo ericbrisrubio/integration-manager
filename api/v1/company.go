@@ -228,7 +228,7 @@ func (c companyApi) Save(context echo.Context) error {
 		MetaData: contextData.MetaData,
 		Id:       contextData.Id,
 		Name:     contextData.Name,
-		Status:   contextData.Status,
+		Status:   enums.ACTIVE,
 	}
 	err := c.companyService.Store(company)
 	if err != nil {

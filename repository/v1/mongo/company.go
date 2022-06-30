@@ -493,16 +493,23 @@ func (c companyRepository) GetByCompanyId(id string) v1.Company {
 
 func (c companyRepository) GetByName(name string, status v1.StatusQueryOption) v1.Company {
 	query := bson.M{
-		"$and": []bson.M{{"name": name}, {"status": status.Option}},
+		"$and": []bson.M{{"name": name}, {"status": string(status.Option)}},
 	}
 	coll := c.manager.Db.Collection(CompanyCollection)
-	result := coll.FindOne(c.manager.Ctx, query, nil)
-	res := new(v1.Company)
-	err := result.Decode(res)
+	result, err := coll.Find(c.manager.Ctx, query, nil)
 	if err != nil {
-		log.Println("[ERROR]", err)
+		return v1.Company{}
 	}
-	return *res
+	for result.Next(context.TODO()) {
+		elemValue := new(v1.Company)
+		err := result.Decode(elemValue)
+		if err != nil {
+			log.Println("[ERROR]", err)
+			break
+		}
+		return *elemValue
+	}
+	return v1.Company{}
 }
 
 func GetPagination(size int64, page int64, limit int64) (int64, int64) {
