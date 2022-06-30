@@ -452,7 +452,7 @@ type companyRepository struct {
 func (c companyRepository) GetCompanies(option v1.CompanyQueryOption, status v1.StatusQueryOption) ([]v1.Company, int64) {
 	var results []v1.Company
 	query := bson.M{
-		"$and": []bson.M{{"status": status.Option}},
+		"$and": []bson.M{{"status": string(status.Option)}},
 	}
 	coll := c.manager.Db.Collection(CompanyCollection)
 	skip := option.Pagination.Page * option.Pagination.Limit
@@ -470,6 +470,7 @@ func (c companyRepository) GetCompanies(option v1.CompanyQueryOption, status v1.
 			log.Println("[ERROR]", err)
 			break
 		}
+		results = append(results, *elemValue)
 	}
 	return results, int64(len(results))
 }
