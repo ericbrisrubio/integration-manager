@@ -73,7 +73,14 @@ func (r repositoryRepository) Store(repositories []v1.Repository) error {
 	coll := r.manager.Db.Collection(RepositoryCollection)
 	if len(repositories) > 0 {
 		var payload []interface{}
-		payload = append(payload, repositories)
+		for _, each := range repositories {
+			payload = append(payload, bson.D{
+				{"id", each.Id},
+				{"companyId", each.CompanyId},
+				{"type", each.Type},
+				{"token", each.Token},
+			})
+		}
 		_, err := coll.InsertMany(r.manager.Ctx, payload)
 		if err != nil {
 			return err

@@ -49,11 +49,15 @@ func (r repositoryService) UpdateRepositories(companyId string, repositoriesDto 
 
 func (r repositoryService) AppendRepositories(companyId string, repositoriesDto []v1.RepositoryDto) error {
 	var repositories []v1.Repository
-	for i, eachRepo := range repositoriesDto {
-		repositoriesDto[i].Id = uuid.New().String()
+	for _, eachRepo := range repositoriesDto {
+		eachRepo.Id = uuid.New().String()
 		var applications []v1.Application
 		for j, _ := range eachRepo.Applications {
 			eachRepo.Applications[j].MetaData.Id = uuid.New().String()
+			if eachRepo.Applications[j].MetaData.Labels == nil {
+				eachRepo.Applications[j].MetaData.Labels = make(map[string]string)
+			}
+			eachRepo.Applications[j].MetaData.Labels["companyId"] = companyId
 			applications = append(applications, v1.Application{
 				MetaData:       eachRepo.Applications[j].MetaData,
 				RepositoryId:   eachRepo.Id,
@@ -81,11 +85,12 @@ func (r repositoryService) AppendRepositories(companyId string, repositoriesDto 
 
 func (r repositoryService) SoftDeleteRepositories(companyId string, repositoriesDto []v1.RepositoryDto) error {
 	for _, eachRepo := range repositoriesDto {
-		for _, eachApp := range eachRepo.Applications {
+		applications, _ := r.applicationService.GetByCompanyIdAndRepoId(companyId, eachRepo.Id, false, v1.CompanyQueryOption{}, false, v1.StatusQueryOption{})
+		for _, eachApp := range applications {
 			application := v1.Application{
 				MetaData:       eachApp.MetaData,
-				RepositoryId:   eachRepo.Id,
-				RepositoryType: eachRepo.Type,
+				RepositoryId:   eachApp.RepositoryId,
+				RepositoryType: eachApp.RepositoryType,
 				CompanyId:      companyId,
 				Url:            eachApp.Url,
 				Webhook:        eachApp.Webhook,
@@ -102,7 +107,8 @@ func (r repositoryService) SoftDeleteRepositories(companyId string, repositories
 
 func (r repositoryService) DeleteRepositories(companyId string, repositoriesDto []v1.RepositoryDto) error {
 	for _, eachRepo := range repositoriesDto {
-		for _, eachApp := range eachRepo.Applications {
+		applications, _ := r.applicationService.GetByCompanyIdAndRepoId(companyId, eachRepo.Id, false, v1.CompanyQueryOption{}, false, v1.StatusQueryOption{})
+		for _, eachApp := range applications {
 			err := r.applicationService.DeleteApplication(companyId, eachRepo.Id, eachApp.MetaData.Id)
 			if err != nil {
 				return err

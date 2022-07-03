@@ -21,7 +21,7 @@ type applicationRepository struct {
 	timeout time.Duration
 }
 
-func (a applicationRepository) GetByApplicationId(companyId string, repoId string, applicationId string) v1.Application {
+func (a applicationRepository) GetById(companyId string, repoId string, applicationId string) v1.Application {
 	query := bson.M{
 		"$and": []bson.M{
 			{"repositoryId": repoId},

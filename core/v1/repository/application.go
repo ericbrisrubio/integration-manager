@@ -8,7 +8,7 @@ import (
 // ApplicationRepository company application repository related operations
 type ApplicationRepository interface {
 	GetAll(companyId string, option v1.CompanyQueryOption) ([]v1.Application, int64)
-	GetByApplicationId(companyId string, repoId string, applicationId string) v1.Application
+	GetById(companyId string, repoId string, applicationId string) v1.Application
 	Store(application v1.Application) error
 	StoreAll(applications []v1.Application) error
 	GetByCompanyIdAndRepoId(companyId, repoId string, pagination bool, option v1.CompanyQueryOption, statusQuery bool, status v1.StatusQueryOption) ([]v1.Application, int64)

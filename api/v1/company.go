@@ -34,7 +34,6 @@ type companyApi struct {
 // @Success 200 {object} common.ResponseDTO{data=[]v1.ApplicationDto}
 // @Router /api/v1/companies/{id}/applications [GET]
 func (c companyApi) GetApplicationsByCompanyIdAndRepositoryType(context echo.Context) error {
-
 	id := context.Param("id")
 	if id == "" {
 		return common.GenerateErrorResponse(context, nil, "Company Id is required!")
@@ -129,16 +128,18 @@ func (c companyApi) UpdateApplications(context echo.Context) error {
 	}
 	var payload []v1.Application
 	payload = formData.Applications
-	for i, _ := range payload {
-		payload[i].MetaData.Id = uuid.New().String()
-		payload[i].Url = UrlFormatter(payload[i].Url)
-		if payload[i].MetaData.Labels == nil {
-			payload[i].MetaData.Labels = make(map[string]string)
+	if options.Option == enums.APPEND_APPLICATION {
+		for i, _ := range payload {
+			payload[i].MetaData.Id = uuid.New().String()
+			payload[i].Url = UrlFormatter(payload[i].Url)
+			if payload[i].MetaData.Labels == nil {
+				payload[i].MetaData.Labels = make(map[string]string)
+			}
+			payload[i].MetaData.Labels["companyId"] = id
+			payload[i].CompanyId = id
+			payload[i].RepositoryId = repoId
+			payload[i].RepositoryType = repository.Type
 		}
-		payload[i].MetaData.Labels["CompanyId"] = id
-		payload[i].CompanyId = id
-		payload[i].RepositoryId = repoId
-		payload[i].RepositoryType = repository.Type
 	}
 	err := c.applicationService.UpdateApplications(repository, payload, options)
 	if err != nil {
@@ -244,6 +245,10 @@ func (c companyApi) Save(context echo.Context) error {
 		})
 		var applications []v1.Application
 		for _, eachApp := range eachRepo.Applications {
+			if eachApp.MetaData.Labels == nil {
+				eachApp.MetaData.Labels = make(map[string]string)
+			}
+			eachApp.MetaData.Labels["companyId"] = company.Id
 			applications = append(applications, v1.Application{
 				MetaData:       eachApp.MetaData,
 				RepositoryId:   eachRepo.Id,
@@ -251,7 +256,7 @@ func (c companyApi) Save(context echo.Context) error {
 				CompanyId:      contextData.Id,
 				Url:            eachApp.Url,
 				Webhook:        eachApp.Webhook,
-				Status:         eachApp.Status,
+				Status:         enums.ACTIVE,
 			})
 		}
 		go c.applicationService.CreateWebHookAndUpdateApplications(eachRepo.Type, eachRepo.Token, applications)

@@ -23,8 +23,8 @@ func (a applicationService) GetByCompanyIdAndRepositoryIdAndUrl(companyId, repos
 	return a.repo.GetByCompanyIdAndRepositoryIdAndUrl(companyId, repositoryId, applicationUrl)
 }
 
-func (a applicationService) GetByApplicationId(companyId string, repoId string, applicationId string) v1.Application {
-	return a.repo.GetByApplicationId(companyId, repoId, applicationId)
+func (a applicationService) GetById(companyId string, repoId string, applicationId string) v1.Application {
+	return a.repo.GetById(companyId, repoId, applicationId)
 }
 
 func (a applicationService) GetAll(companyId string, option v1.CompanyQueryOption) ([]v1.Application, int64) {
@@ -61,7 +61,12 @@ func (a applicationService) AppendApplications(repository v1.Repository, apps []
 }
 
 func (a applicationService) SoftDeleteApplications(repository v1.Repository, apps []v1.Application) error {
+	var applications []v1.Application
 	for _, each := range apps {
+		application := a.repo.GetById(repository.CompanyId, repository.Id, each.MetaData.Id)
+		applications = append(applications, application)
+	}
+	for _, each := range applications {
 		each.Status = enums.INACTIVE
 		applicationMetadataCollection := v1.ApplicationMetadataCollection{
 			MetaData: each.MetaData,
@@ -80,7 +85,12 @@ func (a applicationService) SoftDeleteApplications(repository v1.Repository, app
 }
 
 func (a applicationService) DeleteApplications(repository v1.Repository, apps []v1.Application) error {
+	var applications []v1.Application
 	for _, each := range apps {
+		application := a.repo.GetById(repository.CompanyId, repository.Id, each.MetaData.Id)
+		applications = append(applications, application)
+	}
+	for _, each := range applications {
 		err := a.applicationMetadataService.Delete(each.MetaData.Id, repository.CompanyId)
 		if err != nil {
 			return err
@@ -265,10 +275,21 @@ func (a applicationService) DisableGithubWebhookAndUpdateApplication(companyId, 
 }
 
 func (a applicationService) SoftDeleteApplication(application v1.Application) error {
+	err := a.applicationMetadataService.Update(application.CompanyId, v1.ApplicationMetadataCollection{
+		MetaData: application.MetaData,
+		Status:   application.Status,
+	})
+	if err != nil {
+		return err
+	}
 	return a.repo.SoftDeleteApplication(application)
 }
 
 func (a applicationService) DeleteApplication(companyId, repositoryId, applicationId string) error {
+	err := a.applicationMetadataService.Delete(applicationId, companyId)
+	if err != nil {
+		return err
+	}
 	return a.repo.DeleteApplication(companyId, repositoryId, applicationId)
 }
 

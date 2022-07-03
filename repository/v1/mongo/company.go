@@ -484,12 +484,18 @@ func (c companyRepository) GetByCompanyId(id string) v1.Company {
 	if err != nil {
 		log.Println(err.Error())
 	}
-	res := new(v1.Company)
-	err = result.Decode(res)
-	if err != nil {
-		log.Println("[ERROR]", err)
+	for result.Next(context.TODO()) {
+		elemValue := new(v1.Company)
+		err := result.Decode(elemValue)
+		if err != nil {
+			log.Println("[ERROR]", err)
+			break
+		}
+		if elemValue.Id != "" {
+			return *elemValue
+		}
 	}
-	return *res
+	return v1.Company{}
 }
 
 func (c companyRepository) GetByName(name string, status v1.StatusQueryOption) v1.Company {
