@@ -67,16 +67,20 @@ func (r repositoryApi) GetById(context echo.Context) error {
 // @Produce json
 // @Param id path string true "Repository id"
 // @Param companyy query string true "Company id"
+// @Param page query int64 false "Page number"
+// @Param limit query int64 false "Record count"
+// @Param CompanyQueryOption query string true "Company Update Option"
+// @Param StatusQueryOption query string true "Status Query Option"
 // @Success 200 {object} common.ResponseDTO{data=[]v1.ApplicationDto}
 // @Router /api/v1/repositories/{id}/applications [GET]
 func (r repositoryApi) GetApplicationsById(context echo.Context) error {
 	repoId := context.Param("id")
 	if repoId == "" {
-		return errors.New("repository id is required")
+		return common.GenerateErrorResponse(context, "[ERROR]: Repository ID is required", "Please provide Repository ID")
 	}
 	companyId := context.QueryParam("companyId")
 	if companyId == "" {
-		return errors.New("company id is required")
+		return common.GenerateErrorResponse(context, "[ERROR]: Company ID is required", "Please provide Company ID")
 	}
 	option := getQueryOption(context)
 	status := getStatusOption(context)

@@ -139,7 +139,7 @@ func (a applicationService) CreateGithubWebHookAndStoreApplication(token string,
 }
 
 func (a applicationService) CreateBitbucketWebHookAndStoreApplication(token string, app v1.Application) {
-	usernameOrorgName, repoName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(app.Url)
+	usernameOrorgName, repoName := v1.GetUsernameAndRepoNameFromBitbucketRepositoryUrl(app.Url)
 	gitWebhook, err := NewBitBucketService(nil, a.client).CreateRepositoryWebhook(usernameOrorgName, repoName, token, app.CompanyId)
 	if err != nil {
 		log.Println("ERROR while creating webhook for application: ", err.Error())

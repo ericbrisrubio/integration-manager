@@ -86,7 +86,7 @@ func (c companyApi) UpdateRepositories(context echo.Context) error {
 	if err != nil {
 		return common.GenerateErrorResponse(context, nil, err.Error())
 	}
-	return common.GenerateSuccessResponse(context, formData,
+	return common.GenerateSuccessResponse(context, nil,
 		nil, "Operation Successful")
 }
 

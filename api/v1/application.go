@@ -23,8 +23,6 @@ type applicationApi struct {
 // @Param companyId query string true "company id"
 // @Param page query int64 false "Page number"
 // @Param limit query int64 false "Record count"
-// @Param loadRepositories query bool false "Loads Repositories"
-// @Param loadApplications query bool false "Loads Applications"
 // @Success 200 {object} common.ResponseDTO{data=[]v1.Application}
 // @Router /api/v1/applications [GET]
 func (a applicationApi) Get(context echo.Context) error {

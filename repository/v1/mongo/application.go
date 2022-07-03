@@ -232,7 +232,7 @@ func (a applicationRepository) Update(companyId, repositoryId string, applicatio
 	update := bson.M{
 		"$set": application,
 	}
-	upsert := true
+	upsert := false
 	after := options.After
 	opt := options.FindOneAndUpdateOptions{
 		ReturnDocument: &after,
