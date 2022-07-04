@@ -124,7 +124,7 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 	repository := b.repositoryService.GetByCompanyIdAndApplicationUrl(companyId, resource.Repository.Links.HTML.Href)
 	application := b.applicationService.GetByCompanyIdAndRepositoryIdAndUrl(companyId, repository.Id, resource.Repository.Links.HTML.Href)
 	if !application.MetaData.IsWebhookEnabled {
-		return common.GenerateForbiddenResponse(context, "[Forbidden]: Web hook is disabled!", "Operation Failed!")
+		return common.GenerateForbiddenResponse(context, "[Forbidden]: Webhook is disabled!", "Operation Failed!")
 	}
 	data, err := b.gitService.GetPipeline(repoName, owner, revision, repository.Token)
 	if err != nil {
@@ -188,7 +188,6 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 		}
 	}
 	data.ProcessId = uuid.NewV4().String()
-
 	company := b.companyService.GetByCompanyId(companyId)
 	todaysRanProcess := b.processInventoryEventService.CountTodaysRanProcessByCompanyId(companyId)
 	data.MetaData = v1.PipelineMetadata{

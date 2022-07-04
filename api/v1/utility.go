@@ -72,7 +72,7 @@ func getUsernameAndRepoNameFromBitbucketRepositoryUrl(url string) (username stri
 	if len(urlArray) < 3 {
 		return "", ""
 	}
-	repositoryName := urlArray[len(urlArray)-4]
-	usernameOrorgName := urlArray[len(urlArray)-5]
+	repositoryName := urlArray[len(urlArray)-1]
+	usernameOrorgName := urlArray[len(urlArray)-2]
 	return usernameOrorgName, repositoryName
 }
