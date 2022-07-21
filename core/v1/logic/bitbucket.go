@@ -18,23 +18,19 @@ import (
 )
 
 type bitbucketService struct {
-	companyService service.Company
-	observerList   []service.Observer
-	client         service.HttpClient
+	observerList []service.Observer
+	client       service.HttpClient
 }
 
 func (b bitbucketService) GetContent(repositoryName, username, token, path string) (v1.GitContent, error) {
-	//TODO implement me
 	return v1.GitContent{}, errors.New("bitbucket doesn't support this api")
 }
 
 func (b bitbucketService) CreateDirectoryContent(repositoryName, username, token, path string, content v1.DirectoryContentCreatePayload) (v1.DirectoryContentCreateAndUpdateResponse, error) {
-	//TODO implement me
 	return v1.DirectoryContentCreateAndUpdateResponse{}, errors.New("bitbucket doesn't support this api")
 }
 
 func (b bitbucketService) UpdateDirectoryContent(repositoryName, username, token, path string, content v1.DirectoryContentUpdatePayload) (v1.DirectoryContentCreateAndUpdateResponse, error) {
-	//TODO implement me
 	return v1.DirectoryContentCreateAndUpdateResponse{}, errors.New("bitbucket doesn't support this api")
 }
 
@@ -276,10 +272,9 @@ func (b bitbucketService) notifyAll(listener v1.Subject) {
 }
 
 // NewBitBucketService returns Git type service
-func NewBitBucketService(companyService service.Company, observerList []service.Observer, client service.HttpClient) service.Git {
+func NewBitBucketService(observerList []service.Observer, client service.HttpClient) service.Git {
 	return &bitbucketService{
-		companyService: companyService,
-		observerList:   observerList,
-		client:         client,
+		observerList: observerList,
+		client:       client,
 	}
 }

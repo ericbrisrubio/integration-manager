@@ -7,9 +7,8 @@ import (
 )
 
 type gitlabService struct {
-	companyService service.Company
-	observerList   []service.Observer
-	client         service.HttpClient
+	observerList []service.Observer
+	client       service.HttpClient
 }
 
 func (g gitlabService) GetCommitsByBranch(username, repositoryName, branch, token string, option v1.Pagination) ([]v1.GitCommit, int64, error) {
@@ -63,10 +62,9 @@ func (g gitlabService) DeleteRepositoryWebhookById(username, repositoryName, web
 }
 
 // NewGitlabService returns Git type service
-func NewGitlabService(companyService service.Company, observerList []service.Observer, client service.HttpClient) service.Git {
+func NewGitlabService(observerList []service.Observer, client service.HttpClient) service.Git {
 	return &gitlabService{
-		companyService: companyService,
-		observerList:   observerList,
-		client:         client,
+		observerList: observerList,
+		client:       client,
 	}
 }

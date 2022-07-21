@@ -10,7 +10,8 @@ import (
 )
 
 type pipelineApi struct {
-	pipelineService service.Pipeline
+	pipelineService    service.Pipeline
+	applicationService service.Application
 }
 
 // Update... Update pipeline
@@ -21,7 +22,8 @@ type pipelineApi struct {
 // @Produce json
 // @Param companyId query string true "Company id"
 // @Param repositoryId query string true "Repository id"
-// @Param url query string true "Application url"
+// @Param url query string false "Application url"
+// @Param applicationId query string false "Application Id"
 // @Success 200 {object} common.ResponseDTO{data=v1.DirectoryContentCreateAndUpdateResponse}
 // @Failure 404 {object} common.ResponseDTO
 // @Router /api/v1/pipelines [PUT]
@@ -37,7 +39,15 @@ func (p pipelineApi) Update(context echo.Context) error {
 	}
 	url := context.QueryParam("url")
 	if url == "" {
-		return common.GenerateErrorResponse(context, "[ERROR]: Url is required", "Operation failed")
+		applicationId := context.QueryParam("applicationId")
+		if applicationId == "" {
+			return common.GenerateErrorResponse(context, "[ERROR]: Url or Application Id is required", "Operation failed")
+		}
+		application := p.applicationService.GetById(companyId, repoId, applicationId)
+		if application.Url == "" {
+			return common.GenerateErrorResponse(context, "[ERROR]: Application not found!", "Operation failed")
+		}
+		url = application.Url
 	}
 	if err := context.Bind(&payload); err != nil {
 		return common.GenerateErrorResponse(context, err.Error(), "Operation failed")
@@ -58,7 +68,8 @@ func (p pipelineApi) Update(context echo.Context) error {
 // @Produce json
 // @Param companyId query string true "Company id"
 // @Param repositoryId query string true "Repository id"
-// @Param url query string true "Application url"
+// @Param url query string false "Application url"
+// @Param applicationId query string false "Application Id"
 // @Success 200 {object} common.ResponseDTO{data=v1.DirectoryContentCreateAndUpdateResponse}
 // @Failure 404 {object} common.ResponseDTO
 // @Router /api/v1/pipelines [POST]
@@ -74,7 +85,15 @@ func (p pipelineApi) Create(context echo.Context) error {
 	}
 	url := context.QueryParam("url")
 	if url == "" {
-		return common.GenerateErrorResponse(context, "[ERROR]: Url is required", "Operation failed")
+		applicationId := context.QueryParam("applicationId")
+		if applicationId == "" {
+			return common.GenerateErrorResponse(context, "[ERROR]: Url or Application Id is required", "Operation failed")
+		}
+		application := p.applicationService.GetById(companyId, repoId, applicationId)
+		if application.Url == "" {
+			return common.GenerateErrorResponse(context, "[ERROR]: Application not found!", "Operation failed")
+		}
+		url = application.Url
 	}
 	if err := context.Bind(&payload); err != nil {
 		return common.GenerateErrorResponse(context, err.Error(), "Operation failed")
@@ -95,7 +114,8 @@ func (p pipelineApi) Create(context echo.Context) error {
 // @Param action query string true "action [GET_PIPELINE_FOR_VALIDATION]"
 // @Param companyId query string true "company id"
 // @Param repositoryId query string true "repository id"
-// @Param url query string true "application url"
+// @Param url query string false "application url"
+// @Param applicationId query string false "Application Id"
 // @Param revision query string true "commit id or branch name"
 // @Success 200 {object} common.ResponseDTO{data=v1.PipelineForValidation}
 // @Failure 404 {object} common.ResponseDTO
@@ -112,7 +132,15 @@ func (p pipelineApi) Get(context echo.Context) error {
 		}
 		url := context.QueryParam("url")
 		if url == "" {
-			return common.GenerateErrorResponse(context, "[ERROR]: Url is required", "Operation failed")
+			applicationId := context.QueryParam("applicationId")
+			if applicationId == "" {
+				return common.GenerateErrorResponse(context, "[ERROR]: Url or Application Id is required", "Operation failed")
+			}
+			application := p.applicationService.GetById(companyId, repoId, applicationId)
+			if application.Url == "" {
+				return common.GenerateErrorResponse(context, "[ERROR]: Application not found!", "Operation failed")
+			}
+			url = application.Url
 		}
 		revision := context.QueryParam("revision")
 		if revision == "" {
@@ -128,8 +156,9 @@ func (p pipelineApi) Get(context echo.Context) error {
 }
 
 // NewPipelineApi returns Pipeline type api
-func NewPipelineApi(pipelineService service.Pipeline) api.Pipeline {
+func NewPipelineApi(pipelineService service.Pipeline, applicationService service.Application) api.Pipeline {
 	return &pipelineApi{
-		pipelineService: pipelineService,
+		pipelineService:    pipelineService,
+		applicationService: applicationService,
 	}
 }

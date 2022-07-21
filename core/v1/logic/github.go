@@ -15,9 +15,8 @@ import (
 )
 
 type githubService struct {
-	companyService service.Company
-	observerList   []service.Observer
-	client         service.HttpClient
+	observerList []service.Observer
+	client       service.HttpClient
 }
 
 func (githubService githubService) GetContent(repositoryName, username, token, path string) (v1.GitContent, error) {
@@ -298,10 +297,9 @@ func (githubService githubService) notifyAll(listener v1.Subject) {
 }
 
 // NewGithubService returns Git type service
-func NewGithubService(companyService service.Company, observerList []service.Observer, client service.HttpClient) service.Git {
+func NewGithubService(observerList []service.Observer, client service.HttpClient) service.Git {
 	return &githubService{
-		companyService: companyService,
-		observerList:   observerList,
-		client:         client,
+		observerList: observerList,
+		client:       client,
 	}
 }

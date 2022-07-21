@@ -8,14 +8,13 @@ import (
 )
 
 type pipelineService struct {
-	githubService    service.Git
-	bitbucketService service.Git
-	companyService   service.Company
+	githubService     service.Git
+	bitbucketService  service.Git
+	repositoryService service.Repository
 }
 
 func (p pipelineService) Create(companyId, repositoryId, url string, payload v1.DirectoryContentCreatePayload) (v1.DirectoryContentCreateAndUpdateResponse, error) {
-	option := v1.CompanyQueryOption{LoadRepositories: true, LoadApplications: true, LoadToken: true}
-	repo := p.companyService.GetRepositoryByRepositoryId(companyId, repositoryId, option)
+	repo := p.repositoryService.GetById(companyId, repositoryId)
 	if repo.Id == "" {
 		return v1.DirectoryContentCreateAndUpdateResponse{}, errors.New("repository not found")
 	}
@@ -40,8 +39,7 @@ func (p pipelineService) Create(companyId, repositoryId, url string, payload v1.
 }
 
 func (p pipelineService) Update(companyId, repositoryId, url string, payload v1.DirectoryContentUpdatePayload) (v1.DirectoryContentCreateAndUpdateResponse, error) {
-	option := v1.CompanyQueryOption{LoadRepositories: true, LoadApplications: true, LoadToken: true}
-	repo := p.companyService.GetRepositoryByRepositoryId(companyId, repositoryId, option)
+	repo := p.repositoryService.GetById(companyId, repositoryId)
 	if repo.Id == "" {
 		return v1.DirectoryContentCreateAndUpdateResponse{}, errors.New("repository not found")
 	}
@@ -76,8 +74,7 @@ func (p pipelineService) Update(companyId, repositoryId, url string, payload v1.
 }
 
 func (p pipelineService) GetPipelineForValidation(companyId, repositoryId, url, revision string) (v1.PipelineForValidation, error) {
-	option := v1.CompanyQueryOption{LoadRepositories: true, LoadApplications: true, LoadToken: true}
-	repo := p.companyService.GetRepositoryByRepositoryId(companyId, repositoryId, option)
+	repo := p.repositoryService.GetById(companyId, repositoryId)
 	var username, repoName string
 	var pipelineForValidation v1.PipelineForValidation
 	if repo.Type == enums.GITHUB {
@@ -101,10 +98,10 @@ func (p pipelineService) GetPipelineForValidation(companyId, repositoryId, url, 
 }
 
 // NewPipelineService returns Pipeline type service
-func NewPipelineService(githubService service.Git, bitbucketService service.Git, companyService service.Company) service.Pipeline {
+func NewPipelineService(githubService service.Git, bitbucketService service.Git, repositoryService service.Repository) service.Pipeline {
 	return &pipelineService{
-		githubService:    githubService,
-		bitbucketService: bitbucketService,
-		companyService:   companyService,
+		githubService:     githubService,
+		bitbucketService:  bitbucketService,
+		repositoryService: repositoryService,
 	}
 }

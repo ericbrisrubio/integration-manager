@@ -12,9 +12,8 @@ import (
 )
 
 type githubMockService struct {
-	companyService service.Company
-	observerList   []service.Observer
-	client         service.HttpClient
+	observerList []service.Observer
+	client       service.HttpClient
 }
 
 func (g githubMockService) GetCommitsByBranch(username, repositoryName, branch, token string, option v1.Pagination) ([]v1.GitCommit, int64, error) {
@@ -178,10 +177,9 @@ func DirectoryContents() []byte {
 }
 
 // NewGithubMockService returns Git type service
-func NewGithubMockService(companyService service.Company, observerList []service.Observer, client service.HttpClient) service.Git {
+func NewGithubMockService(observerList []service.Observer, client service.HttpClient) service.Git {
 	return &githubMockService{
-		companyService: companyService,
-		observerList:   observerList,
-		client:         client,
+		observerList: observerList,
+		client:       client,
 	}
 }

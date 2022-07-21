@@ -12,9 +12,8 @@ import (
 )
 
 type bitbucketMockService struct {
-	companyService service.Company
-	observerList   []service.Observer
-	client         service.HttpClient
+	observerList []service.Observer
+	client       service.HttpClient
 }
 
 func (b bitbucketMockService) GetCommitsByBranch(username, repositoryName, branch, token string, option v1.Pagination) ([]v1.GitCommit, int64, error) {
@@ -306,10 +305,9 @@ func (b bitbucketMockService) DeleteRepositoryWebhookById(username, repositoryNa
 }
 
 // NewBitBucketMockService returns Git type service
-func NewBitBucketMockService(companyService service.Company, observerList []service.Observer, client service.HttpClient) service.Git {
+func NewBitBucketMockService(observerList []service.Observer, client service.HttpClient) service.Git {
 	return &bitbucketMockService{
-		companyService: companyService,
-		observerList:   observerList,
-		client:         client,
+		observerList: observerList,
+		client:       client,
 	}
 }

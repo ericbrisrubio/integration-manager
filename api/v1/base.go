@@ -25,9 +25,9 @@ func BitbucketEventRouter(g *echo.Group) {
 	var bitbucketApi api.Git
 
 	if config.Environment == string(enums.PRODUCTION) {
-		bitbucketApi = NewBitbucketApi(dependency.GetV1BitbucketService(), dependency.GetV1CompanyService(), dependency.GetV1ProcessInventoryEventService(), dependency.GetV1Observers())
+		bitbucketApi = NewBitbucketApi(dependency.GetV1BitbucketService(), dependency.GetV1CompanyService(), dependency.GetV1RepositoryService(), dependency.GetV1ApplicationService(), dependency.GetV1ProcessInventoryEventService(), dependency.GetV1Observers())
 	} else {
-		bitbucketApi = NewBitbucketApi(dependency.GetV1MockBitbucketService(), dependency.GetV1MockCompanyService(), dependency.GetV1ProcessInventoryEventService(), dependency.GetV1Observers())
+		bitbucketApi = NewBitbucketApi(dependency.GetV1MockBitbucketService(), dependency.GetV1MockCompanyService(), dependency.GetV1RepositoryService(), dependency.GetV1ApplicationService(), dependency.GetV1ProcessInventoryEventService(), dependency.GetV1Observers())
 	}
 	g.POST("", bitbucketApi.ListenEvent)
 	g.GET("/branches", bitbucketApi.GetBranches)
@@ -38,9 +38,9 @@ func BitbucketEventRouter(g *echo.Group) {
 func GithubEventRouter(g *echo.Group) {
 	var githubApi api.Git
 	if config.Environment == string(enums.PRODUCTION) {
-		githubApi = NewGithubApi(dependency.GetV1GithubService(), dependency.GetV1CompanyService(), dependency.GetV1ProcessInventoryEventService(), dependency.GetV1Observers())
+		githubApi = NewGithubApi(dependency.GetV1GithubService(), dependency.GetV1CompanyService(), dependency.GetV1RepositoryService(), dependency.GetV1ApplicationService(), dependency.GetV1ProcessInventoryEventService(), dependency.GetV1Observers())
 	} else {
-		githubApi = NewGithubApi(dependency.GetV1MockGithubService(), dependency.GetV1MockCompanyService(), dependency.GetV1ProcessInventoryEventService(), dependency.GetV1Observers())
+		githubApi = NewGithubApi(dependency.GetV1MockGithubService(), dependency.GetV1MockCompanyService(), dependency.GetV1RepositoryService(), dependency.GetV1ApplicationService(), dependency.GetV1ProcessInventoryEventService(), dependency.GetV1Observers())
 	}
 	g.POST("", githubApi.ListenEvent)
 	g.GET("/branches", githubApi.GetBranches)
@@ -49,38 +49,35 @@ func GithubEventRouter(g *echo.Group) {
 
 // CompanyRouter api/v1/companies/* router
 func CompanyRouter(g *echo.Group) {
-	companyApi := NewCompanyApi(dependency.GetV1CompanyService(), dependency.GetV1BitbucketService(), dependency.GetV1GithubService(), nil)
+	companyApi := NewCompanyApi(dependency.GetV1CompanyService(), dependency.GetV1RepositoryService(), dependency.GetV1ApplicationService(), dependency.GetV1GithubService(), dependency.GetV1BitbucketService(), nil)
 	g.POST("", companyApi.Save, AuthenticationAndAuthorizationHandler)
 	g.GET("", companyApi.Get, AuthenticationAndAuthorizationHandler)
 	g.GET("/:id", companyApi.GetById, AuthenticationAndAuthorizationHandler)
 	g.GET("/:id/repositories", companyApi.GetRepositoriesById, AuthenticationAndAuthorizationHandler)
 	g.PUT("/:id/repositories", companyApi.UpdateRepositories, AuthenticationAndAuthorizationHandler)
 	g.GET("/:id/applications", companyApi.GetApplicationsByCompanyIdAndRepositoryType, AuthenticationAndAuthorizationHandler)
+	g.PUT("/:id/repositories/:repoId/applications", companyApi.UpdateApplications, AuthenticationAndAuthorizationHandler)
 	g.PATCH("/:id/repositories/:repoId/webhooks", companyApi.UpdateWebhook, AuthenticationAndAuthorizationHandler)
 }
 
 // RepositoryRouter api/v1/repositories/* router
 func RepositoryRouter(g *echo.Group) {
-	repositoryApi := NewRepositoryApi(dependency.GetV1CompanyService(), nil)
+	repositoryApi := NewRepositoryApi(dependency.GetV1RepositoryService(), dependency.GetV1ApplicationService(), nil)
 	g.GET("/:id", repositoryApi.GetById, AuthenticationAndAuthorizationHandler)
 	g.GET("/:id/applications", repositoryApi.GetApplicationsById, AuthenticationAndAuthorizationHandler)
 }
 
 // ApplicationRouter api/v1/applications/* router
 func ApplicationRouter(g *echo.Group) {
-	applicationApi := NewApplicationApi(dependency.GetV1CompanyService(), nil, dependency.GetV1PipelineService())
+	applicationApi := NewApplicationApi(dependency.GetV1ApplicationService(), nil, dependency.GetV1PipelineService())
 	//companyId, repositoryId via query param
-	g.POST("", applicationApi.Update, AuthenticationAndAuthorizationHandler)
 	g.GET("/:id", applicationApi.GetById, AuthenticationAndAuthorizationHandler)
 	g.GET("", applicationApi.Get, AuthenticationAndAuthorizationHandler)
-	g.GET("/:id/pipelines", applicationApi.GetPipelineForValidation, AuthenticationAndAuthorizationHandler)
-	g.PUT("/:id/pipelines", applicationApi.UpdateApplicationPipeLine, AuthenticationAndAuthorizationHandler)
-	g.POST("/:id/pipelines", applicationApi.CreateApplicationPipeLine, AuthenticationAndAuthorizationHandler)
 }
 
 // PipelineRouter api/v1/pipelines/* router
 func PipelineRouter(g *echo.Group) {
-	pipelineApi := NewPipelineApi(dependency.GetV1PipelineService())
+	pipelineApi := NewPipelineApi(dependency.GetV1PipelineService(), dependency.GetV1ApplicationService())
 	g.GET("", pipelineApi.Get, AuthenticationAndAuthorizationHandler)
 	g.POST("", pipelineApi.Create, AuthenticationAndAuthorizationHandler)
 	g.PUT("", pipelineApi.Update, AuthenticationAndAuthorizationHandler)

@@ -34,7 +34,7 @@ func (a applicationMetadataRepository) SearchAppsByCompanyIdAndName(companyId, n
 	var results []v1.ApplicationMetadataCollection
 	query := bson.M{
 		"$and": []bson.M{
-			{"_metadata.labels.CompanyId": companyId},
+			{"_metadata.labels.companyId": companyId},
 			{"_metadata.name": primitive.Regex{Pattern: name}},
 		},
 	}
@@ -59,7 +59,7 @@ func (a applicationMetadataRepository) GetById(id, companyId string) v1.Applicat
 	var data v1.ApplicationMetadataCollection
 	query := bson.M{
 		"$and": []bson.M{
-			{"_metadata.labels.CompanyId": companyId},
+			{"_metadata.labels.companyId": companyId},
 			{"_metadata.id": id},
 		},
 	}
@@ -82,7 +82,7 @@ func (a applicationMetadataRepository) Update(companyId string, data v1.Applicat
 	filter := bson.M{
 		"$and": []bson.M{
 			{"_metadata.id": data.MetaData.Id},
-			{"_metadata.labels.CompanyId": companyId},
+			{"_metadata.labels.companyId": companyId},
 		},
 	}
 	update := bson.M{
@@ -106,7 +106,7 @@ func (a applicationMetadataRepository) Delete(id, companyId string) error {
 	filter := bson.M{
 		"$and": []bson.M{
 			{"_metadata.id": id},
-			{"_metadata.labels.CompanyId": companyId},
+			{"_metadata.labels.companyId": companyId},
 		},
 	}
 	coll := a.manager.Db.Collection(ApplicationMetadataCollection)

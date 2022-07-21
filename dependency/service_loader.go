@@ -11,27 +11,27 @@ import (
 
 // GetV1GithubService returns Git service
 func GetV1GithubService() service.Git {
-	return logic.NewGithubService(GetV1CompanyService(), nil, logic.NewHttpClientService())
+	return logic.NewGithubService(nil, logic.NewHttpClientService())
 }
 
 // GetMockV1GithubService returns Git service
 func GetMockV1GithubService() service.Git {
-	return logic.NewGithubService(GetV1MockCompanyService(), nil, logic.NewHttpClientService())
+	return logic.NewGithubService(nil, logic.NewHttpClientService())
 }
 
 // GetV1BitbucketService returns Git service
 func GetV1BitbucketService() service.Git {
-	return logic.NewBitBucketService(GetV1CompanyService(), nil, logic.NewHttpClientService())
+	return logic.NewBitBucketService(nil, logic.NewHttpClientService())
 }
 
 // GetV1MockBitbucketService returns Git service
 func GetV1MockBitbucketService() service.Git {
-	return logic.NewBitBucketMockService(GetV1MockCompanyService(), nil, logic.NewHttpClientService())
+	return logic.NewBitBucketMockService(nil, logic.NewHttpClientService())
 }
 
 // GetV1MockGithubService returns Git service
 func GetV1MockGithubService() service.Git {
-	return logic.NewGithubMockService(GetV1MockCompanyService(), nil, logic.NewHttpClientService())
+	return logic.NewGithubMockService(nil, logic.NewHttpClientService())
 }
 
 // GetV1Observers returns Observer services
@@ -62,6 +62,27 @@ func GetV1MockCompanyService() service.Company {
 	return company
 }
 
+// GetV1RepositoryService returns Repository service
+func GetV1RepositoryService() service.Repository {
+	var repository service.Repository
+	repository = logic.NewRepositoryService(mongo.NewRepositoryRepository(3000), GetV1ApplicationService())
+	return repository
+}
+
+// GetV1ApplicationMetadataService returns ApplicationMetadata service
+func GetV1ApplicationMetadataService() service.ApplicationMetadataService {
+	var applicationMetadata service.ApplicationMetadataService
+	applicationMetadata = logic.NewApplicationMetadataService(mongo.NewApplicationMetadataRepository(3000))
+	return applicationMetadata
+}
+
+// GetV1ApplicationService returns Application service
+func GetV1ApplicationService() service.Application {
+	var application service.Application
+	application = logic.NewApplicationService(mongo.NewApplicationRepository(3000), GetV1ApplicationMetadataService(), logic.NewHttpClientService())
+	return application
+}
+
 // GetV1ProcessInventoryEventService returns ProcessInventoryEvent service
 func GetV1ProcessInventoryEventService() service.ProcessInventoryEvent {
 	return logic.NewProcessInventoryEventService(logic.NewHttpClientService())
@@ -81,7 +102,7 @@ func GetV1SearchService() service.Search {
 
 // GetV1PipelineService returns Pipeline service
 func GetV1PipelineService() service.Pipeline {
-	pipeline := logic.NewPipelineService(GetV1GithubService(), GetV1BitbucketService(), GetV1CompanyService())
+	pipeline := logic.NewPipelineService(GetV1GithubService(), GetV1BitbucketService(), GetV1RepositoryService())
 	return pipeline
 }
 
