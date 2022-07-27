@@ -20,9 +20,10 @@
 - Notifies observers.
 
 
-| Versions | 
-|----------|
-| 0.0.1    |
+| Versions | Descriptors  |
+|----------|-------------|
+| [v0.0.1-beta](https://github.com/klovercloud-ci-cd/integration-manager/releases/tag/v0.0.1-beta) | [k8s](k8s/v0.0.1-beta) |
+
 
 ## Want to contribute
 
