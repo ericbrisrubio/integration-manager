@@ -18,4 +18,5 @@ type ApplicationRepository interface {
 	Update(companyId, repositoryId string, application v1.Application) error
 	SoftDeleteApplication(application v1.Application) error
 	DeleteApplication(companyId, repositoryId, applicationId string) error
+	SearchAppsByCompanyIdAndName(companyId, name string) []v1.Application
 }

@@ -10,9 +10,12 @@ import (
 )
 
 type applicationService struct {
-	repo                       repository.ApplicationRepository
-	applicationMetadataService service.ApplicationMetadataService
-	client                     service.HttpClient
+	repo   repository.ApplicationRepository
+	client service.HttpClient
+}
+
+func (a applicationService) SearchAppsByCompanyIdAndName(companyId, name string) []v1.Application {
+	return a.repo.SearchAppsByCompanyIdAndName(companyId, name)
 }
 
 func (a applicationService) GetByCompanyIdAndUrl(companyId, applicationUrl string) v1.Application {
@@ -67,16 +70,7 @@ func (a applicationService) SoftDeleteApplications(repository v1.Repository, app
 		applications = append(applications, application)
 	}
 	for _, each := range applications {
-		each.Status = enums.INACTIVE
-		applicationMetadataCollection := v1.ApplicationMetadataCollection{
-			MetaData: each.MetaData,
-			Status:   each.Status,
-		}
-		err := a.applicationMetadataService.Update(repository.CompanyId, applicationMetadataCollection)
-		if err != nil {
-			return err
-		}
-		err = a.repo.SoftDeleteApplication(each)
+		err := a.repo.SoftDeleteApplication(each)
 		if err != nil {
 			return err
 		}
@@ -91,11 +85,7 @@ func (a applicationService) DeleteApplications(repository v1.Repository, apps []
 		applications = append(applications, application)
 	}
 	for _, each := range applications {
-		err := a.applicationMetadataService.Delete(each.MetaData.Id, repository.CompanyId)
-		if err != nil {
-			return err
-		}
-		err = a.repo.DeleteApplication(repository.CompanyId, repository.Id, each.MetaData.Id)
+		err := a.repo.DeleteApplication(repository.CompanyId, repository.Id, each.MetaData.Id)
 		if err != nil {
 			return err
 		}
@@ -124,14 +114,6 @@ func (a applicationService) CreateGithubWebHookAndStoreApplication(token string,
 	app.Webhook = gitWebhook
 	app.MetaData.IsWebhookEnabled = gitWebhook.Active
 	app.Status = enums.ACTIVE
-	applicationMetadataCollection := v1.ApplicationMetadataCollection{
-		MetaData: app.MetaData,
-		Status:   app.Status,
-	}
-	err = a.applicationMetadataService.Update(app.CompanyId, applicationMetadataCollection)
-	if err != nil {
-		return
-	}
 	err = a.repo.Store(app)
 	if err != nil {
 		return
@@ -147,14 +129,6 @@ func (a applicationService) CreateBitbucketWebHookAndStoreApplication(token stri
 	app.Webhook = gitWebhook
 	app.MetaData.IsWebhookEnabled = gitWebhook.Active
 	app.Status = enums.ACTIVE
-	applicationMetadataCollection := v1.ApplicationMetadataCollection{
-		MetaData: app.MetaData,
-		Status:   app.Status,
-	}
-	err = a.applicationMetadataService.Update(app.CompanyId, applicationMetadataCollection)
-	if err != nil {
-		return
-	}
 	err = a.repo.Store(app)
 	if err != nil {
 		return
@@ -191,14 +165,6 @@ func (a applicationService) EnableBitbucketWebhookAndUpdateApplication(companyId
 	if err != nil {
 		return err
 	}
-	applicationMetadata := v1.ApplicationMetadataCollection{
-		MetaData: app.MetaData,
-		Status:   app.Status,
-	}
-	err = a.applicationMetadataService.Update(companyId, applicationMetadata)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -212,14 +178,6 @@ func (a applicationService) DisableBitbucketWebhookAndUpdateApplication(companyI
 	app.Webhook = v1.GitWebhook{}
 	app.MetaData.IsWebhookEnabled = false
 	err = a.repo.Update(companyId, repoId, app)
-	if err != nil {
-		return err
-	}
-	applicationMetadata := v1.ApplicationMetadataCollection{
-		MetaData: app.MetaData,
-		Status:   app.Status,
-	}
-	err = a.applicationMetadataService.Update(companyId, applicationMetadata)
 	if err != nil {
 		return err
 	}
@@ -239,14 +197,6 @@ func (a applicationService) EnableGithubWebhookAndUpdateApplication(companyId, r
 	if err != nil {
 		return err
 	}
-	applicationMetadata := v1.ApplicationMetadataCollection{
-		MetaData: app.MetaData,
-		Status:   app.Status,
-	}
-	err = a.applicationMetadataService.Update(companyId, applicationMetadata)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -263,41 +213,21 @@ func (a applicationService) DisableGithubWebhookAndUpdateApplication(companyId, 
 	if err != nil {
 		return err
 	}
-	applicationMetadata := v1.ApplicationMetadataCollection{
-		MetaData: app.MetaData,
-		Status:   app.Status,
-	}
-	err = a.applicationMetadataService.Update(companyId, applicationMetadata)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
 func (a applicationService) SoftDeleteApplication(application v1.Application) error {
-	err := a.applicationMetadataService.Update(application.CompanyId, v1.ApplicationMetadataCollection{
-		MetaData: application.MetaData,
-		Status:   application.Status,
-	})
-	if err != nil {
-		return err
-	}
 	return a.repo.SoftDeleteApplication(application)
 }
 
 func (a applicationService) DeleteApplication(companyId, repositoryId, applicationId string) error {
-	err := a.applicationMetadataService.Delete(applicationId, companyId)
-	if err != nil {
-		return err
-	}
 	return a.repo.DeleteApplication(companyId, repositoryId, applicationId)
 }
 
 // NewApplicationService returns Application type service
-func NewApplicationService(repo repository.ApplicationRepository, applicationMetadataService service.ApplicationMetadataService, client service.HttpClient) service.Application {
+func NewApplicationService(repo repository.ApplicationRepository, client service.HttpClient) service.Application {
 	return &applicationService{
-		repo:                       repo,
-		applicationMetadataService: applicationMetadataService,
-		client:                     httpClientService{},
+		repo:   repo,
+		client: client,
 	}
 }

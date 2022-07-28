@@ -9,4 +9,5 @@ type Repository interface {
 	UpdateRepositories(companyId string, repositoriesDto []v1.RepositoryDto, repositoryUpdateOption v1.RepositoryUpdateOption) error
 	GetById(companyId, repositoryId string) v1.Repository
 	GetByCompanyIdAndApplicationUrl(companyId, url string) v1.Repository
+	SearchByNameAndCompanyId(name, companyId string) []v1.Repository
 }

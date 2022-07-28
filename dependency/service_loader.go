@@ -48,9 +48,9 @@ func GetV1Observers() []service.Observer {
 func GetV1CompanyService() service.Company {
 	var company service.Company
 	if config.Database == enums.MONGO {
-		company = logic.NewCompanyService(mongo.NewCompanyRepository(3000), mongo.NewApplicationMetadataRepository(3000), logic.NewHttpClientService())
+		company = logic.NewCompanyService(mongo.NewCompanyRepository(3000), logic.NewHttpClientService())
 	} else {
-		company = logic.NewCompanyService(inmemory.NewCompanyRepository(3000), nil, logic.NewHttpClientService())
+		company = logic.NewCompanyService(inmemory.NewCompanyRepository(3000), logic.NewHttpClientService())
 	}
 	return company
 }
@@ -69,17 +69,10 @@ func GetV1RepositoryService() service.Repository {
 	return repository
 }
 
-// GetV1ApplicationMetadataService returns ApplicationMetadata service
-func GetV1ApplicationMetadataService() service.ApplicationMetadataService {
-	var applicationMetadata service.ApplicationMetadataService
-	applicationMetadata = logic.NewApplicationMetadataService(mongo.NewApplicationMetadataRepository(3000))
-	return applicationMetadata
-}
-
 // GetV1ApplicationService returns Application service
 func GetV1ApplicationService() service.Application {
 	var application service.Application
-	application = logic.NewApplicationService(mongo.NewApplicationRepository(3000), GetV1ApplicationMetadataService(), logic.NewHttpClientService())
+	application = logic.NewApplicationService(mongo.NewApplicationRepository(3000), logic.NewHttpClientService())
 	return application
 }
 
@@ -96,7 +89,7 @@ func GetV1JwtService() service.Jwt {
 // GetV1SearchService returns Search service
 func GetV1SearchService() service.Search {
 	var search service.Search
-	search = logic.NewSearchService(mongo.NewApplicationMetadataRepository(3000))
+	search = logic.NewSearchService(GetV1ApplicationService())
 	return search
 }
 

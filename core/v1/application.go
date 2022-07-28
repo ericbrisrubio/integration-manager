@@ -30,30 +30,12 @@ type Applications struct {
 	Applications []Application `bson:"applications" json:"applications"`
 }
 
-// Validate validates application info
-//func (application Application) Validate() error {
-//	if application.Url == "" {
-//		return errors.New("Application url is required!")
-//	}
-//	err := application.MetaData.Validate()
-//	if err != nil {
-//		return err
-//	}
-//	return nil
-//}
-
 // ApplicationMetadata contains application metadata info
 type ApplicationMetadata struct {
 	Labels           map[string]string `bson:"labels" json:"labels"`
 	Id               string            `bson:"id" json:"id"`
 	Name             string            `bson:"name" json:"name"`
 	IsWebhookEnabled bool              `bson:"is_webhook_enabled" json:"is_webhook_enabled"`
-}
-
-// ApplicationMetadataCollection contains application metadata collection info
-type ApplicationMetadataCollection struct {
-	MetaData ApplicationMetadata  `bson:"_metadata" json:"_metadata"`
-	Status   enums.COMPANY_STATUS `bson:"status" json:"status"`
 }
 
 // Validate validates application metadata

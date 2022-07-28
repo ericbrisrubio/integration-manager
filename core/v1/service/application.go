@@ -19,4 +19,5 @@ type Application interface {
 	DeleteApplication(companyId, repositoryId, applicationId string) error
 	UpdateApplications(repository v1.Repository, apps []v1.Application, applicationUpdateOption v1.ApplicationUpdateOption) error
 	UpdateWebhook(repository v1.Repository, url, webhookId, action string) error
+	SearchAppsByCompanyIdAndName(companyId, name string) []v1.Application
 }

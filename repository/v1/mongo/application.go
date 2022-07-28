@@ -6,6 +6,7 @@ import (
 	"github.com/klovercloud-ci-cd/integration-manager/core/v1/repository"
 	"github.com/klovercloud-ci-cd/integration-manager/enums"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"time"
@@ -19,6 +20,31 @@ var (
 type applicationRepository struct {
 	manager *dmManager
 	timeout time.Duration
+}
+
+func (a applicationRepository) SearchAppsByCompanyIdAndName(companyId, name string) []v1.Application {
+	var results []v1.Application
+	query := bson.M{
+		"$and": []bson.M{
+			{"companyId": companyId},
+			{"_metadata.name": primitive.Regex{Pattern: name}},
+		},
+	}
+	coll := a.manager.Db.Collection(ApplicationCollection)
+	result, err := coll.Find(a.manager.Ctx, query, nil)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	for result.Next(context.TODO()) {
+		elemValue := new(v1.Application)
+		err := result.Decode(elemValue)
+		if err != nil {
+			log.Println("[ERROR]", err)
+			break
+		}
+		results = append(results, *elemValue)
+	}
+	return results
 }
 
 func (a applicationRepository) GetById(companyId string, repoId string, applicationId string) v1.Application {
