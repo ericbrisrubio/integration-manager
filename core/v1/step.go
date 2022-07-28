@@ -109,7 +109,7 @@ func (step Step) GetTypeWithValidation() map[string]string {
 		typeMap["message"] = ""
 	} else {
 		typeMap["valid"] = "false"
-		typeMap["message"] = "invalid step type is given"
+		typeMap["message"] = "invalid step type"
 	}
 	return typeMap
 }
@@ -127,7 +127,7 @@ func (step Step) GetTriggerWithValidation() map[string]string {
 		triggerMap["message"] = ""
 	} else {
 		triggerMap["valid"] = "false"
-		triggerMap["message"] = "invalid step trigger is given"
+		triggerMap["message"] = "invalid step trigger"
 	}
 	return triggerMap
 }
@@ -151,7 +151,7 @@ func (step Step) GetParamsWithValidation() []map[string]string {
 			paramMap["message"] = ""
 		} else {
 			paramMap["valid"] = "false"
-			paramMap["message"] = "invalid step param is given"
+			paramMap["message"] = "invalid param"
 		}
 		paramsMap = append(paramsMap, paramMap)
 	}
@@ -175,7 +175,7 @@ func (step Step) GetNextWithValidation(stepNameMap map[string]bool) []map[string
 			nextMap["message"] = ""
 		} else {
 			nextMap["valid"] = "false"
-			nextMap["message"] = "invalid step next is given"
+			nextMap["message"] = "invalid step"
 		}
 		nextMaps = append(nextMaps, nextMap)
 	}
