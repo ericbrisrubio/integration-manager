@@ -9,9 +9,8 @@ import (
 )
 
 type companyService struct {
-	repo                          repository.CompanyRepository
-	applicationMetadataRepository repository.ApplicationMetadataRepository
-	client                        service.HttpClient
+	repo   repository.CompanyRepository
+	client service.HttpClient
 }
 
 func (c companyService) Store(company v1.Company) error {
@@ -47,10 +46,9 @@ func (c companyService) GetByName(name string, status v1.StatusQueryOption) v1.C
 }
 
 // NewCompanyService returns Company type service
-func NewCompanyService(repo repository.CompanyRepository, applicationMetadataRepository repository.ApplicationMetadataRepository, client service.HttpClient) service.Company {
+func NewCompanyService(repo repository.CompanyRepository, client service.HttpClient) service.Company {
 	return &companyService{
-		repo:                          repo,
-		applicationMetadataRepository: applicationMetadataRepository,
-		client:                        client,
+		repo:   repo,
+		client: client,
 	}
 }

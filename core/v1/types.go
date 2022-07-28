@@ -6,8 +6,8 @@ import (
 
 // SearchData contains repositories and applications info
 type SearchData struct {
-	Repositories []Repository                    `json:"repositories" bson:"repositories"`
-	Applications []ApplicationMetadataCollection `json:"applications" bson:"applications"`
+	Repositories []Repository  `json:"repositories" bson:"repositories"`
+	Applications []Application `json:"applications" bson:"applications"`
 }
 
 // Subject observers listen event with an object of this struct

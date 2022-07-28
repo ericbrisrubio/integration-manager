@@ -14,6 +14,10 @@ type repositoryService struct {
 	applicationService service.Application
 }
 
+func (r repositoryService) SearchByNameAndCompanyId(name, companyId string) []v1.Repository {
+	return r.SearchByNameAndCompanyId(name, companyId)
+}
+
 func (r repositoryService) GetById(companyId, repositoryId string) v1.Repository {
 	return r.repo.GetById(companyId, repositoryId)
 }
