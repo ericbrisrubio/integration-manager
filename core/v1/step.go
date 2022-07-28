@@ -109,7 +109,7 @@ func (step Step) GetTypeWithValidation() map[string]string {
 		typeMap["message"] = ""
 	} else {
 		typeMap["valid"] = "false"
-		typeMap["message"] = "invalid step type is given"
+		typeMap["message"] = "invalid step type"
 	}
 	return typeMap
 }
@@ -121,13 +121,13 @@ func (step Step) GetTriggerWithValidation() map[string]string {
 	triggerMap["accepts"] = string(enums.AUTO + ", " + enums.MANUAL)
 	if step.Trigger == "" {
 		triggerMap["valid"] = "false"
-		triggerMap["message"] = "step trigger is missing"
+		triggerMap["message"] = "trigger is missing"
 	} else if val, _ := triggerMap["value"]; val == string(enums.AUTO) || val == string(enums.MANUAL) {
 		triggerMap["valid"] = "true"
 		triggerMap["message"] = ""
 	} else {
 		triggerMap["valid"] = "false"
-		triggerMap["message"] = "invalid step trigger is given"
+		triggerMap["message"] = "invalid trigger"
 	}
 	return triggerMap
 }
@@ -145,13 +145,13 @@ func (step Step) GetParamsWithValidation() []map[string]string {
 		}
 		if val == "" {
 			paramMap["valid"] = "false"
-			paramMap["message"] = "step param is missing"
+			paramMap["message"] = "param is missing"
 		} else if acceptValue, _ := paramMap["accepts"]; acceptValue == "*" || val == acceptValue {
 			paramMap["valid"] = "true"
 			paramMap["message"] = ""
 		} else {
 			paramMap["valid"] = "false"
-			paramMap["message"] = "invalid step param is given"
+			paramMap["message"] = "invalid param"
 		}
 		paramsMap = append(paramsMap, paramMap)
 	}
@@ -175,7 +175,7 @@ func (step Step) GetNextWithValidation(stepNameMap map[string]bool) []map[string
 			nextMap["message"] = ""
 		} else {
 			nextMap["valid"] = "false"
-			nextMap["message"] = "invalid step next is given"
+			nextMap["message"] = "invalid step"
 		}
 		nextMaps = append(nextMaps, nextMap)
 	}
