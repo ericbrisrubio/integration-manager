@@ -2,6 +2,7 @@ package logic
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/klovercloud-ci-cd/integration-manager/config"
 	v1 "github.com/klovercloud-ci-cd/integration-manager/core/v1"
@@ -169,10 +170,18 @@ func (githubService githubService) CreateRepositoryWebhook(username, repositoryN
 		return v1.GitWebhook{}, err
 	}
 	webhook := v1.GithubWebhook{}
+	webHookErrorRes := v1.GitWebHookErrorResponse{}
 	err = json.Unmarshal(data, &webhook)
 	if err != nil {
 		log.Println(err.Error())
 		return v1.GitWebhook{}, err
+	}
+	if webhook.URL == "" {
+		err = json.Unmarshal(data, &webHookErrorRes)
+		if len(webHookErrorRes.Errors) > 0 {
+			return v1.GitWebhook{}, errors.New(webHookErrorRes.Errors[len(webHookErrorRes.Errors)-1].Message)
+		}
+		return v1.GitWebhook{}, errors.New(webHookErrorRes.Message)
 	}
 	return webhook.GetGitWebhook(), nil
 }
