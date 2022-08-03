@@ -18,6 +18,6 @@ type Application interface {
 	SoftDeleteApplication(application v1.Application) error
 	DeleteApplication(companyId, repositoryId, applicationId string) error
 	UpdateApplications(repository v1.Repository, apps []v1.Application, applicationUpdateOption v1.ApplicationUpdateOption) error
-	UpdateWebhook(repository v1.Repository, url, webhookId, action string) error
+	UpdateWebhook(repository v1.Repository, url, webhookId, action, appId string) error
 	SearchAppsByCompanyIdAndName(companyId, name string) []v1.Application
 }

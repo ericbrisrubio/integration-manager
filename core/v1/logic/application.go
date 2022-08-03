@@ -135,30 +135,30 @@ func (a applicationService) CreateBitbucketWebHookAndStoreApplication(token stri
 	}
 }
 
-func (a applicationService) UpdateWebhook(repository v1.Repository, url, webhookId, action string) error {
+func (a applicationService) UpdateWebhook(repository v1.Repository, url, webhookId, action, appId string) error {
 	if action == string(enums.WEBHOOK_EANBLE) {
 		if repository.Type == enums.GITHUB {
-			return a.EnableGithubWebhookAndUpdateApplication(repository.CompanyId, repository.Id, url, repository.Token)
+			return a.EnableGithubWebhookAndUpdateApplication(repository.CompanyId, repository.Id, appId, url, repository.Token)
 		} else if repository.Type == enums.BIT_BUCKET {
-			return a.EnableBitbucketWebhookAndUpdateApplication(repository.CompanyId, repository.Id, url, repository.Token)
+			return a.EnableBitbucketWebhookAndUpdateApplication(repository.CompanyId, repository.Id, appId, url, repository.Token)
 		}
 	} else if action == string(enums.WEBHOOK_DISABLE) {
 		if repository.Type == enums.GITHUB {
-			return a.DisableGithubWebhookAndUpdateApplication(repository.CompanyId, repository.Id, url, webhookId, repository.Token)
+			return a.DisableGithubWebhookAndUpdateApplication(repository.CompanyId, repository.Id, appId, url, webhookId, repository.Token)
 		} else if repository.Type == enums.BIT_BUCKET {
-			return a.DisableBitbucketWebhookAndUpdateApplication(repository.CompanyId, repository.Id, url, webhookId, repository.Token)
+			return a.DisableBitbucketWebhookAndUpdateApplication(repository.CompanyId, repository.Id, appId, url, webhookId, repository.Token)
 		}
 	}
 	return errors.New("provide valid action")
 }
 
-func (a applicationService) EnableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, token string) error {
+func (a applicationService) EnableBitbucketWebhookAndUpdateApplication(companyId, repoId, appId, url, token string) error {
 	username, repositoryName := v1.GetUsernameAndRepoNameFromBitbucketRepositoryUrl(url)
 	webhook, err := NewBitBucketService(nil, a.client).CreateRepositoryWebhook(username, repositoryName, token, companyId)
 	if err != nil {
 		return err
 	}
-	app := a.repo.GetByCompanyIdAndRepositoryIdAndUrl(companyId, repoId, url)
+	app := a.repo.GetById(companyId, repoId, appId)
 	app.Webhook = webhook
 	app.MetaData.IsWebhookEnabled = true
 	err = a.repo.Update(companyId, repoId, app)
@@ -168,13 +168,13 @@ func (a applicationService) EnableBitbucketWebhookAndUpdateApplication(companyId
 	return nil
 }
 
-func (a applicationService) DisableBitbucketWebhookAndUpdateApplication(companyId, repoId, url, webhookId, token string) error {
+func (a applicationService) DisableBitbucketWebhookAndUpdateApplication(companyId, repoId, appId, url, webhookId, token string) error {
 	username, repositoryName := v1.GetUsernameAndRepoNameFromBitbucketRepositoryUrl(url)
 	err := NewBitBucketService(nil, a.client).DeleteRepositoryWebhookById(username, repositoryName, webhookId, token)
 	if err != nil {
 		return err
 	}
-	app := a.repo.GetByCompanyIdAndRepositoryIdAndUrl(companyId, repoId, url)
+	app := a.repo.GetById(companyId, repoId, appId)
 	app.Webhook = v1.GitWebhook{}
 	app.MetaData.IsWebhookEnabled = false
 	err = a.repo.Update(companyId, repoId, app)
@@ -184,13 +184,13 @@ func (a applicationService) DisableBitbucketWebhookAndUpdateApplication(companyI
 	return nil
 }
 
-func (a applicationService) EnableGithubWebhookAndUpdateApplication(companyId, repoId, url, token string) error {
+func (a applicationService) EnableGithubWebhookAndUpdateApplication(companyId, repoId, appId, url, token string) error {
 	username, repositoryName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(url)
 	webhook, err := NewGithubService(nil, a.client).CreateRepositoryWebhook(username, repositoryName, token, companyId)
 	if err != nil {
 		return err
 	}
-	app := a.repo.GetByCompanyIdAndRepositoryIdAndUrl(companyId, repoId, url)
+	app := a.repo.GetById(companyId, repoId, appId)
 	app.Webhook = webhook
 	app.MetaData.IsWebhookEnabled = true
 	err = a.repo.Update(companyId, repoId, app)
@@ -200,13 +200,13 @@ func (a applicationService) EnableGithubWebhookAndUpdateApplication(companyId, r
 	return nil
 }
 
-func (a applicationService) DisableGithubWebhookAndUpdateApplication(companyId, repoId, url, webhookId, token string) error {
+func (a applicationService) DisableGithubWebhookAndUpdateApplication(companyId, repoId, appId, url, webhookId, token string) error {
 	username, repositoryName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(url)
 	err := NewGithubService(nil, a.client).DeleteRepositoryWebhookById(username, repositoryName, webhookId, token)
 	if err != nil {
 		return err
 	}
-	app := a.repo.GetByCompanyIdAndRepositoryIdAndUrl(companyId, repoId, url)
+	app := a.repo.GetById(companyId, repoId, appId)
 	app.Webhook = v1.GitWebhook{}
 	app.MetaData.IsWebhookEnabled = false
 	err = a.repo.Update(companyId, repoId, app)

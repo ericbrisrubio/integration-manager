@@ -430,6 +430,10 @@ func (c companyApi) UpdateWebhook(context echo.Context) error {
 	if action != string(enums.WEBHOOK_EANBLE) && action != string(enums.WEBHOOK_DISABLE) {
 		return common.GenerateErrorResponse(context, "[ERROR]: invalid action provided", "Provide valid action. [enable/disable]")
 	}
+	appId := context.QueryParam("appId")
+	if appId == "" {
+		return common.GenerateErrorResponse(context, "[ERROR]: no application id is not provided", "Please provide application id")
+	}
 	id := context.Param("id")
 	if id == "" {
 		return common.GenerateErrorResponse(context, "[ERROR]: no company id is not provided", "Please provide company id")
@@ -450,7 +454,7 @@ func (c companyApi) UpdateWebhook(context echo.Context) error {
 	if repository.Id == "" {
 		return common.GenerateErrorResponse(context, "[ERROR]: repository not found", "Please provide valid repository id")
 	}
-	err := c.applicationService.UpdateWebhook(repository, url, webhookId, action)
+	err := c.applicationService.UpdateWebhook(repository, url, webhookId, action, appId)
 	if err != nil {
 		return common.GenerateErrorResponse(context, err, err.Error())
 	}
