@@ -125,7 +125,7 @@ func (g githubMockService) GetDirectoryContents(repositoryName, username, revisi
 	return gitDirectoryContents, nil
 }
 
-func (g githubMockService) CreateRepositoryWebhook(username, repositoryName, token string, companyId string) (v1.GitWebhook, error) {
+func (g githubMockService) CreateRepositoryWebhook(username, repositoryName, token string, companyId, appId string) (v1.GitWebhook, error) {
 	//TODO implement me
 	panic("implement me")
 }

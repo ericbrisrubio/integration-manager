@@ -13,7 +13,7 @@ type Git interface {
 	GetContent(repositoryName, username, token, path string) (v1.GitContent, error)
 	CreateDirectoryContent(repositoryName, username, token, path string, content v1.DirectoryContentCreatePayload) (v1.DirectoryContentCreateAndUpdateResponse, error)
 	UpdateDirectoryContent(repositoryName, username, token, path string, content v1.DirectoryContentUpdatePayload) (v1.DirectoryContentCreateAndUpdateResponse, error)
-	CreateRepositoryWebhook(username, repositoryName, token string, companyId string) (v1.GitWebhook, error)
+	CreateRepositoryWebhook(username, repositoryName, token string, companyId, appId string) (v1.GitWebhook, error)
 	DeleteRepositoryWebhookById(username, repositoryName, webhookId, token string) error
 	GetBranches(username, repositoryName, token string) (v1.GitBranches, error)
 	GetCommitsByBranch(username, repositoryName, branch, token string, option v1.Pagination) ([]v1.GitCommit, int64, error)

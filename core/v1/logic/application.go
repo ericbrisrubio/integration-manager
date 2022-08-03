@@ -107,7 +107,7 @@ func (a applicationService) CreateWebHookAndUpdateApplications(repoType enums.RE
 
 func (a applicationService) CreateGithubWebHookAndStoreApplication(token string, app v1.Application) {
 	usernameOrorgName, repoName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(app.Url)
-	gitWebhook, err := NewGithubService(nil, a.client).CreateRepositoryWebhook(usernameOrorgName, repoName, token, app.CompanyId)
+	gitWebhook, err := NewGithubService(nil, a.client).CreateRepositoryWebhook(usernameOrorgName, repoName, token, app.CompanyId, app.MetaData.Id)
 	if err != nil {
 		log.Println("ERROR while creating webhook for application: ", err.Error())
 	}
@@ -122,7 +122,7 @@ func (a applicationService) CreateGithubWebHookAndStoreApplication(token string,
 
 func (a applicationService) CreateBitbucketWebHookAndStoreApplication(token string, app v1.Application) {
 	usernameOrorgName, repoName := v1.GetUsernameAndRepoNameFromBitbucketRepositoryUrl(app.Url)
-	gitWebhook, err := NewBitBucketService(nil, a.client).CreateRepositoryWebhook(usernameOrorgName, repoName, token, app.CompanyId)
+	gitWebhook, err := NewBitBucketService(nil, a.client).CreateRepositoryWebhook(usernameOrorgName, repoName, token, app.CompanyId, app.MetaData.Id)
 	if err != nil {
 		log.Println("ERROR while creating webhook for application: ", err.Error())
 	}
@@ -154,7 +154,7 @@ func (a applicationService) UpdateWebhook(repository v1.Repository, url, webhook
 
 func (a applicationService) EnableBitbucketWebhookAndUpdateApplication(companyId, repoId, appId, url, token string) error {
 	username, repositoryName := v1.GetUsernameAndRepoNameFromBitbucketRepositoryUrl(url)
-	webhook, err := NewBitBucketService(nil, a.client).CreateRepositoryWebhook(username, repositoryName, token, companyId)
+	webhook, err := NewBitBucketService(nil, a.client).CreateRepositoryWebhook(username, repositoryName, token, companyId, appId)
 	if err != nil {
 		return err
 	}
@@ -186,7 +186,7 @@ func (a applicationService) DisableBitbucketWebhookAndUpdateApplication(companyI
 
 func (a applicationService) EnableGithubWebhookAndUpdateApplication(companyId, repoId, appId, url, token string) error {
 	username, repositoryName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(url)
-	webhook, err := NewGithubService(nil, a.client).CreateRepositoryWebhook(username, repositoryName, token, companyId)
+	webhook, err := NewGithubService(nil, a.client).CreateRepositoryWebhook(username, repositoryName, token, companyId, appId)
 	if err != nil {
 		return err
 	}
