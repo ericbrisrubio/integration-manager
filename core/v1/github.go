@@ -277,3 +277,13 @@ func (webhook GithubWebhook) GetGitWebhook() GitWebhook {
 		DeliveriesURL: webhook.DeliveriesURL,
 	}
 }
+
+type GitWebHookErrorResponse struct {
+	Message string `json:"message"`
+	Errors  []struct {
+		Resource string `json:"resource"`
+		Code     string `json:"code"`
+		Message  string `json:"message"`
+	} `json:"errors"`
+	DocumentationURL string `json:"documentation_url"`
+}
