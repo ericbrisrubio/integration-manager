@@ -128,16 +128,20 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 	branch := strings.Split(resource.Ref, "/")[2]
 	companyId := context.QueryParam("companyId")
 	if companyId == "" {
-		return common.GenerateErrorResponse(context, "[ERROR] no companyId is provided", "Please provide companyId")
+		return common.GenerateErrorResponse(context, "[ERROR] no company id is provided", "Please provide company id")
+	}
+	appId := context.QueryParam("applicationId")
+	if appId == "" {
+		return common.GenerateErrorResponse(context, "[ERROR] no application id is provided", "Please provide application id")
 	}
 	repoName := resource.Repository.Name
 	owner := resource.Repository.Owner.Login
 	revision := resource.After
-	repository := g.repositoryService.GetByCompanyIdAndApplicationUrl(companyId, resource.Repository.URL)
-	application := g.applicationService.GetByCompanyIdAndRepositoryIdAndUrl(companyId, repository.Id, resource.Repository.URL)
+	application := g.applicationService.GetById(companyId, appId)
 	if !application.MetaData.IsWebhookEnabled {
 		return common.GenerateForbiddenResponse(context, "[Forbidden]: Webhook is disabled!", "Operation Failed!")
 	}
+	repository := g.repositoryService.GetById(companyId, application.RepositoryId)
 	data, err := g.gitService.GetPipeline(repoName, owner, revision, repository.Token)
 	if err != nil {
 		log.Println("[ERROR]:Failed to trigger pipeline process! ", err.Error())
@@ -149,9 +153,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		return common.GenerateErrorResponse(context, "Branch does not exist!", "Operation Failed!")
 	}
 	if data != nil {
-
 		stepsCount := len(data.Steps)
-
 		for i := 0; i < stepsCount; i++ {
 			if data.Steps[i].Type == enums.BUILD {
 				if images, ok := data.Steps[i].Params[enums.IMAGE]; ok {
@@ -170,7 +172,6 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 				}
 
 			} else if data.Steps[i].Type == enums.DEPLOY {
-
 				isThisStepValidForThisCommit := false
 				if data.Steps[i].Params[enums.REVISION] != "" {
 					allowedRevisions := strings.Split(data.Steps[i].Params[enums.REVISION], ",")
@@ -203,7 +204,6 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		}
 	}
 	data.ProcessId = uuid.NewV4().String()
-
 	company := g.companyService.GetByCompanyId(companyId)
 	todaysRanProcess := g.processInventoryEventService.CountTodaysRanProcessByCompanyId(companyId)
 	data.MetaData = v1.PipelineMetadata{
@@ -240,7 +240,6 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		subject.EventData["trigger"] = false
 		subject.EventData["log"] = subject.Log
 	}
-
 	go g.notifyAll(subject)
 	return common.GenerateSuccessResponse(context, data.ProcessId, nil, "Pipeline triggered!")
 }

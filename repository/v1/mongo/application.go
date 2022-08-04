@@ -22,6 +22,23 @@ type applicationRepository struct {
 	timeout time.Duration
 }
 
+func (a applicationRepository) GetById(companyId string, applicationId string) v1.Application {
+	query := bson.M{
+		"$and": []bson.M{
+			{"companyId": companyId},
+			{"_metadata.id": applicationId},
+		},
+	}
+	temp := new(v1.Application)
+	coll := a.manager.Db.Collection(ApplicationCollection)
+	result := coll.FindOne(a.manager.Ctx, query)
+	err := result.Decode(&temp)
+	if err != nil {
+		log.Println("[ERROR]", err)
+	}
+	return *temp
+}
+
 func (a applicationRepository) SearchAppsByCompanyIdAndName(companyId, name string) []v1.Application {
 	var results []v1.Application
 	query := bson.M{
@@ -47,7 +64,7 @@ func (a applicationRepository) SearchAppsByCompanyIdAndName(companyId, name stri
 	return results
 }
 
-func (a applicationRepository) GetById(companyId string, repoId string, applicationId string) v1.Application {
+func (a applicationRepository) GetByIdAndRepoId(companyId string, repoId string, applicationId string) v1.Application {
 	query := bson.M{
 		"$and": []bson.M{
 			{"repositoryId": repoId},

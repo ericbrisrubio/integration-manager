@@ -14,6 +14,10 @@ type applicationService struct {
 	client service.HttpClient
 }
 
+func (a applicationService) GetById(companyId string, applicationId string) v1.Application {
+	return a.repo.GetById(companyId, applicationId)
+}
+
 func (a applicationService) SearchAppsByCompanyIdAndName(companyId, name string) []v1.Application {
 	return a.repo.SearchAppsByCompanyIdAndName(companyId, name)
 }
@@ -26,8 +30,8 @@ func (a applicationService) GetByCompanyIdAndRepositoryIdAndUrl(companyId, repos
 	return a.repo.GetByCompanyIdAndRepositoryIdAndUrl(companyId, repositoryId, applicationUrl)
 }
 
-func (a applicationService) GetById(companyId string, repoId string, applicationId string) v1.Application {
-	return a.repo.GetById(companyId, repoId, applicationId)
+func (a applicationService) GetByIdAndRepoId(companyId string, repoId string, applicationId string) v1.Application {
+	return a.repo.GetByIdAndRepoId(companyId, repoId, applicationId)
 }
 
 func (a applicationService) GetAll(companyId string, option v1.CompanyQueryOption) ([]v1.Application, int64) {
@@ -66,7 +70,7 @@ func (a applicationService) AppendApplications(repository v1.Repository, apps []
 func (a applicationService) SoftDeleteApplications(repository v1.Repository, apps []v1.Application) error {
 	var applications []v1.Application
 	for _, each := range apps {
-		application := a.repo.GetById(repository.CompanyId, repository.Id, each.MetaData.Id)
+		application := a.repo.GetByIdAndRepoId(repository.CompanyId, repository.Id, each.MetaData.Id)
 		applications = append(applications, application)
 	}
 	for _, each := range applications {
@@ -81,7 +85,7 @@ func (a applicationService) SoftDeleteApplications(repository v1.Repository, app
 func (a applicationService) DeleteApplications(repository v1.Repository, apps []v1.Application) error {
 	var applications []v1.Application
 	for _, each := range apps {
-		application := a.repo.GetById(repository.CompanyId, repository.Id, each.MetaData.Id)
+		application := a.repo.GetByIdAndRepoId(repository.CompanyId, repository.Id, each.MetaData.Id)
 		applications = append(applications, application)
 	}
 	for _, each := range applications {
@@ -158,7 +162,7 @@ func (a applicationService) EnableBitbucketWebhookAndUpdateApplication(companyId
 	if err != nil {
 		return err
 	}
-	app := a.repo.GetById(companyId, repoId, appId)
+	app := a.repo.GetByIdAndRepoId(companyId, repoId, appId)
 	app.Webhook = webhook
 	app.MetaData.IsWebhookEnabled = true
 	err = a.repo.Update(companyId, repoId, app)
@@ -174,7 +178,7 @@ func (a applicationService) DisableBitbucketWebhookAndUpdateApplication(companyI
 	if err != nil {
 		return err
 	}
-	app := a.repo.GetById(companyId, repoId, appId)
+	app := a.repo.GetByIdAndRepoId(companyId, repoId, appId)
 	app.Webhook = v1.GitWebhook{}
 	app.MetaData.IsWebhookEnabled = false
 	err = a.repo.Update(companyId, repoId, app)
@@ -190,7 +194,7 @@ func (a applicationService) EnableGithubWebhookAndUpdateApplication(companyId, r
 	if err != nil {
 		return err
 	}
-	app := a.repo.GetById(companyId, repoId, appId)
+	app := a.repo.GetByIdAndRepoId(companyId, repoId, appId)
 	app.Webhook = webhook
 	app.MetaData.IsWebhookEnabled = true
 	err = a.repo.Update(companyId, repoId, app)
@@ -206,7 +210,7 @@ func (a applicationService) DisableGithubWebhookAndUpdateApplication(companyId, 
 	if err != nil {
 		return err
 	}
-	app := a.repo.GetById(companyId, repoId, appId)
+	app := a.repo.GetByIdAndRepoId(companyId, repoId, appId)
 	app.Webhook = v1.GitWebhook{}
 	app.MetaData.IsWebhookEnabled = false
 	err = a.repo.Update(companyId, repoId, app)

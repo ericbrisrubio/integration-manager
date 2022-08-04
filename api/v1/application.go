@@ -72,7 +72,7 @@ func (a applicationApi) GetById(context echo.Context) error {
 	if repositoryId == "" {
 		return common.GenerateErrorResponse(context, "[ERROR]: Repository id is required", "Operation failed")
 	}
-	data := a.applicationService.GetById(companyId, repositoryId, id)
+	data := a.applicationService.GetByIdAndRepoId(companyId, repositoryId, id)
 	if data.MetaData.Id == "" {
 		return common.GenerateErrorResponse(context, "[ERROR]: Application not found", "Operation failed")
 	}

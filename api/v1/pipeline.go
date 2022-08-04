@@ -43,7 +43,7 @@ func (p pipelineApi) Update(context echo.Context) error {
 		if applicationId == "" {
 			return common.GenerateErrorResponse(context, "[ERROR]: Url or Application Id is required", "Operation failed")
 		}
-		application := p.applicationService.GetById(companyId, repoId, applicationId)
+		application := p.applicationService.GetByIdAndRepoId(companyId, repoId, applicationId)
 		if application.Url == "" {
 			return common.GenerateErrorResponse(context, "[ERROR]: Application not found!", "Operation failed")
 		}
@@ -89,7 +89,7 @@ func (p pipelineApi) Create(context echo.Context) error {
 		if applicationId == "" {
 			return common.GenerateErrorResponse(context, "[ERROR]: Url or Application Id is required", "Operation failed")
 		}
-		application := p.applicationService.GetById(companyId, repoId, applicationId)
+		application := p.applicationService.GetByIdAndRepoId(companyId, repoId, applicationId)
 		if application.Url == "" {
 			return common.GenerateErrorResponse(context, "[ERROR]: Application not found!", "Operation failed")
 		}
@@ -136,7 +136,7 @@ func (p pipelineApi) Get(context echo.Context) error {
 			if applicationId == "" {
 				return common.GenerateErrorResponse(context, "[ERROR]: Url or Application Id is required", "Operation failed")
 			}
-			application := p.applicationService.GetById(companyId, repoId, applicationId)
+			application := p.applicationService.GetByIdAndRepoId(companyId, repoId, applicationId)
 			if application.Url == "" {
 				return common.GenerateErrorResponse(context, "[ERROR]: Application not found!", "Operation failed")
 			}
