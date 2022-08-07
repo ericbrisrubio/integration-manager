@@ -130,7 +130,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 	if companyId == "" {
 		return common.GenerateErrorResponse(context, "[ERROR] no company id is provided", "Please provide company id")
 	}
-	appId := context.QueryParam("applicationId")
+	appId := context.QueryParam("appId")
 	if appId == "" {
 		return common.GenerateErrorResponse(context, "[ERROR] no application id is provided", "Please provide application id")
 	}
