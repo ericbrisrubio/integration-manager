@@ -117,15 +117,19 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 	if companyId == "" {
 		return common.GenerateErrorResponse(context, "[ERROR] no companyId is provided", "Please provide companyId")
 	}
+	appId := context.QueryParam("appId")
+	if appId == "" {
+		return common.GenerateErrorResponse(context, "[ERROR] no application id is provided", "Please provide application id")
+	}
 	branch := resource.Push.Changes[len(resource.Push.Changes)-1].New.Name
 	repoName := resource.Repository.Name
 	owner := resource.Repository.Workspace.Slug
 	revision := resource.Push.Changes[len(resource.Push.Changes)-1].New.Target.Hash
-	repository := b.repositoryService.GetByCompanyIdAndApplicationUrl(companyId, resource.Repository.Links.HTML.Href)
-	application := b.applicationService.GetByCompanyIdAndRepositoryIdAndUrl(companyId, repository.Id, resource.Repository.Links.HTML.Href)
+	application := b.applicationService.GetById(companyId, appId)
 	if !application.MetaData.IsWebhookEnabled {
 		return common.GenerateForbiddenResponse(context, "[Forbidden]: Webhook is disabled!", "Operation Failed!")
 	}
+	repository := b.repositoryService.GetById(companyId, application.RepositoryId)
 	data, err := b.gitService.GetPipeline(repoName, owner, revision, repository.Token)
 	if err != nil {
 		log.Println("[ERROR]:Failed to trigger pipeline process! ", err.Error())
@@ -152,6 +156,10 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 				}
 				if buildType, ok := data.Steps[i].Params[enums.BUILD_TYPE]; ok {
 					data.Steps[i].Params[enums.BUILD_TYPE] = buildType
+				}
+				if url, ok := data.Steps[i].Params[enums.URL]; ok {
+					data.Steps[i].Params[enums.URL] = url
+					resource.Repository.Links.HTML.Href=url
 				}
 
 			} else if data.Steps[i].Type == enums.DEPLOY {
