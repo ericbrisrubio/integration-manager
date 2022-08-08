@@ -152,6 +152,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 	if !checkingFlag {
 		return common.GenerateErrorResponse(context, "Branch does not exist!", "Operation Failed!")
 	}
+
 	if data != nil {
 		stepsCount := len(data.Steps)
 		for i := 0; i < stepsCount; i++ {
@@ -169,6 +170,10 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 				}
 				if buildType, ok := data.Steps[i].Params[enums.BUILD_TYPE]; ok {
 					data.Steps[i].Params[enums.BUILD_TYPE] = buildType
+				}
+				if url, ok := data.Steps[i].Params[enums.URL]; ok {
+					data.Steps[i].Params[enums.URL] = url
+					resource.Repository.URL=url
 				}
 
 			} else if data.Steps[i].Type == enums.DEPLOY {
@@ -212,6 +217,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		CommitId:        revision,
 	}
 	err = data.Validate()
+
 	subject := v1.Subject{
 		Log:                   "Pipeline triggered",
 		CoreRequestQueryParam: map[string]string{"url": resource.Repository.URL, "revision": revision, "purging": config.PipelinePurging},
