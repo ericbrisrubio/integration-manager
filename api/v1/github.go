@@ -116,6 +116,10 @@ func (g v1GithubApi) GetBranches(context echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param data body v1.GithubWebHookEvent true "GithubWebHookEvent Data"
+// @Param companyId string true "Comapny Id"
+// @Param appId string true "Application Id"
+// @Param appSecret string true "Application Secret"
+// @Param userType string false "User Type"
 // @Success 200 {object} common.ResponseDTO{data=string}
 // @Failure 404 {object} common.ResponseDTO
 // @Router /api/v1/githubs [POST]
@@ -181,7 +185,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 				}
 				if url, ok := data.Steps[i].Params[enums.URL]; ok {
 					data.Steps[i].Params[enums.URL] = url
-					resource.Repository.URL=url
+					resource.Repository.URL = url
 				}
 
 			} else if data.Steps[i].Type == enums.DEPLOY {
