@@ -88,10 +88,29 @@ func (a applicationService) DeleteApplications(repository v1.Repository, apps []
 		application := a.repo.GetByIdAndRepoId(repository.CompanyId, repository.Id, each.MetaData.Id)
 		applications = append(applications, application)
 	}
-	for _, each := range applications {
-		err := a.repo.DeleteApplication(repository.CompanyId, repository.Id, each.MetaData.Id)
-		if err != nil {
-			return err
+	if repository.Type == enums.GITHUB {
+		for _, each := range applications {
+			usernameOrorgName, repoName := v1.GetUsernameAndRepoNameFromGithubRepositoryUrl(each.Url)
+			err := NewGithubService(nil, a.client).DeleteRepositoryWebhookById(usernameOrorgName, repoName, each.Webhook.ID, repository.Token)
+			if err != nil {
+				return err
+			}
+			err = a.repo.DeleteApplication(repository.CompanyId, repository.Id, each.MetaData.Id)
+			if err != nil {
+				return err
+			}
+		}
+	} else if repository.Type == enums.BIT_BUCKET {
+		for _, each := range applications {
+			usernameOrorgName, repoName := v1.GetUsernameAndRepoNameFromBitbucketRepositoryUrl(each.Url)
+			err := NewGithubService(nil, a.client).DeleteRepositoryWebhookById(usernameOrorgName, repoName, each.Webhook.ID, repository.Token)
+			if err != nil {
+				return err
+			}
+			err = a.repo.DeleteApplication(repository.CompanyId, repository.Id, each.MetaData.Id)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
