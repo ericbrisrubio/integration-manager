@@ -148,6 +148,9 @@ const (
 
 	// REPOSITORY_TYPE_PARAM resource repository type
 	REPOSITORY_TYPE_PARAM = PARAMS("repository_type")
+
+	// URL key for url as pipeline step param
+	URL = PARAMS("url")
 )
 
 // VARIABLES pipeline parameters variables
