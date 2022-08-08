@@ -53,7 +53,7 @@ func (g gitlabService) GetDirectoryContents(repositoryName, username, revision, 
 	panic("implement me")
 }
 
-func (g gitlabService) CreateRepositoryWebhook(username, repositoryName, token string, companyId, appId string) (v1.GitWebhook, error) {
+func (g gitlabService) CreateRepositoryWebhook(username, repositoryName, token string, companyId, appId, appSecret string) (v1.GitWebhook, error) {
 	panic("implement me")
 }
 

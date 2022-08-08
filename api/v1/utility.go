@@ -5,6 +5,7 @@ import (
 	"github.com/klovercloud-ci-cd/integration-manager/enums"
 	"log"
 	"strings"
+	"time"
 )
 
 func UrlFormatter(url string) string {
@@ -75,4 +76,14 @@ func getUsernameAndRepoNameFromBitbucketRepositoryUrl(url string) (username stri
 	repositoryName := urlArray[len(urlArray)-1]
 	usernameOrorgName := urlArray[len(urlArray)-2]
 	return usernameOrorgName, repositoryName
+}
+
+func IsAppSecretValid(app v1.Application, secret string) bool {
+	if secret != app.Secret {
+		return false
+	} else if app.SecretValidUntil.Before(time.Now().UTC()) {
+		return false
+	} else {
+		return true
+	}
 }

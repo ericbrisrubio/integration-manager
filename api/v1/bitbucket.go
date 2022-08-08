@@ -104,6 +104,10 @@ func (b v1BitbucketApi) GetBranches(context echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param data body v1.BitbucketWebHookEvent true "GithubWebHookEvent Data"
+// @Param companyId string true "Comapny Id"
+// @Param appId string true "Application Id"
+// @Param appSecret string true "Application Secret"
+// @Param userType string false "User Type"
 // @Success 200 {object} common.ResponseDTO{data=string}
 // @Failure 404 {object} common.ResponseDTO
 // @Router /api/v1/bitbuckets [POST]
@@ -121,11 +125,19 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 	if appId == "" {
 		return common.GenerateErrorResponse(context, "[ERROR] no application id is provided", "Please provide application id")
 	}
+	application := b.applicationService.GetById(companyId, appId)
+	appSecret := context.QueryParam("appSecret")
+	userType := context.QueryParam("userType")
+	if userType == enums.USER_TYPE {
+		isValid := IsAppSecretValid(application, appSecret)
+		if !isValid {
+			return common.GenerateErrorResponse(context, "Application Secret is not valid", "Failed to trigger pipeline process!")
+		}
+	}
 	branch := resource.Push.Changes[len(resource.Push.Changes)-1].New.Name
 	repoName := resource.Repository.Name
 	owner := resource.Repository.Workspace.Slug
 	revision := resource.Push.Changes[len(resource.Push.Changes)-1].New.Target.Hash
-	application := b.applicationService.GetById(companyId, appId)
 	if !application.MetaData.IsWebhookEnabled {
 		return common.GenerateForbiddenResponse(context, "[Forbidden]: Webhook is disabled!", "Operation Failed!")
 	}
@@ -159,7 +171,7 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 				}
 				if url, ok := data.Steps[i].Params[enums.URL]; ok {
 					data.Steps[i].Params[enums.URL] = url
-					resource.Repository.Links.HTML.Href=url
+					resource.Repository.Links.HTML.Href = url
 				}
 
 			} else if data.Steps[i].Type == enums.DEPLOY {

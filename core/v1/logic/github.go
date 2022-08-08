@@ -143,7 +143,7 @@ func (githubService githubService) DeleteRepositoryWebhookById(username, reposit
 	return nil
 }
 
-func (githubService githubService) CreateRepositoryWebhook(username, repositoryName, token string, companyId, appId string) (v1.GitWebhook, error) {
+func (githubService githubService) CreateRepositoryWebhook(username, repositoryName, token string, companyId, appId, appSecret string) (v1.GitWebhook, error) {
 	url := enums.GITHUB_API_BASE_URL + "repos/" + username + "/" + repositoryName + "/hooks"
 	header := make(map[string]string)
 	header["Authorization"] = "token " + token
@@ -154,7 +154,7 @@ func (githubService githubService) CreateRepositoryWebhook(username, repositoryN
 			URL         string `json:"url"`
 			ContentType string `json:"content_type"`
 		}{
-			URL:         config.GithubWebhookConsumingUrl + "?companyId=" + companyId + "&appId=" + appId,
+			URL:         config.GithubWebhookConsumingUrl + "?companyId=" + companyId + "&appId=" + appId + "&appSecret=" + appSecret,
 			ContentType: "json",
 		},
 		Events: []enums.GITHUB_EVENT{enums.GITHUB_PUSH_EVENT, enums.GITHUB_DELETE_EVENT, enums.GITHUB_RELEASE_EVENT},

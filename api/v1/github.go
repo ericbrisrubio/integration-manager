@@ -116,6 +116,10 @@ func (g v1GithubApi) GetBranches(context echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param data body v1.GithubWebHookEvent true "GithubWebHookEvent Data"
+// @Param companyId string true "Comapny Id"
+// @Param appId string true "Application Id"
+// @Param appSecret string true "Application Secret"
+// @Param userType string false "User Type"
 // @Success 200 {object} common.ResponseDTO{data=string}
 // @Failure 404 {object} common.ResponseDTO
 // @Router /api/v1/githubs [POST]
@@ -134,13 +138,21 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 	if appId == "" {
 		return common.GenerateErrorResponse(context, "[ERROR] no application id is provided", "Please provide application id")
 	}
-	repoName := resource.Repository.Name
-	owner := resource.Repository.Owner.Login
-	revision := resource.After
 	application := g.applicationService.GetById(companyId, appId)
+	appSecret := context.QueryParam("appSecret")
+	userType := context.QueryParam("userType")
+	if userType == enums.USER_TYPE {
+		isValid := IsAppSecretValid(application, appSecret)
+		if !isValid {
+			return common.GenerateErrorResponse(context, "Application Secret is not valid", "Failed to trigger pipeline process!")
+		}
+	}
 	if !application.MetaData.IsWebhookEnabled {
 		return common.GenerateForbiddenResponse(context, "[Forbidden]: Webhook is disabled!", "Operation Failed!")
 	}
+	repoName := resource.Repository.Name
+	owner := resource.Repository.Owner.Login
+	revision := resource.After
 	repository := g.repositoryService.GetById(companyId, application.RepositoryId)
 	data, err := g.gitService.GetPipeline(repoName, owner, revision, repository.Token)
 	if err != nil {
@@ -173,7 +185,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 				}
 				if url, ok := data.Steps[i].Params[enums.URL]; ok {
 					data.Steps[i].Params[enums.URL] = url
-					resource.Repository.URL=url
+					resource.Repository.URL = url
 				}
 
 			} else if data.Steps[i].Type == enums.DEPLOY {
