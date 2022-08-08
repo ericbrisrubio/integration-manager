@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"crypto/rand"
+	"fmt"
 	uuid "github.com/google/uuid"
 	"github.com/klovercloud-ci-cd/integration-manager/api/common"
 	"github.com/klovercloud-ci-cd/integration-manager/config"
@@ -12,6 +14,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type companyApi struct {
@@ -99,6 +102,7 @@ func (c companyApi) UpdateRepositories(context echo.Context) error {
 // @Param id path string true "Company id"
 // @Param repoId path string true "Repository id"
 // @Param companyUpdateOption query string true "Company Update Option"
+// @Param validTill query string false "secret validity date in UTC"
 // @Success 200 {object} common.ResponseDTO
 // @Router /api/v1/companies/{id}/repositories/{repoId}/applications [PUT]
 func (c companyApi) UpdateApplications(context echo.Context) error {
@@ -118,6 +122,8 @@ func (c companyApi) UpdateApplications(context echo.Context) error {
 	if repository.Id == "" {
 		return common.GenerateErrorResponse(context, "[ERROR] Repository does not exist", "Operation failed")
 	}
+	validity := context.QueryParam("validTill")
+
 	updateOption := context.QueryParam("companyUpdateOption")
 	var options v1.ApplicationUpdateOption
 	options.Option = enums.APPLICATION_UPDATE_OPTION(updateOption)
@@ -139,6 +145,8 @@ func (c companyApi) UpdateApplications(context echo.Context) error {
 			payload[i].CompanyId = id
 			payload[i].RepositoryId = repoId
 			payload[i].RepositoryType = repository.Type
+			payload[i].Secret = generateAppSecret(20)
+			payload[i].SecretValidUntil = convertDatetoDateTime(validity)
 		}
 	}
 	err := c.applicationService.UpdateApplications(repository, payload, options)
@@ -147,6 +155,33 @@ func (c companyApi) UpdateApplications(context echo.Context) error {
 	}
 	return common.GenerateSuccessResponse(context, formData,
 		nil, "Operation Successful")
+}
+func convertDatetoDateTime(date string) time.Time {
+	layout := "2006-1-2"
+	d, err := time.Parse(layout, date)
+	if err != nil {
+		log.Println("invalid date format")
+		return time.Now().UTC().AddDate(32, 0, 0)
+	}
+	dateTime, err := time.Parse(time.RFC3339, d.Format(time.RFC3339))
+	if err != nil {
+		log.Println("invalid date format")
+		return time.Now().UTC().AddDate(32, 0, 0)
+	}
+	isPast := dateTime.Before(time.Now().UTC())
+	if isPast {
+		dateTime.AddDate(32, 0, 0)
+	}
+	return dateTime
+}
+
+func generateAppSecret(num int) string {
+	bytes := make([]byte, num)
+	if _, err := rand.Read(bytes); err != nil {
+		panic(err)
+	}
+	formattedSec := fmt.Sprintf("%X", bytes)
+	return formattedSec
 }
 
 // Get... Get companies

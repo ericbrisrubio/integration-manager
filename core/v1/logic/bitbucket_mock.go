@@ -294,7 +294,7 @@ func (b bitbucketMockService) GetDirectoryContents(repositoryName, username, rev
 	return gitDirectoryContents, nil
 }
 
-func (b bitbucketMockService) CreateRepositoryWebhook(username, repositoryName, token string, companyId, appId string) (v1.GitWebhook, error) {
+func (b bitbucketMockService) CreateRepositoryWebhook(username, repositoryName, token string, companyId, appId, appSecret string) (v1.GitWebhook, error) {
 	//TODO implement me
 	panic("implement me")
 }

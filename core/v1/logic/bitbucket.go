@@ -219,7 +219,7 @@ func (b bitbucketService) GetDirectoryContents(repositoryName, username, revisio
 	return gitDirectoryContents, nil
 }
 
-func (b bitbucketService) CreateRepositoryWebhook(username, repositoryName, token, companyId, appId string) (v1.GitWebhook, error) {
+func (b bitbucketService) CreateRepositoryWebhook(username, repositoryName, token, companyId, appId, appSecret string) (v1.GitWebhook, error) {
 	base64ConvertedToken := base64.StdEncoding.EncodeToString([]byte(username + ":" + token))
 	url := enums.BITBUCKET_API_BASE_URL + "repositories/" + username + "/" + repositoryName + "/hooks"
 	header := make(map[string]string)
@@ -228,7 +228,7 @@ func (b bitbucketService) CreateRepositoryWebhook(username, repositoryName, toke
 
 	body := v1.BitbucketCreateWebhookRequest{
 		Description: "Bitbucket webhook",
-		URL:         config.BitbucketWebhookConsumingUrl + "?companyId=" + companyId + "&appId=" + appId,
+		URL:         config.BitbucketWebhookConsumingUrl + "?companyId=" + companyId + "&appId=" + appId + "&appSecret=" + appSecret,
 		Active:      true,
 		Events:      []string{"repo:" + string(enums.BITBUCKET_PUSH_EVENT)},
 	}

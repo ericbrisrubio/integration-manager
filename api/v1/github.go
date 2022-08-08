@@ -134,13 +134,21 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 	if appId == "" {
 		return common.GenerateErrorResponse(context, "[ERROR] no application id is provided", "Please provide application id")
 	}
-	repoName := resource.Repository.Name
-	owner := resource.Repository.Owner.Login
-	revision := resource.After
 	application := g.applicationService.GetById(companyId, appId)
+	appSecret := context.QueryParam("appSecret")
+	userType := context.QueryParam("userType")
+	if userType == enums.USER_TYPE {
+		isValid := IsAppSecretValid(application, appSecret)
+		if !isValid {
+			return common.GenerateErrorResponse(context, "Application Secret is not valid", "Failed to trigger pipeline process!")
+		}
+	}
 	if !application.MetaData.IsWebhookEnabled {
 		return common.GenerateForbiddenResponse(context, "[Forbidden]: Webhook is disabled!", "Operation Failed!")
 	}
+	repoName := resource.Repository.Name
+	owner := resource.Repository.Owner.Login
+	revision := resource.After
 	repository := g.repositoryService.GetById(companyId, application.RepositoryId)
 	data, err := g.gitService.GetPipeline(repoName, owner, revision, repository.Token)
 	if err != nil {

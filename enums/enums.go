@@ -19,6 +19,9 @@ const (
 	INMEMORY = "INMEMORY"
 )
 
+//USER_TYPE user type[api call from user or others]
+const USER_TYPE = "client"
+
 // REPOSITORY_TYPE repository types[may be any git]
 type REPOSITORY_TYPE string
 
@@ -132,7 +135,7 @@ const (
 	REVISION = PARAMS("revision")
 
 	// ALLOWED_BRANCHES allowed branches for this pipeline
-	ALLOWED_BRANCHES= PARAMS("allowed_branches")
+	ALLOWED_BRANCHES = PARAMS("allowed_branches")
 
 	// IMAGE resource image key for  pipeline step param
 	IMAGE = PARAMS("images")
@@ -153,10 +156,9 @@ const (
 // VARIABLES pipeline parameters variables
 type VARIABLES string
 
-const  (
-    BRANCH= VARIABLES("$BRANCH")
+const (
+	BRANCH = VARIABLES("$BRANCH")
 )
-
 
 type ACCESS_MODE string
 
