@@ -185,7 +185,8 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 				}
 				if url, ok := data.Steps[i].Params[enums.URL]; ok {
 					data.Steps[i].Params[enums.URL] = url
-					resource.Repository.URL = url
+				}else{
+					data.Steps[i].Params[enums.URL]=resource.Repository.URL
 				}
 
 			} else if data.Steps[i].Type == enums.DEPLOY {
