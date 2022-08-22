@@ -171,7 +171,8 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 				}
 				if url, ok := data.Steps[i].Params[enums.URL]; ok {
 					data.Steps[i].Params[enums.URL] = url
-					resource.Repository.Links.HTML.Href = url
+				}else{
+					data.Steps[i].Params[enums.URL]=resource.Repository.Links.HTML.Href
 				}
 
 			} else if data.Steps[i].Type == enums.DEPLOY {
