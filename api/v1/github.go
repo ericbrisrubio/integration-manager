@@ -141,7 +141,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 	application := g.applicationService.GetById(companyId, appId)
 	appSecret := context.QueryParam("appSecret")
 	userType := context.QueryParam("userType")
-	if userType == enums.USER_TYPE {
+	if userType == string(enums.CLIENT) {
 		isValid := IsAppSecretValid(application, appSecret)
 		if !isValid {
 			return common.GenerateErrorResponse(context, "Application Secret is not valid", "Failed to trigger pipeline process!")

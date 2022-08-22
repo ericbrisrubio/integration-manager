@@ -19,9 +19,14 @@ const (
 	INMEMORY = "INMEMORY"
 )
 
-//USER_TYPE user type[api call from user or others]
-const USER_TYPE = "client"
-
+//USER_TYPE user type[api call from user or clients like github]
+type USER_TYPE  string
+const (
+	// CLIENT client as user
+	CLIENT = USER_TYPE("client")
+	// REGULAR regular user as user
+	REGULAR = USER_TYPE("regular")
+)
 // REPOSITORY_TYPE repository types[may be any git]
 type REPOSITORY_TYPE string
 
