@@ -183,10 +183,11 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 				if buildType, ok := data.Steps[i].Params[enums.BUILD_TYPE]; ok {
 					data.Steps[i].Params[enums.BUILD_TYPE] = buildType
 				}
-				if url, ok := data.Steps[i].Params[enums.URL]; ok {
-					data.Steps[i].Params[enums.URL] = url
-				}else{
-					data.Steps[i].Params[enums.URL]=resource.Repository.URL
+				if _, ok := data.Steps[i].Params[enums.URL]; !ok {
+					data.Steps[i].Params[enums.URL] = resource.Repository.URL
+					if _, ok := data.Steps[i].Params[enums.REVISION]; !ok {
+						data.Steps[i].Params[enums.REVISION] = revision
+					}
 				}
 
 			} else if data.Steps[i].Type == enums.DEPLOY {
