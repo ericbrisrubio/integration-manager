@@ -229,6 +229,7 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		CompanyId:       companyId,
 		CompanyMetadata: company.MetaData,
 		CommitId:        revision,
+		AllowedBranches: data.MetaData.AllowedBranches,
 	}
 	err = data.Validate()
 
