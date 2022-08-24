@@ -23,39 +23,29 @@ func UrlFormatter(url string) string {
 
 }
 
-// branchExists returns boolean for branch existence
-func BranchExists(steps []v1.Step, resourceRef string, gitType enums.REPOSITORY_TYPE) bool {
+// BranchExists returns boolean for branch existence
+func BranchExists(allowedBranches []string, resourceRef string, gitType enums.REPOSITORY_TYPE) bool {
 	if gitType == enums.GITHUB {
-		for _, step := range steps {
-			if step.Type == enums.BUILD && step.Params[enums.ALLOWED_BRANCHES] != "" {
-				branch := strings.Split(resourceRef, "/")[2]
-				branches := strings.Split(step.Params[enums.ALLOWED_BRANCHES], ",")
-				for _, each := range branches {
-					if branch == each {
-						return true
-					}
-				}
-				log.Println("[Forbidden]: Branch wasn't matched!")
-				return false
+		branch := strings.Split(resourceRef, "/")[2]
+		for _, each := range allowedBranches {
+			if branch == each {
+				return true
 			}
 		}
-		return true
-	} else {
-		for _, step := range steps {
-			if step.Type == enums.BUILD && step.Params[enums.ALLOWED_BRANCHES] != "" {
-				branches := strings.Split(step.Params[enums.ALLOWED_BRANCHES], ",")
-				for _, each := range branches {
-					if resourceRef == each {
-						return true
-					}
-				}
-				log.Println("[Forbidden]: Branch wasn't matched!")
-				return false
+		log.Println("[Forbidden]: Branch wasn't matched!")
+		return false
+	} else if gitType == enums.BIT_BUCKET {
+		for _, each := range allowedBranches {
+			if resourceRef == each {
+				return true
 			}
 		}
-		return true
+		log.Println("[Forbidden]: Branch wasn't matched!")
+		return false
 	}
+	return false
 }
+
 func getUsernameAndRepoNameFromGithubRepositoryUrl(url string) (username string, repoName string) {
 	trim := strings.TrimSuffix(url, ".git")
 	urlArray := strings.Split(trim, "/")

@@ -159,8 +159,8 @@ func (g v1GithubApi) ListenEvent(context echo.Context) error {
 		log.Println("[ERROR]:Failed to trigger pipeline process! ", err.Error())
 		return common.GenerateErrorResponse(context, err.Error(), "Failed to trigger pipeline process!")
 	}
-
-	checkingFlag := BranchExists(data.Steps, resource.Ref, "GITHUB")
+	allowedBranches := strings.Split(data.MetaData.AllowedBranches, ",")
+	checkingFlag := BranchExists(allowedBranches, resource.Ref, enums.GITHUB)
 	if !checkingFlag {
 		return common.GenerateErrorResponse(context, "Branch does not exist!", "Operation Failed!")
 	}

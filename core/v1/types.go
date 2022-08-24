@@ -74,4 +74,5 @@ type PipelineMetadata struct {
 	CompanyId       string          `json:"company_id" yaml:"company_id"`
 	CompanyMetadata CompanyMetadata `json:"company_metadata" yaml:"company_metadata"`
 	CommitId        string          `json:"commit_id" yaml:"commit_id"`
+	AllowedBranches string          `json:"allowed_branches" bson:"allowed_branches"`
 }

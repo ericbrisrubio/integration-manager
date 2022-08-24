@@ -147,7 +147,8 @@ func (b v1BitbucketApi) ListenEvent(context echo.Context) error {
 		log.Println("[ERROR]:Failed to trigger pipeline process! ", err.Error())
 		return common.GenerateErrorResponse(context, err.Error(), "Failed to trigger pipeline process!")
 	}
-	checkingFlag := BranchExists(data.Steps, resource.Push.Changes[len(resource.Push.Changes)-1].New.Name, "BIT_BUCKET")
+	allowedBranches := strings.Split(data.MetaData.AllowedBranches, ",")
+	checkingFlag := BranchExists(allowedBranches, resource.Push.Changes[len(resource.Push.Changes)-1].New.Name, enums.BIT_BUCKET)
 	if !checkingFlag {
 		return common.GenerateErrorResponse(context, "Branch does not exist!", "Operation Failed!")
 	}
